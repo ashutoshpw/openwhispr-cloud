@@ -9,7 +9,7 @@ import './globals.css'
 
 
 export const metadata: Metadata = {
-  title: 'Nextjs 14 Starter Template',
+  title: 'Nextjs 16 Starter Template',
   description: 'Build your next SAAS product',
 }
 
