@@ -1,3 +1,4 @@
+"use client"
 import {
     Avatar,
     AvatarFallback,
@@ -13,7 +14,7 @@ import {
     DropdownMenuShortcut,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import { SignOutButton, useUser } from "@clerk/nextjs"
+import { useSession, signOut } from "@/lib/auth-client"
 import {
     CreditCard,
     LogOut,
@@ -21,16 +22,24 @@ import {
     User
 } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 export function Profile() {
-    const { isSignedIn, user, isLoaded } = useUser();
+    const { data: session } = useSession();
+    const router = useRouter();
+
+    const handleSignOut = async () => {
+        await signOut();
+        router.push("/");
+        router.refresh();
+    };
 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild className="w-[2.25rem] h-[2.25rem]">
                 <Avatar >
-                    <AvatarImage src={user?.imageUrl} alt="User Profile" />
-                    <AvatarFallback></AvatarFallback>
+                    <AvatarImage src={session?.user?.image || ""} alt="User Profile" />
+                    <AvatarFallback>{session?.user?.name?.[0]?.toUpperCase() || "U"}</AvatarFallback>
                 </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56">
@@ -50,13 +59,11 @@ export function Profile() {
                         <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
-                <SignOutButton>
-                    <DropdownMenuItem>
-                        <LogOut className="mr-2 h-4 w-4" />
-                        <span>Log out</span>
-                        <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                </SignOutButton>
+                <DropdownMenuItem onClick={handleSignOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                    <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+                </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     )

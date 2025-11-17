@@ -1,10 +1,17 @@
 "use client"
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useUser } from '@clerk/nextjs'
+import { useSession } from '@/lib/auth-client'
+import { redirect } from 'next/navigation'
 
 export default function Settings() {
-  const user = useUser()
+  const { data: session } = useSession()
+
+  if (!session?.user) {
+    redirect('/sign-in')
+  }
+
+  const user = session.user
 
   return (
     <div className='flex justify-start items-center flex-wrap px-4 pt-5 gap-4'>
@@ -14,18 +21,20 @@ export default function Settings() {
         </h2>
         <div className='flex w-full gap-3 mt-3'>
           <div className='flex flex-col gap-3 w-full'>
-            <Label>First Name</Label>
-            <Input disabled defaultValue={user?.user?.firstName ? user?.user?.firstName : ""} />
-          </div>
-          <div className='flex flex-col gap-3 w-full'>
-            <Label>Last Name</Label>
-            <Input disabled defaultValue={user?.user?.lastName ? user?.user?.lastName : ""} />
+            <Label>Name</Label>
+            <Input disabled defaultValue={user?.name || ""} />
           </div>
         </div>
         <div className='flex flex-col gap-3'>
           <div className='flex flex-col gap-3'>
             <Label>E-mail</Label>
-            <Input disabled defaultValue={user?.user?.emailAddresses?.[0]?.emailAddress!} />
+            <Input disabled defaultValue={user?.email || ""} />
+          </div>
+        </div>
+        <div className='flex flex-col gap-3'>
+          <div className='flex flex-col gap-3'>
+            <Label>Email Verified</Label>
+            <Input disabled defaultValue={user?.emailVerified ? "Yes" : "No"} />
           </div>
         </div>
       </div>

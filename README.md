@@ -9,7 +9,7 @@ A modern, production-ready Next.js 16 starter template for building full-stack w
 ## ✨ Features
 
 - 🚀 **Next.js 16** with App Router for optimal performance
-- 🔐 **Authentication** powered by Clerk - Sign up, sign in, and user management
+- 🔐 **Authentication** powered by BetterAuth - Self-hosted, TypeScript-first auth solution
 - 💾 **Database** with PostgreSQL and Drizzle ORM for type-safe queries
 - 🎨 **Beautiful UI** with Shadcn UI, TailwindCSS, and multiple component libraries
 - 📝 **Forms** with React Hook Form and Zod validation
@@ -27,7 +27,7 @@ A modern, production-ready Next.js 16 starter template for building full-stack w
 | Language | TypeScript (strict mode) |
 | Styling | TailwindCSS |
 | UI Components | Shadcn UI, Radix UI, Tremor, Magic UI |
-| Authentication | Clerk |
+| Authentication | BetterAuth |
 | Database | PostgreSQL |
 | ORM | Drizzle ORM |
 | Forms | React Hook Form + Zod |
@@ -43,7 +43,7 @@ A modern, production-ready Next.js 16 starter template for building full-stack w
 
 - Node.js 18+ and npm
 - PostgreSQL database (local or remote)
-- Clerk account for authentication ([sign up here](https://clerk.com))
+- BetterAuth for authentication (self-hosted, no external account needed)
 
 ### Quick Start with Docker (Recommended)
 
@@ -59,7 +59,7 @@ The fastest way to get started is using Docker Compose, which sets up everything
    ```bash
    cp .env.example .env.local
    ```
-   Edit `.env.local` and add your Clerk credentials (see [Environment Variables](#-environment-variables) section)
+   Edit `.env.local` and add your BetterAuth credentials (see [Environment Variables](#-environment-variables) section)
 
 3. **Start with Docker Compose**
    ```bash
@@ -162,18 +162,19 @@ This opens a web interface at http://localhost:4983
 
 Create a `.env.local` file with the following variables:
 
-### Required - Clerk Authentication
+### Required - BetterAuth Authentication
 
-Sign up at [Clerk.com](https://clerk.com) to get these credentials:
+Generate a secure secret key and configure BetterAuth:
+
+```bash
+# Generate a secure secret (run this command)
+openssl rand -base64 32
+```
 
 ```env
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
-CLERK_SECRET_KEY=sk_test_...
-NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
-NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
-NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/
-NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/
-WEBHOOK_SECRET=whsec_...
+BETTER_AUTH_SECRET=<your-generated-secret>
+BETTER_AUTH_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
 ### Required - Database
@@ -319,7 +320,7 @@ npm run build
 
 - **Next.js**: https://nextjs.org/docs
 - **Drizzle ORM**: https://orm.drizzle.team/docs
-- **Clerk Auth**: https://clerk.com/docs
+- **BetterAuth**: https://www.better-auth.com/docs
 - **Shadcn UI**: https://ui.shadcn.com
 - **TailwindCSS**: https://tailwindcss.com/docs
 - **React Hook Form**: https://react-hook-form.com
@@ -334,7 +335,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 - Built with [Next.js](https://nextjs.org/)
 - UI components from [Shadcn UI](https://ui.shadcn.com)
-- Authentication by [Clerk](https://clerk.com)
+- Authentication by [BetterAuth](https://www.better-auth.com)
 - Database management with [Drizzle ORM](https://orm.drizzle.team)
 
 ## 💬 Support
