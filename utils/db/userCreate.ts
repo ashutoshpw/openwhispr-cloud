@@ -1,6 +1,6 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
 import { z } from "zod";
+import { db } from "@/lib/db";
+import { user } from "@/lib/db/schema";
 
 const userCreateSchema = z.object({
   email: z
@@ -34,29 +34,23 @@ export const userCreate = async ({
   profile_image_url,
   user_id,
 }: userCreateProps) => {
-  const supabase = createServerComponentClient({ cookies });
-
   try {
-    const { data, error } = await supabase
-      .from("User")
-      .insert([
-        {
-          email,
-          first_name,
-          last_name,
-          profile_image_url,
-          user_id,
-        },
-      ])
-      .select();
+    const data = await db()
+      .insert(user)
+      .values({
+        email,
+        first_name,
+        last_name,
+        profile_image_url,
+        user_id,
+      })
+      .returning();
 
     console.log("data", data);
-    console.log("error", error);
-
-    if (error?.code) return error;
 
     return data;
   } catch (error: any) {
+    console.error("error", error);
     throw new Error(error.message);
   }
 };

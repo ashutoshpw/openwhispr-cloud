@@ -38,15 +38,15 @@ const ProjectsData = [
   },
   {
     id: 6,
-    name: 'Postgres (Supabase)',
-    description: 'PostgreSQL-based open-source database with Supabase for building scalable applications.',
-    image: '/supabase.png',
+    name: 'PostgreSQL',
+    description: 'Powerful, open-source relational database system with strong reliability and performance.',
+    image: '/postgres.png', // Note: Add postgres.png to public directory
   },
   {
     id: 7,
-    name: 'Prisma ORM',
-    description: 'Modern database toolkit for TypeScript and Node.js, simplifying database interactions.',
-    image: '/prisma.png',
+    name: 'Drizzle ORM',
+    description: 'Modern TypeScript ORM for SQL databases with excellent type safety and performance.',
+    image: '/drizzle.png', // Note: Add drizzle.png to public directory
   },
   {
     id: 8,

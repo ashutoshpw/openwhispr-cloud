@@ -1,6 +1,7 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
 import { z } from "zod";
+import { db } from "@/lib/db";
+import { user } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 const userUpdateSchema = z.object({
   email: z
@@ -33,27 +34,22 @@ export const userUpdate = async ({
   profile_image_url,
   user_id,
 }: userUpdateProps) => {
-  const supabase = createServerComponentClient({ cookies });
-
   try {
-    const { data, error } = await supabase
-      .from("User")
-      .update([
-        {
-          email,
-          first_name,
-          last_name,
-          profile_image_url,
-          user_id,
-        },
-      ])
-      .eq("email", email)
-      .select();
+    const data = await db()
+      .update(user)
+      .set({
+        email,
+        first_name,
+        last_name,
+        profile_image_url,
+        user_id,
+      })
+      .where(eq(user.email, email))
+      .returning();
 
-    if (data) return data;
-
-    if (error) return error;
+    return data;
   } catch (error: any) {
+    console.error("error", error);
     throw new Error(error.message);
   }
 };
