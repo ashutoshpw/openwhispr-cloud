@@ -50,9 +50,9 @@ const ProjectsData = [
   },
   {
     id: 8,
-    name: 'Clerk Authentication',
-    description: 'Seamless and secure authentication service for web applications.',
-    image: '/clerk.png',
+    name: 'BetterAuth',
+    description: 'Modern, self-hosted authentication framework for TypeScript with excellent security.',
+    image: '/better-auth.png',
   },
   {
     id: 9,
