@@ -15,7 +15,7 @@ export const registerPayment = async (
   currency: string
 ) => {
   try {
-    const data = await db
+    const data = await db()
       .insert(payments)
       .values({
         email,

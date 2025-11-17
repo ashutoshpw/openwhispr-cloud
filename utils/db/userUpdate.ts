@@ -35,7 +35,7 @@ export const userUpdate = async ({
   user_id,
 }: userUpdateProps) => {
   try {
-    const data = await db
+    const data = await db()
       .update(user)
       .set({
         email,

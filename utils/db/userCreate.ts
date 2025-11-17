@@ -35,7 +35,7 @@ export const userCreate = async ({
   user_id,
 }: userCreateProps) => {
   try {
-    const data = await db
+    const data = await db()
       .insert(user)
       .values({
         email,

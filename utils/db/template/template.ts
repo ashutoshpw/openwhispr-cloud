@@ -1,17 +1,14 @@
 "use server";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { db } from "@/lib/db";
+import { user } from "@/lib/db/schema";
 
 export const template = async () => {
-  const supabase = createServerComponentClient({ cookies });
-
   try {
-    let { data: user, error } = await supabase.from("User").select("*");
+    const users = await db().select().from(user);
 
-    if (user) return user;
-
-    if (error) return error;
+    return users;
   } catch (error: any) {
+    console.error("Error fetching users:", error);
     throw new Error(error.message);
   }
 };

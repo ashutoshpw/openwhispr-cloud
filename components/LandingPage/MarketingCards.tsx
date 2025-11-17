@@ -38,9 +38,9 @@ const ProjectsData = [
   },
   {
     id: 6,
-    name: 'Postgres (Supabase)',
-    description: 'PostgreSQL-based open-source database with Supabase for building scalable applications.',
-    image: '/supabase.png',
+    name: 'PostgreSQL',
+    description: 'Powerful, open-source relational database system with strong reliability and performance.',
+    image: '/postgres.png',
   },
   {
     id: 7,
