@@ -40,13 +40,13 @@ const ProjectsData = [
     id: 6,
     name: 'PostgreSQL',
     description: 'Powerful, open-source relational database system with strong reliability and performance.',
-    image: '/postgres.png',
+    image: '/postgres.png', // Note: Add postgres.png to public directory
   },
   {
     id: 7,
     name: 'Drizzle ORM',
     description: 'Modern TypeScript ORM for SQL databases with excellent type safety and performance.',
-    image: '/drizzle.png',
+    image: '/drizzle.png', // Note: Add drizzle.png to public directory
   },
   {
     id: 8,

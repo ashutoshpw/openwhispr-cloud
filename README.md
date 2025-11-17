@@ -26,11 +26,11 @@ Redis & Upstash - Rate limit + Caching
 ### Using Docker (Recommended for local development)
 
 1. Clone the repository
-2. Create a `.env.local` file with the required environment variables (see below)
+2. Copy `.env.example` to `.env.local` and fill in the required environment variables
 3. Run the following command to start the application with Docker Compose:
 
 ```bash
-docker-compose up
+docker compose up
 ```
 
 This will start:
@@ -38,6 +38,16 @@ This will start:
 - Next.js application on port 3000
 
 The database schema will be automatically pushed on startup.
+
+To stop the services:
+```bash
+docker compose down
+```
+
+To rebuild after changes:
+```bash
+docker compose up --build
+```
 
 ### Manual Setup
 
@@ -60,10 +70,19 @@ npm run dev
 
 ## Database Commands
 
-- `npm run db:generate` - Generate migration files
-- `npm run db:migrate` - Run migrations
-- `npm run db:push` - Push schema to database (useful for development)
-- `npm run db:studio` - Open Drizzle Studio to view your database
+- `npm run db:generate` - Generate migration files from schema changes
+- `npm run db:migrate` - Run migrations against the database
+- `npm run db:push` - Push schema to database directly (useful for development)
+- `npm run db:studio` - Open Drizzle Studio (a GUI) to view and edit your database
+
+## Migration from Prisma
+
+This project has been migrated from Prisma to Drizzle ORM. If you're coming from an older version:
+
+1. The Prisma schema has been converted to Drizzle schema in `lib/db/schema.ts`
+2. All database operations now use Drizzle instead of Prisma Client or Supabase
+3. The `@prisma/client` and Supabase dependencies have been removed
+4. Use the new Drizzle commands listed above for database management
 
 ## ENV variables needed
 
