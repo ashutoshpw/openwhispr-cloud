@@ -42,7 +42,7 @@ export default function ContactUs() {
             email: ""
         }
     });
-    const form = useRef();
+    const form = useRef<HTMLFormElement>(null);
     const { toast } = useToast()
 
     const onSubmit = async (data: z.infer<typeof ContactUsForm>) => {
@@ -80,7 +80,7 @@ export default function ContactUs() {
                                 Fill out the form below and we&apos;ll get back to you as soon as possible.
                             </p>
                         </div>
-                        <form ref={form as any} onSubmit={handleSubmit(onSubmit)}>
+                        <form ref={form} onSubmit={handleSubmit(onSubmit)}>
                             <div className="space-y-4">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
