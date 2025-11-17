@@ -1,5 +1,5 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { db } from "@/lib/db";
+import { payments } from "@/lib/db/schema";
 
 export const registerPayment = async (
   email: string,
@@ -14,43 +14,33 @@ export const registerPayment = async (
   billing_details: string,
   currency: string
 ) => {
-  const supabase = createServerComponentClient({ cookies });
   try {
-    const { data, error } = await supabase
-      .from("payments")
-      .insert([
-        {
-          email,
-          amount,
-          payment,
-          type,
-          payment_time,
-          payment_date,
-          receipt_email,
-          receipt_url,
-          payment_details,
-          billing_details,
-          currency,
-        },
-      ])
-      .select();
+    const data = await db
+      .insert(payments)
+      .values({
+        email,
+        amount,
+        payment,
+        type,
+        payment_time,
+        payment_date,
+        receipt_email,
+        receipt_url,
+        payment_details,
+        billing_details,
+        currency,
+      })
+      .returning();
 
-    if (data) {
-      return {
-        message: "success",
-        data,
-      };
-    }
-
-    if (Object.keys(error).length > 0) {
-      return {
-        message: "error",
-        error,
-      };
-    }
-
-    return
+    return {
+      message: "success",
+      data,
+    };
   } catch (error) {
-    return error;
+    console.error("Payment registration error:", error);
+    return {
+      message: "error",
+      error,
+    };
   }
 };

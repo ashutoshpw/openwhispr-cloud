@@ -44,9 +44,9 @@ const ProjectsData = [
   },
   {
     id: 7,
-    name: 'Prisma ORM',
-    description: 'Modern database toolkit for TypeScript and Node.js, simplifying database interactions.',
-    image: '/prisma.png',
+    name: 'Drizzle ORM',
+    description: 'Modern TypeScript ORM for SQL databases with excellent type safety and performance.',
+    image: '/drizzle.png',
   },
   {
     id: 8,
