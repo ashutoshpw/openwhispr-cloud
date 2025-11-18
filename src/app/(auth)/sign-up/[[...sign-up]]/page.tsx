@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { authClient } from "@/lib/auth-client";
+import { baseClient } from "@/lib/auth-client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -28,7 +28,7 @@ export default function SignUpPage() {
     setIsLoading(true);
 
     try {
-      await authClient.signUp.email({
+      await baseClient.signUp.email({
         email,
         password,
         name,

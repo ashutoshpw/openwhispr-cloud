@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { authClient } from "@/lib/auth-client";
+import { baseClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -22,7 +22,7 @@ export default function OnboardingPage() {
 
   useEffect(() => {
     const checkSession = async () => {
-      const session = await authClient.getSession();
+      const session = await baseClient.getSession();
       if (!session?.data?.user) {
         router.push("/sign-in");
       }
@@ -35,19 +35,21 @@ export default function OnboardingPage() {
     setIsLoading(true);
 
     try {
-      const orgClient = (authClient as any).organization;
-      if (!orgClient || typeof orgClient.create !== "function") {
-        toast.error("Organization client not available");
-        setIsLoading(false);
-        return;
-      }
-      const result = await orgClient.create({
-        name: workspaceName,
+      const response = await fetch("/api/auth/organization", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: workspaceName,
+        }),
       });
 
-      if (result.error) {
+      const result = await response.json();
+
+      if (!response.ok || result.error) {
         toast.error(
-          result.error.message ||
+          result.error?.message ||
             "Failed to create workspace. Please try again.",
         );
         return;

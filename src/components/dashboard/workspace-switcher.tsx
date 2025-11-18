@@ -9,7 +9,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { authClient } from "@/lib/auth-client";
 import { Building2, ChevronsUpDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -24,13 +23,13 @@ export function WorkspaceSwitcher() {
   useEffect(() => {
     const fetchWorkspaces = async () => {
       try {
-        const orgClient = (authClient as any).organization;
-        if (!orgClient || typeof orgClient.list !== "function") {
-          console.error("Organization client not available");
+        const response = await fetch("/api/auth/organization/list");
+        if (!response.ok) {
+          console.error("Failed to fetch workspaces");
           setIsLoading(false);
           return;
         }
-        const result = await orgClient.list();
+        const result = await response.json();
         if (result?.data) {
           setWorkspaces(result.data);
 
@@ -50,15 +49,23 @@ export function WorkspaceSwitcher() {
 
   const handleSwitchWorkspace = async (workspaceId: string) => {
     try {
-      const orgClient = (authClient as any).organization;
-      if (!orgClient || typeof orgClient.setActive !== "function") {
-        toast.error("Organization client not available");
-        return;
-      }
-      const result = await orgClient.setActive({
-        organizationId: workspaceId,
+      const response = await fetch("/api/auth/organization/set-active", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          organizationId: workspaceId,
+        }),
       });
 
+      if (!response.ok) {
+        const result = await response.json();
+        toast.error(result.error?.message || "Failed to switch workspace");
+        return;
+      }
+
+      const result = await response.json();
       if (result.error) {
         toast.error(result.error.message || "Failed to switch workspace");
         return;
