@@ -40,3 +40,7 @@ next-env.d.ts
 
 # docker
 docker-compose.override.yml
+
+# cursor (override global gitignore)
+!.cursor/
+!.cursor/**
