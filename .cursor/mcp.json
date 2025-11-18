@@ -9,7 +9,7 @@
     },
     "chrome-devtools": {
         "command": "npx",
-        "args": ["-y", "chrome-devtools-mcp@latest"]
+        "args": ["-y", "chrome-devtools-mcp@latest","-w","ws://100.92.18.1:8080/devtools/browser"]
     }
   }
 }
