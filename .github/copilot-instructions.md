@@ -123,6 +123,41 @@ This is a modern, production-ready Next.js 16 starter template designed for buil
 3. Generate BetterAuth secret with `openssl rand -base64 32`
 4. Run `npm install --legacy-peer-deps` to install dependencies
 
+### ⚠️ CRITICAL: Starting the Development Server
+
+**Before running the dev server, you MUST follow this sequence:**
+
+1. **Start the database with Docker Compose** (if not already running):
+   ```bash
+   docker compose up postgres
+   ```
+   Or start all services including the database:
+   ```bash
+   docker compose up -d postgres
+   ```
+
+2. **Sync the database schema**:
+   ```bash
+   npm run db:push
+   ```
+   This pushes the current schema from `lib/db/schema.ts` to the database.
+
+3. **Start the development server**:
+   ```bash
+   npm run dev
+   ```
+
+**Why this order matters:**
+- The Next.js application requires a running PostgreSQL database to function
+- Database schema must be synced before the app starts to avoid runtime errors
+- Skipping these steps will cause connection errors and application failures
+
+**For convenience, you can also use:**
+```bash
+docker compose up
+```
+This starts both the database and the app, and automatically runs `db:push` before starting the dev server (see `docker-compose.yml`).
+
 ### Database Management
 
 - **Push Schema**: `npm run db:push` - Push schema changes to database (development)
@@ -132,10 +167,12 @@ This is a modern, production-ready Next.js 16 starter template designed for buil
 
 ### Running the Application
 
-- **Development**: `npm run dev` - Start dev server on port 3000
+- **Development**: `npm run dev` - Start dev server on port 3000 (⚠️ see "Starting the Development Server" section above for required prerequisites)
 - **Build**: `npm run build` - Create production build
 - **Start**: `npm run start` - Run production build
 - **Lint**: `npm run lint` - Run ESLint
+
+**Important:** Always ensure the database is running and the schema is synced before running `npm run dev`. See the "Starting the Development Server" section above.
 
 ### Docker Development
 
@@ -156,6 +193,10 @@ This is a modern, production-ready Next.js 16 starter template designed for buil
 
 - **Minimal Changes**: Make the smallest changes necessary to solve the problem.
 - **Test Before Committing**: Run `npm run lint` and `npm run build` to catch errors.
+- **Development Environment**: Before testing changes locally:
+  1. Ensure database is running: `docker compose up -d postgres`
+  2. Sync schema if you made database changes: `npm run db:push`
+  3. Start dev server: `npm run dev`
 - **Database Changes**: If schema changes are needed:
   1. Update `lib/db/schema.ts`
   2. Run `npm run db:push` (dev) or `npm run db:generate` (prod)
