@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button'
-import React from 'react'
+import { Button } from "@/components/ui/button";
+import React from "react";
 
 export default function WorkspacesPage() {
   return (
@@ -15,6 +15,6 @@ export default function WorkspacesPage() {
           <Button>Create Workspace</Button>
         </div>
       </div>
-    </main>)
+    </main>
+  );
 }
-

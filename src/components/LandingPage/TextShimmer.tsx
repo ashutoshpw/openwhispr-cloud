@@ -1,6 +1,6 @@
-"use client"
-import { cn } from "@/lib/utils";
+"use client";
 import TextShimmer from "@/components/magicui/animated-shiny-text";
+import { cn } from "@/lib/utils";
 import { ArrowRightIcon } from "@radix-ui/react-icons";
 
 export async function TextShimmerComponent() {

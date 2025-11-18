@@ -1,15 +1,20 @@
-"use client"
+"use client";
 
-import { ModeToggle } from '@/components/ModeToggle'
-import { Profile } from '@/components/Profile'
-import { ReactNode } from 'react'
-import { SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
-import { HamburgerMenuIcon } from '@radix-ui/react-icons'
-import { Dialog, DialogClose } from '@/components/ui/dialog'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Folder, HomeIcon, Settings } from 'lucide-react'
-import { Separator } from '@/components/ui/separator'
+import { ModeToggle } from "@/components/ModeToggle";
+import { Profile } from "@/components/Profile";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogClose } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
+import {
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { HamburgerMenuIcon } from "@radix-ui/react-icons";
+import { Folder, HomeIcon, Settings } from "lucide-react";
+import Link from "next/link";
+import type { ReactNode } from "react";
 
 export default function DashboardTopNav({ children }: { children: ReactNode }) {
   return (
@@ -70,5 +75,5 @@ export default function DashboardTopNav({ children }: { children: ReactNode }) {
       </header>
       {children}
     </div>
-  )
+  );
 }

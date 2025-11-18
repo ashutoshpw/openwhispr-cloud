@@ -5,7 +5,7 @@ async function fetchTemplate() {
   try {
     const response = await template();
 
-    return response
+    return response;
   } catch (error) {
     return error;
   }

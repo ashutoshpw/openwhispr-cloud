@@ -242,7 +242,7 @@ For detailed migration information, see [MIGRATION.md](./MIGRATION.md)
 - **TypeScript**: Strict mode enabled - all code must be fully typed
 - **Components**: Use Server Components by default, add `"use client"` only when needed
 - **Imports**: Use path aliases (`@/`) for cleaner imports
-- **Formatting**: Follow the project's ESLint configuration
+- **Formatting**: Follow the project's Biome configuration
 
 ### Database Operations
 

@@ -9,7 +9,6 @@ import PricingPage from "@/components/LandingPage/Pricing";
 export default function Home() {
   return (
     <PageWrapper>
-
       <div className="mt-[1rem] p-3">
         <HeroSection />
       </div>

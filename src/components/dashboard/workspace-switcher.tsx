@@ -1,9 +1,6 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { ChevronsUpDown, Building2 } from "lucide-react"
-import { authClient } from "@/lib/auth-client"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,66 +8,70 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { toast } from "sonner"
-import { useRouter } from "next/navigation"
+} from "@/components/ui/dropdown-menu";
+import { authClient } from "@/lib/auth-client";
+import { Building2, ChevronsUpDown } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export function WorkspaceSwitcher() {
-  const [workspaces, setWorkspaces] = useState<any[]>([])
-  const [activeWorkspace, setActiveWorkspace] = useState<any>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const router = useRouter()
+  const [workspaces, setWorkspaces] = useState<any[]>([]);
+  const [activeWorkspace, setActiveWorkspace] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchWorkspaces = async () => {
       try {
-        const orgClient = (authClient as any).organization
-        if (!orgClient || typeof orgClient.list !== 'function') {
-          console.error("Organization client not available")
-          setIsLoading(false)
-          return
+        const orgClient = (authClient as any).organization;
+        if (!orgClient || typeof orgClient.list !== "function") {
+          console.error("Organization client not available");
+          setIsLoading(false);
+          return;
         }
-        const result = await orgClient.list()
+        const result = await orgClient.list();
         if (result?.data) {
-          setWorkspaces(result.data)
-          
-          const active = result.data.find((org: any) => org.isActive) || result.data[0]
-          setActiveWorkspace(active)
+          setWorkspaces(result.data);
+
+          const active =
+            result.data.find((org: any) => org.isActive) || result.data[0];
+          setActiveWorkspace(active);
         }
       } catch (error) {
-        console.error("Failed to fetch workspaces:", error)
+        console.error("Failed to fetch workspaces:", error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchWorkspaces()
-  }, [])
+    fetchWorkspaces();
+  }, []);
 
   const handleSwitchWorkspace = async (workspaceId: string) => {
     try {
-      const orgClient = (authClient as any).organization
-      if (!orgClient || typeof orgClient.setActive !== 'function') {
-        toast.error("Organization client not available")
-        return
+      const orgClient = (authClient as any).organization;
+      if (!orgClient || typeof orgClient.setActive !== "function") {
+        toast.error("Organization client not available");
+        return;
       }
       const result = await orgClient.setActive({
         organizationId: workspaceId,
-      })
+      });
 
       if (result.error) {
-        toast.error(result.error.message || "Failed to switch workspace")
-        return
+        toast.error(result.error.message || "Failed to switch workspace");
+        return;
       }
 
-      const workspace = workspaces.find((w) => w.id === workspaceId)
-      setActiveWorkspace(workspace)
-      toast.success("Workspace switched successfully")
-      router.refresh()
+      const workspace = workspaces.find((w) => w.id === workspaceId);
+      setActiveWorkspace(workspace);
+      toast.success("Workspace switched successfully");
+      router.refresh();
     } catch (error: any) {
-      toast.error(error?.message || "Failed to switch workspace")
+      toast.error(error?.message || "Failed to switch workspace");
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -78,7 +79,7 @@ export function WorkspaceSwitcher() {
         <Building2 className="mr-2 h-4 w-4" />
         Loading...
       </Button>
-    )
+    );
   }
 
   if (!activeWorkspace) {
@@ -89,16 +90,13 @@ export function WorkspaceSwitcher() {
           Create Workspace
         </a>
       </Button>
-    )
+    );
   }
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          className="w-full justify-between px-3"
-        >
+        <Button variant="ghost" className="w-full justify-between px-3">
           <div className="flex items-center gap-2">
             <Building2 className="h-4 w-4" />
             <span className="truncate max-w-[150px]">
@@ -130,6 +128,5 @@ export function WorkspaceSwitcher() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }
-

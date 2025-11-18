@@ -7,6 +7,6 @@ const baseClient = createAuthClient({
 
 export const authClient = baseClient.$use(organizationClient());
 
-export const { useSession, signIn, signUp, signOut } = baseClient;
+export const { useSession, signIn, signUp, signOut } = authClient;
 
 export type AuthClient = typeof authClient;

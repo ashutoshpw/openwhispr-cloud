@@ -1,21 +1,20 @@
-import Provider from '@/app/provider'
-import { ThemeProvider } from "@/components/theme-provider"
-import { Toaster } from "@/components/ui/sonner"
-import { Analytics } from "@vercel/analytics/react"
-import type { Metadata } from 'next'
-import { GeistSans } from 'geist/font/sans';
-import './globals.css'
-
+import Provider from "@/app/provider";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
+import { Analytics } from "@vercel/analytics/react";
+import { GeistSans } from "geist/font/sans";
+import type { Metadata } from "next";
+import "./globals.css";
 
 export const metadata: Metadata = {
-  title: 'Nextjs 16 Starter Template',
-  description: 'Build your next SAAS product',
-}
+  title: "Nextjs 16 Starter Template",
+  description: "Build your next SAAS product",
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -27,12 +26,12 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-          {children}
-          <Toaster />
+            {children}
+            <Toaster />
           </ThemeProvider>
         </Provider>
         <Analytics />
       </body>
     </html>
-  )
+  );
 }

@@ -12,7 +12,7 @@ export const registerPayment = async (
   receipt_url: string,
   payment_details: string,
   billing_details: string,
-  currency: string
+  currency: string,
 ) => {
   try {
     const data = await db()

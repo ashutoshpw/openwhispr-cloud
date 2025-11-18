@@ -1,14 +1,12 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { BarChartComponent } from './(components)/BarChart'
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BarChartComponent } from "./(components)/BarChart";
 
 export default async function Dashboard() {
   return (
-    <div className='flex justify-start items-center flex-wrap px-4 pt-4 gap-4'>
-      <Card className='w-[20rem]'>
+    <div className="flex justify-start items-center flex-wrap px-4 pt-4 gap-4">
+      <Card className="w-[20rem]">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">
-            Welcome
-          </CardTitle>
+          <CardTitle className="text-sm font-medium">Welcome</CardTitle>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -38,5 +36,5 @@ export default async function Dashboard() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

@@ -1,6 +1,6 @@
-"use client"
+"use client";
 import { cn } from "@/lib/utils";
-import { CSSProperties, FC, ReactNode } from "react";
+import type { CSSProperties, FC, ReactNode } from "react";
 
 interface AnimatedShinyTextProps {
   children: ReactNode;

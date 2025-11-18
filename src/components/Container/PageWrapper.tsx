@@ -1,8 +1,10 @@
-import React from 'react'
-import { NavBar } from '../NavBar'
-import Footer from '../LandingPage/Footer'
+import type React from "react";
+import Footer from "../LandingPage/Footer";
+import { NavBar } from "../NavBar";
 
-export default function PageWrapper({ children }: { children: React.ReactNode }) {
+export default function PageWrapper({
+  children,
+}: { children: React.ReactNode }) {
   return (
     <>
       <NavBar />
@@ -12,5 +14,5 @@ export default function PageWrapper({ children }: { children: React.ReactNode })
       </main>
       <Footer />
     </>
-  )
+  );
 }

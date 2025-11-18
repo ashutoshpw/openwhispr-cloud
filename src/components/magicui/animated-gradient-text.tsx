@@ -1,6 +1,6 @@
-"use client"
+"use client";
 import { cn } from "@/lib/utils";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 export default function AnimatedGradientText({
   children,
