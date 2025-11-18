@@ -23,7 +23,7 @@ permissions:
   issues: write
 jobs:
   deploy-preview:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     
     env:
       VERCEL_ORG_ID: team_M1i3qUTW4i3A6mETy54E1Fy8
