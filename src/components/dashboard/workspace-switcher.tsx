@@ -30,11 +30,16 @@ export function WorkspaceSwitcher() {
           return;
         }
         const result = await response.json();
-        if (result?.data) {
-          setWorkspaces(result.data);
+        
+        // BetterAuth returns array directly, not wrapped in data property
+        const organizations = Array.isArray(result) ? result : result?.data || [];
+        
+        if (organizations.length > 0) {
+          setWorkspaces(organizations);
 
+          // Set first organization as active if none marked as active
           const active =
-            result.data.find((org: any) => org.isActive) || result.data[0];
+            organizations.find((org: any) => org.isActive) || organizations[0];
           setActiveWorkspace(active);
         }
       } catch (error) {
