@@ -9,7 +9,7 @@ This is a modern, production-ready Next.js 16 starter template designed for buil
 - **Framework**: Next.js 16 with App Router
 - **Language**: TypeScript with strict mode enabled
 - **Styling**: TailwindCSS with Shadcn UI components
-- **Authentication**: Clerk for complete auth solution
+- **Authentication**: BetterAuth (self-hosted, TypeScript-first auth solution)
 - **Database**: PostgreSQL with Drizzle ORM
 - **Forms**: React Hook Form with Zod validation
 - **State Management**: TanStack Query (React Query)
@@ -107,18 +107,21 @@ This is a modern, production-ready Next.js 16 starter template designed for buil
 
 ### Authentication
 
-- **Provider**: Clerk handles all authentication.
+- **Provider**: BetterAuth handles all authentication (self-hosted, TypeScript-first).
+- **Configuration**: Auth configuration is in `lib/auth.ts` and `lib/auth-client.ts`.
 - **Middleware**: Authentication middleware is in `middleware.ts`.
-- **Protected Routes**: Use Clerk's built-in route protection.
-- **User Data**: Access user data via Clerk hooks (`useUser`, `useAuth`).
+- **Protected Routes**: Use BetterAuth's built-in route protection.
+- **User Data**: Access user data via BetterAuth client hooks.
+- **Setup**: Requires `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, and `NEXT_PUBLIC_APP_URL` environment variables.
 
 ## Development Workflow
 
 ### Environment Setup
 
 1. Copy `.env.example` to `.env.local`
-2. Fill in required environment variables (Clerk keys, database URL)
-3. Run `npm install --legacy-peer-deps` to install dependencies
+2. Fill in required environment variables (BetterAuth secret, database URL)
+3. Generate BetterAuth secret with `openssl rand -base64 32`
+4. Run `npm install --legacy-peer-deps` to install dependencies
 
 ### Database Management
 
@@ -216,7 +219,7 @@ export async function GET() {
 - **Environment Variables**: Never commit `.env.local` or expose secrets.
 - **API Routes**: Always validate input and check authentication.
 - **Database Queries**: Use parameterized queries (Drizzle handles this).
-- **Clerk Webhooks**: Verify webhook signatures using `WEBHOOK_SECRET`.
+- **BetterAuth**: Secure the `BETTER_AUTH_SECRET` and never expose it publicly.
 - **Rate Limiting**: Use Upstash rate limiting for public endpoints.
 
 ## Testing Guidelines
@@ -246,7 +249,7 @@ This project was recently migrated from Prisma to Drizzle ORM. See `MIGRATION.md
 
 - **Next.js Docs**: https://nextjs.org/docs
 - **Drizzle Docs**: https://orm.drizzle.team/docs
-- **Clerk Docs**: https://clerk.com/docs
+- **BetterAuth Docs**: https://www.better-auth.com/docs
 - **Shadcn UI**: https://ui.shadcn.com
 - **TailwindCSS**: https://tailwindcss.com/docs
 
