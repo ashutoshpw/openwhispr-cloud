@@ -28,11 +28,16 @@ export default function SignUpPage() {
     setIsLoading(true);
 
     try {
-      await baseClient.signUp.email({
+      const { data, error } = await baseClient.signUp.email({
         email,
         password,
         name,
       });
+
+      if (error) {
+        toast.error(error.message || "Failed to create account. Please try again.");
+        return;
+      }
 
       toast.success("Account created successfully!");
       router.push("/onboarding");

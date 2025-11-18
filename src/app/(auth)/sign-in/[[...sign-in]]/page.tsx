@@ -27,10 +27,15 @@ export default function SignInPage() {
     setIsLoading(true);
 
     try {
-      await baseClient.signIn.email({
+      const { data, error } = await baseClient.signIn.email({
         email,
         password,
       });
+
+      if (error) {
+        toast.error(error.message || "Failed to sign in. Please check your credentials.");
+        return;
+      }
 
       toast.success("Signed in successfully!");
       router.push("/dashboard");
