@@ -28,32 +28,16 @@ export default function SignUpPage() {
     setIsLoading(true);
 
     try {
-      // Use direct fetch API as a workaround for BetterAuth client issue
-      const response = await fetch("/api/auth/sign-up/email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password, name }),
+      await baseClient.signUp.email({
+        email,
+        password,
+        name,
       });
-
-      const result = await response.json();
-
-      console.log("Sign up result:", result);
-
-      if (!response.ok || result.error) {
-        console.error("Sign up error:", result.error);
-        toast.error(
-          result.error?.message || result.message || "Failed to create account. Please try again.",
-        );
-        return;
-      }
 
       toast.success("Account created successfully!");
       router.push("/onboarding");
       router.refresh();
     } catch (error: any) {
-      console.error("Sign up exception:", error);
       toast.error(
         error?.message || "Failed to create account. Please try again.",
       );
