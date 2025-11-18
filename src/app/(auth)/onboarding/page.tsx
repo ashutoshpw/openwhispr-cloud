@@ -35,25 +35,27 @@ export default function OnboardingPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/auth/organization", {
+      const response = await fetch("/api/auth/organization/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           name: workspaceName,
+          slug: workspaceName.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""),
         }),
       });
 
-      const result = await response.json();
-
-      if (!response.ok || result.error) {
+      if (!response.ok) {
+        const result = await response.json();
         toast.error(
           result.error?.message ||
             "Failed to create workspace. Please try again.",
         );
         return;
       }
+
+      const result = await response.json();
 
       toast.success("Workspace created successfully!");
       router.push("/dashboard");
