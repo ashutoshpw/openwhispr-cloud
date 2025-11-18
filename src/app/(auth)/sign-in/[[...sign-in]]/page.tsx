@@ -27,15 +27,32 @@ export default function SignInPage() {
     setIsLoading(true);
 
     try {
-      await baseClient.signIn.email({
-        email,
-        password,
+      // Use direct fetch API as a workaround for BetterAuth client issue
+      const response = await fetch("/api/auth/sign-in/email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
       });
+
+      const result = await response.json();
+
+      console.log("Sign in result:", result);
+
+      if (!response.ok || result.error) {
+        console.error("Sign in error:", result.error);
+        toast.error(
+          result.error?.message || result.message || "Failed to sign in. Please check your credentials.",
+        );
+        return;
+      }
 
       toast.success("Signed in successfully!");
       router.push("/dashboard");
       router.refresh();
     } catch (error: any) {
+      console.error("Sign in exception:", error);
       toast.error(
         error?.message || "Failed to sign in. Please check your credentials.",
       );
