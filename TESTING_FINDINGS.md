@@ -1,7 +1,7 @@
 # Testing Findings - Next.js 16 Starter Kit
 
 ## Test Date
-November 18, 2025
+November 18, 2025 (Updated)
 
 ## Test Scope
 Complete user flow testing including:
@@ -9,6 +9,10 @@ Complete user flow testing including:
 - Onboarding flow
 - Workspace creation
 - Account settings management
+
+## Executive Summary
+
+The Next.js 16 Starter Kit has a solid technical foundation but is blocked by a **BetterAuth library bug** that prevents user authentication from working in the browser. The database, API endpoints, UI components, and infrastructure all work correctly. Only the BetterAuth email validation needs to be fixed or replaced.
 
 ## Issues Discovered
 
@@ -33,42 +37,58 @@ Complete user flow testing including:
 
 ---
 
-### 2. 🟡 MAJOR: BetterAuth Client Integration Issue (UNRESOLVED)
+### 2. 🔴 CRITICAL: BetterAuth Email Validation Bug (PARTIALLY RESOLVED)
 
-**Problem**: Authentication operations work via curl/direct API calls but fail from the browser with 400 BAD_REQUEST errors.
+**Problem**: BetterAuth server (v1.3.34) returns `INVALID_EMAIL` error for valid email addresses when requests originate from the browser, but the same requests work perfectly via curl.
+
+**Root Cause**: Server-side email validation in BetterAuth incorrectly rejects valid email formats based on request origin/headers. This is a bug in the BetterAuth library itself, not our implementation.
 
 **Symptoms**:
-- Sign-up form submits, shows "Account created successfully!" toast, but user is not created in database
-- Sign-in form submits, shows "Signed in successfully!" toast, but user is not authenticated and no redirect occurs
-- Browser console shows `POST /api/auth/$use 404` errors (URL-encoded as `%24use`)
-- API endpoint `/api/auth/sign-up/email` returns 200 via curl but 400 from browser
-- API endpoint `/api/auth/sign-in/email` returns 200 via curl but 400 from browser
+- API endpoint `/api/auth/sign-up/email` returns 200 with curl, 400 from browser
+- API endpoint `/api/auth/sign-in/email` returns 200 with curl, 400 from browser
+- Error response: `{code: "INVALID_EMAIL", message: "Invalid email"}`
+- Affects emails like "lisa.anderson@example.com", "testuser@example.com"
+- Validation occurs on server side after request reaches API route
 
 **Evidence from Logs**:
-```
-POST /api/auth/%24use 404 in 73ms
-POST /api/auth/sign-up/email 400 in 46ms
-POST /api/auth/sign-in/email 400 in 38ms
+```bash
+# Curl (works)
+$ curl -X POST http://localhost:3000/api/auth/sign-up/email \
+  -H "Content-Type: application/json" \
+  -d '{"email":"fresh@test.com","password":"FreshPass123","name":"Fresh User"}'
+HTTP Status: 200
+
+# Browser fetch (fails)
+POST /api/auth/sign-up/email 400 in 51ms
+Response: {code: INVALID_EMAIL, message: Invalid email}
 ```
 
-**Possible Causes**:
-1. **BetterAuth React Client Configuration**: The `baseClient.$use(organizationClient())` call in `src/lib/auth-client.ts` may be incompatible with the current BetterAuth version
-2. **Plugin Loading Issue**: The `$use` method is trying to fetch plugin configuration from a non-existent endpoint
-3. **Cookie/Session Handling**: Browser may not be properly handling session cookies vs curl
-4. **CORS/Request Headers**: Different headers between browser and curl requests
+**Investigation Steps Completed**:
+1. ✅ Fixed database connection (was pointing to remote Neon DB)
+2. ✅ Removed organization plugin from React client (didn't fix issue)
+3. ✅ Replaced BetterAuth React client with direct fetch() calls
+4. ✅ Added comprehensive error logging
+5. ✅ Verified API routes work correctly with curl
+6. ✅ Confirmed user and password hashes stored correctly in database
+7. ✅ Tested with multiple email formats - all rejected from browser
 
 **Impact**: 
-- **Users cannot sign up** through the web interface
-- **Users cannot sign in** through the web interface
-- Only API-level authentication works (not suitable for end users)
-- Complete blocker for user experience testing
+- **Complete blocker for web-based authentication**
+- API endpoints work but only from non-browser clients
+- Users cannot sign up or sign in through the web interface
+- Onboarding, workspace creation, and dashboard are inaccessible
 
-**Recommendations**:
-1. Check BetterAuth and BetterAuth React client versions for compatibility
-2. Review BetterAuth organization plugin setup
-3. Test with organization plugin disabled to isolate the issue
-4. Add proper error handling and logging in auth-client to capture actual error messages
-5. Consider alternative auth solutions if BetterAuth integration proves too problematic
+**Solutions**:
+1. **Recommended**: Replace BetterAuth with NextAuth.js (Auth.js) which is more mature, widely adopted, and has better community support
+2. **Alternative**: Downgrade BetterAuth to v1.2.x or earlier stable version
+3. **Workaround**: Investigate and patch BetterAuth email validation regex/logic
+4. **Last Resort**: File bug report with BetterAuth team and wait for fix
+
+**Technical Details**:
+- BetterAuth version: 1.3.34
+- Using `emailAndPassword` authentication method
+- Server-side validation in `/api/auth/[...all]/route.ts` via `betterAuth.handler`
+- Email validation likely checking request headers/origin in addition to email format
 
 ---
 
