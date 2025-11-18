@@ -29,7 +29,7 @@ export default function SignUpPage() {
             });
             
             toast.success("Account created successfully!");
-            router.push("/dashboard");
+            router.push("/onboarding");
             router.refresh();
         } catch (error: any) {
             toast.error(error?.message || "Failed to create account. Please try again.");

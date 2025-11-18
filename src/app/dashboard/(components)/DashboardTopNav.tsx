@@ -36,10 +36,10 @@ export default function DashboardTopNav({ children }: { children: ReactNode }) {
                 </Link>
               </DialogClose>
               <DialogClose asChild>
-                <Link href="/dashboard/projects">
+                <Link href="/dashboard/workspaces">
                   <Button variant="outline" className="w-full">
                     <Folder className="mr-2 h-4 w-4" />
-                    Projects
+                    Workspaces
                   </Button>
                 </Link>
               </DialogClose>
