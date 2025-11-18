@@ -6,6 +6,7 @@ This is a modern, production-ready Next.js 16 starter template designed for buil
 
 ## Tech Stack
 
+- **Package Manager**: Bun (v1.3+)
 - **Framework**: Next.js 16 with App Router
 - **Language**: TypeScript with strict mode enabled
 - **Styling**: TailwindCSS with Shadcn UI components
@@ -121,7 +122,7 @@ This is a modern, production-ready Next.js 16 starter template designed for buil
 1. Copy `.env.example` to `.env.local`
 2. Fill in required environment variables (BetterAuth secret, database URL)
 3. Generate BetterAuth secret with `openssl rand -base64 32`
-4. Run `npm install --legacy-peer-deps` to install dependencies
+4. Run `bun install` to install dependencies
 
 ### ⚠️ CRITICAL: Starting the Development Server
 
@@ -138,13 +139,13 @@ This is a modern, production-ready Next.js 16 starter template designed for buil
 
 2. **Sync the database schema**:
    ```bash
-   npm run db:push
+   bun run db:push
    ```
    This pushes the current schema from `lib/db/schema.ts` to the database.
 
 3. **Start the development server**:
    ```bash
-   npm run dev
+   bun run dev
    ```
 
 **Why this order matters:**
@@ -160,19 +161,19 @@ This starts both the database and the app, and automatically runs `db:push` befo
 
 ### Database Management
 
-- **Push Schema**: `npm run db:push` - Push schema changes to database (development)
-- **Generate Migrations**: `npm run db:generate` - Generate migration files
-- **Run Migrations**: `npm run db:migrate` - Apply migrations (production)
-- **Database Studio**: `npm run db:studio` - Open Drizzle Studio GUI
+- **Push Schema**: `bun run db:push` - Push schema changes to database (development)
+- **Generate Migrations**: `bun run db:generate` - Generate migration files
+- **Run Migrations**: `bun run db:migrate` - Apply migrations (production)
+- **Database Studio**: `bun run db:studio` - Open Drizzle Studio GUI
 
 ### Running the Application
 
-- **Development**: `npm run dev` - Start dev server on port 3000 (⚠️ see "Starting the Development Server" section above for required prerequisites)
-- **Build**: `npm run build` - Create production build
-- **Start**: `npm run start` - Run production build
-- **Lint**: `npm run lint` - Run ESLint
+- **Development**: `bun run dev` - Start dev server on port 3000 (⚠️ see "Starting the Development Server" section above for required prerequisites)
+- **Build**: `bun run build` - Create production build
+- **Start**: `bun run start` - Run production build
+- **Lint**: `bun run lint` - Run ESLint
 
-**Important:** Always ensure the database is running and the schema is synced before running `npm run dev`. See the "Starting the Development Server" section above.
+**Important:** Always ensure the database is running and the schema is synced before running `bun run dev`. See the "Starting the Development Server" section above.
 
 ### Docker Development
 
@@ -192,14 +193,14 @@ This starts both the database and the app, and automatically runs `db:push` befo
 ### When Implementing Changes
 
 - **Minimal Changes**: Make the smallest changes necessary to solve the problem.
-- **Test Before Committing**: Run `npm run lint` and `npm run build` to catch errors.
+- **Test Before Committing**: Run `bun run lint` and `bun run build` to catch errors.
 - **Development Environment**: Before testing changes locally:
   1. Ensure database is running: `docker compose up -d postgres`
-  2. Sync schema if you made database changes: `npm run db:push`
-  3. Start dev server: `npm run dev`
+  2. Sync schema if you made database changes: `bun run db:push`
+  3. Start dev server: `bun run dev`
 - **Database Changes**: If schema changes are needed:
   1. Update `lib/db/schema.ts`
-  2. Run `npm run db:push` (dev) or `npm run db:generate` (prod)
+  2. Run `bun run db:push` (dev) or `bun run db:generate` (prod)
   3. Update affected queries and types
 - **Component Changes**: Keep components focused and single-purpose.
 - **Type Safety**: Ensure all TypeScript types are correct; no type errors allowed.
@@ -265,8 +266,8 @@ export async function GET() {
 
 ## Testing Guidelines
 
-- **Build Test**: Always run `npm run build` before submitting changes.
-- **Lint Check**: Run `npm run lint` to catch style issues.
+- **Build Test**: Always run `bun run build` before submitting changes.
+- **Lint Check**: Run `bun run lint` to catch style issues.
 - **Manual Testing**: Test the UI in the browser for visual changes.
 - **Database Testing**: Test with actual PostgreSQL database, not mocks.
 
