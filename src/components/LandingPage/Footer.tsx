@@ -52,7 +52,7 @@ export default function Footer() {
                 <ul className="mt-6 space-y-4 text-sm">
                   <li>
                     <a
-                      href="https://twitter.com/rasmickyy"
+                      href="https://x.com/ak_ishere"
                       target="_blank"
                       className="transition hover:opacity-75"
                       rel="noreferrer"
@@ -63,7 +63,7 @@ export default function Footer() {
                   </li>
                   <li>
                     <a
-                      href="https://www.youtube.com/@rasmic"
+                      href="https://www.youtube.com/@AIStackTeam"
                       target="_blank"
                       className="  transition hover:opacity-75"
                       rel="noreferrer"
