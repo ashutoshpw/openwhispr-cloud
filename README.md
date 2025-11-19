@@ -16,6 +16,7 @@ A modern, production-ready Next.js 16 starter template for building full-stack w
 - 🔄 **State Management** using TanStack Query for server state
 - ⚡ **Rate Limiting & Caching** with Redis/Upstash
 - 💳 **Payment Integration** with Stripe (optional)
+- 🤖 **ChatGPT Apps SDK** with Model Context Protocol (MCP) support for AI integration
 - 🐳 **Docker Support** for easy local development
 - 📊 **Database Studio** with Drizzle Studio for visual database management
 
@@ -34,6 +35,7 @@ A modern, production-ready Next.js 16 starter template for building full-stack w
 | State Management | TanStack Query (React Query) |
 | Caching | Redis (Upstash) |
 | Payments | Stripe (optional) |
+| AI Integration | ChatGPT Apps SDK + MCP |
 | Icons | Lucide React, Tabler Icons |
 | Animations | Framer Motion |
 
@@ -337,6 +339,40 @@ This project is open source and available under the [MIT License](LICENSE).
 - UI components from [Shadcn UI](https://ui.shadcn.com)
 - Authentication by [BetterAuth](https://www.better-auth.com)
 - Database management with [Drizzle ORM](https://orm.drizzle.team)
+
+## 🤖 ChatGPT Apps SDK Integration
+
+This starter kit now includes full ChatGPT Apps SDK support! You can run your Next.js app as an embedded widget inside ChatGPT using the Model Context Protocol (MCP).
+
+### Quick Start
+
+1. **Deploy your app** to Vercel (or any hosting platform)
+2. **Connect to ChatGPT**:
+   - Enable Developer Mode in ChatGPT settings
+   - Add MCP connector with URL: `https://your-app.vercel.app/mcp`
+3. **Test it out** - Try "Show me the content" in ChatGPT
+
+### Features Included
+
+- ✅ MCP server endpoint at `/mcp` for tool registration
+- ✅ React hooks for ChatGPT platform integration
+- ✅ Iframe compatibility patches for browser APIs
+- ✅ CORS support for cross-origin embedding
+- ✅ Automatic environment detection (dev/prod)
+
+### Learn More
+
+See [CHATGPT_APPS_SDK.md](./CHATGPT_APPS_SDK.md) for:
+- Complete setup guide
+- Usage examples
+- How to add custom tools
+- Troubleshooting tips
+- Architecture deep dive
+
+**References:**
+- [Vercel's Guide: Running Next.js inside ChatGPT](https://vercel.com/blog/running-next-js-inside-chatgpt-a-deep-dive-into-native-app-integration)
+- [ChatGPT Apps SDK Starter](https://github.com/vercel-labs/chatgpt-apps-sdk-nextjs-starter)
+- [Model Context Protocol](https://modelcontextprotocol.io)
 
 ## 💬 Support
 

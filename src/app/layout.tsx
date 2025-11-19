@@ -1,6 +1,8 @@
 import Provider from "@/app/provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { NextChatSDKBootstrap } from "@/components/NextChatSDKBootstrap";
+import { baseURL } from "@/../baseUrl";
 import { Analytics } from "@vercel/analytics/react";
 import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
@@ -18,6 +20,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <NextChatSDKBootstrap baseUrl={baseURL} />
+      </head>
       <body className={GeistSans.className}>
         <Provider>
           <ThemeProvider
