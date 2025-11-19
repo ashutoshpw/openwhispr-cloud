@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth";
+import { getSiteAdminStatus } from "@/lib/auth-utils";
 import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 
@@ -13,6 +14,22 @@ export async function middleware(request: NextRequest) {
 
     if (!session) {
       return NextResponse.redirect(new URL("/sign-in", request.url));
+    }
+  }
+
+  // Check if the route is admin portal
+  if (pathname.startsWith("/adminx")) {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return NextResponse.redirect(new URL("/sign-in", request.url));
+    }
+
+    const isAdmin = await getSiteAdminStatus(session.user.id);
+    if (!isAdmin) {
+      return new NextResponse(null, { status: 404 });
     }
   }
 

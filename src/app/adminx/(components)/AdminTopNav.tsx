@@ -1,0 +1,85 @@
+"use client";
+
+import { ModeToggle } from "@/components/ModeToggle";
+import { Profile } from "@/components/Profile";
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { HamburgerMenuIcon } from "@radix-ui/react-icons";
+import {
+  LayoutDashboard,
+  Users,
+  Building2,
+  UserCog,
+  CreditCard,
+  Activity,
+  Settings,
+} from "lucide-react";
+import Link from "next/link";
+import type { ReactNode } from "react";
+import { usePathname } from "next/navigation";
+
+export default function AdminTopNav({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+
+  const navItems = [
+    { href: "/adminx/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+    { href: "/adminx/users", icon: Users, label: "Users" },
+    { href: "/adminx/organizations", icon: Building2, label: "Organizations" },
+    { href: "/adminx/members", icon: UserCog, label: "Members" },
+    { href: "/adminx/payments", icon: CreditCard, label: "Payments" },
+    { href: "/adminx/sessions", icon: Activity, label: "Sessions" },
+    { href: "/adminx/settings", icon: Settings, label: "Settings" },
+  ];
+
+  return (
+    <div className="flex flex-col">
+      <header className="flex h-14 lg:h-[55px] items-center gap-4 border-b px-6">
+        <Sheet>
+          <SheetTrigger className="min-[1024px]:hidden p-2 transition">
+            <HamburgerMenuIcon />
+            <span className="sr-only">Menu</span>
+          </SheetTrigger>
+          <SheetContent side="left">
+            <SheetHeader>
+              <Link href="/adminx/dashboard">
+                <SheetTitle>Admin Portal</SheetTitle>
+              </Link>
+            </SheetHeader>
+            <div className="flex flex-col space-y-3 mt-[1rem]">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link key={item.href} href={item.href}>
+                    <Button
+                      variant={
+                        pathname === item.href || pathname.startsWith(item.href + "/")
+                          ? "default"
+                          : "outline"
+                      }
+                      className="w-full"
+                    >
+                      <Icon className="mr-2 h-4 w-4" />
+                      {item.label}
+                    </Button>
+                  </Link>
+                );
+              })}
+            </div>
+          </SheetContent>
+        </Sheet>
+        <div className="flex justify-center items-center gap-3 ml-auto">
+          <Profile />
+          <ModeToggle />
+        </div>
+      </header>
+      {children}
+    </div>
+  );
+}
+
