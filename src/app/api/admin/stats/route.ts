@@ -4,19 +4,19 @@ import { getSiteAdminStatus } from "@/lib/auth-utils";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { sql } from "drizzle-orm";
+import { sql, gt } from "drizzle-orm";
 
 export async function GET() {
   try {
-    const session = await auth.api.getSession({
+    const authSession = await auth.api.getSession({
       headers: await headers(),
     });
 
-    if (!session?.user?.id) {
+    if (!authSession?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const isAdmin = await getSiteAdminStatus(session.user.id);
+    const isAdmin = await getSiteAdminStatus(authSession.user.id);
     if (!isAdmin) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
@@ -36,7 +36,7 @@ export async function GET() {
     const activeSessions = await db()
       .select()
       .from(session)
-      .where(sql`${session.expiresAt} > NOW()`);
+      .where(gt(session.expiresAt, new Date()));
 
     return NextResponse.json({
       totalUsers: Number(totalUsers.count),

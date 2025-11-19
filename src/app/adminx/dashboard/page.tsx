@@ -1,7 +1,7 @@
 import { StatsCards } from "@/components/admin/StatsCards";
 import { db } from "@/lib/db";
 import { user, organization, payments, session } from "@/lib/db/schema";
-import { sql } from "drizzle-orm";
+import { sql, gt } from "drizzle-orm";
 
 async function getStats() {
   try {
@@ -20,7 +20,7 @@ async function getStats() {
     const activeSessions = await db()
       .select()
       .from(session)
-      .where(sql`${session.expiresAt} > NOW()`);
+      .where(gt(session.expiresAt, new Date()));
 
     return {
       totalUsers: Number(totalUsers.count),

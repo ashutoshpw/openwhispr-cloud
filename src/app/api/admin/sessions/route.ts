@@ -8,15 +8,15 @@ import { sql } from "drizzle-orm";
 
 export async function GET() {
   try {
-    const sessionData = await auth.api.getSession({
+    const authSession = await auth.api.getSession({
       headers: await headers(),
     });
 
-    if (!sessionData?.user?.id) {
+    if (!authSession?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const isAdmin = await getSiteAdminStatus(sessionData.user.id);
+    const isAdmin = await getSiteAdminStatus(authSession.user.id);
     if (!isAdmin) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
