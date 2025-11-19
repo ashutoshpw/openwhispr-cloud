@@ -104,10 +104,8 @@ export default function Footer() {
               <ul className="flex flex-wrap gap-4 text-xs">
                 <li>
                   <a
-                    href="/"
-                    target="_blank"
+                    href="/terms"
                     className="transition hover:opacity-75"
-                    rel="noreferrer"
                   >
                     Terms & Conditions{" "}
                   </a>
@@ -115,10 +113,8 @@ export default function Footer() {
 
                 <li>
                   <a
-                    href="/"
-                    target="_blank"
+                    href="/privacy"
                     className="transition hover:opacity-75"
-                    rel="noreferrer"
                   >
                     Privacy Policy{" "}
                   </a>
@@ -126,7 +122,7 @@ export default function Footer() {
               </ul>
 
               <p className="mt-8 text-xs  ">
-                &copy; 2024. SomeCompany LLC. All rights reserved.
+                &copy; {new Date().getFullYear()}. SomeCompany LLC. All rights reserved.
               </p>
             </div>
           </div>
