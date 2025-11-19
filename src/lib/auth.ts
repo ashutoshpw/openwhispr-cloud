@@ -30,13 +30,6 @@ export const auth = betterAuth({
   },
   plugins: [
     nextCookies(),
-    organization({
-      async slugGenerator(name) {
-        return name
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/(^-|-$)/g, "");
-      },
-    }),
+    organization(),
   ],
 });
