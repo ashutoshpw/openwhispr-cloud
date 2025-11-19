@@ -5,7 +5,7 @@ import type { OpenAIGlobals } from "./types";
 import { SET_GLOBALS_EVENT_TYPE } from "./types";
 
 export function useOpenAIGlobal<K extends keyof OpenAIGlobals>(
-  key: K
+  key: K,
 ): OpenAIGlobals[K] | null {
   return useSyncExternalStore(
     (onChange) => {
@@ -30,7 +30,8 @@ export function useOpenAIGlobal<K extends keyof OpenAIGlobals>(
         window.removeEventListener(SET_GLOBALS_EVENT_TYPE, handleSetGlobal);
       };
     },
-    () => (typeof window !== "undefined" ? window.openai?.[key] ?? null : null),
-    () => null
+    () =>
+      typeof window !== "undefined" ? (window.openai?.[key] ?? null) : null,
+    () => null,
   );
 }

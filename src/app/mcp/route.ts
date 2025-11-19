@@ -41,7 +41,7 @@ const handler = createMcpHandler(async (server) => {
     description: "Displays the homepage content from Next.js 16 starter kit",
     widgetDomain: "https://nextjs.org/docs",
   };
-  
+
   server.registerResource(
     "content-widget",
     contentWidget.templateUri,
@@ -67,7 +67,7 @@ const handler = createMcpHandler(async (server) => {
           },
         },
       ],
-    })
+    }),
   );
 
   server.registerTool(
@@ -77,7 +77,9 @@ const handler = createMcpHandler(async (server) => {
       description:
         "Fetch and display the homepage content with the name of the user",
       inputSchema: {
-        name: z.string().describe("The name of the user to display on the homepage"),
+        name: z
+          .string()
+          .describe("The name of the user to display on the homepage"),
       },
       _meta: widgetMeta(contentWidget),
     },
@@ -95,7 +97,7 @@ const handler = createMcpHandler(async (server) => {
         },
         _meta: widgetMeta(contentWidget),
       };
-    }
+    },
   );
 });
 

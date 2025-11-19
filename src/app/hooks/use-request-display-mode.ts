@@ -9,9 +9,9 @@ export function useRequestDisplayMode() {
       if (typeof window === "undefined" || !window.openai?.requestDisplayMode) {
         return { mode };
       }
-      
+
       return await window.openai.requestDisplayMode({ mode });
     },
-    []
+    [],
   );
 }

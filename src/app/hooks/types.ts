@@ -2,7 +2,7 @@ export type OpenAIGlobals<
   ToolInput = UnknownObject,
   ToolOutput = UnknownObject,
   ToolResponseMetadata = UnknownObject,
-  WidgetState = UnknownObject
+  WidgetState = UnknownObject,
 > = {
   theme: Theme;
   userAgent: UserAgent;
@@ -65,7 +65,7 @@ export type CallToolResponse = {
 
 export type CallTool = (
   name: string,
-  args: Record<string, unknown>
+  args: Record<string, unknown>,
 ) => Promise<CallToolResponse>;
 
 export const SET_GLOBALS_EVENT_TYPE = "openai:set_globals";
