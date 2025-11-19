@@ -1,4 +1,4 @@
-name: Dashboard - Deploy to Vercel - Preview
+name: Deploy to Vercel - Preview
 
 on:
   pull_request:

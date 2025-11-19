@@ -1,4 +1,4 @@
-name: Dashboard - Deploy to Vercel
+name: Deploy to Vercel
 
 on:
   push:
