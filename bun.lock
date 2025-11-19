@@ -30,7 +30,7 @@
         "@upstash/redis": "^1.24.2",
         "@vercel/analytics": "^1.2.2",
         "axios": "^1.6.8",
-        "better-auth": "^1.1.6",
+        "better-auth": "^1.2.12",
         "class-variance-authority": "^0.7.0",
         "clsx": "^2.1.1",
         "cmdk": "^1.0.0",
