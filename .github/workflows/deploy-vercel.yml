@@ -27,6 +27,7 @@ jobs:
     env:
       VERCEL_ORG_ID: team_M1i3qUTW4i3A6mETy54E1Fy8
       VERCEL_PROJECT_ID: prj_YLF5HawHAOzh4oKqS8wmxoBZ9hU5
+      VERCEL_PROJECT_SLUG: nexvio-ai
       DEPLOY_ENVIRONMENT_NAME: ${{ ((github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')) && 'production - dashboard' || 'preview' }}
     
     steps:
@@ -93,7 +94,7 @@ jobs:
         run: |
           rm -rf .vercel
           mkdir -p .vercel
-          echo '{"orgId":"${{ secrets.VERCEL_ORG_ID }}","projectId":"prj_FVUmj4OL2EnYNdXF6yh6RBuJayRw","projectName":"nexvio-ai"}' > .vercel/project.json
+          echo '{"orgId":"${{ secrets.VERCEL_ORG_ID }}","projectId":"${{ secrets.VERCEL_PROJECT_ID }}","projectName":"${{ secrets.VERCEL_PROJECT_SLUG }}"}' > .vercel/project.json
 
       - name: Pull Vercel Environment Information
         run: vercel pull --prod --token=${{ secrets.VERCEL_TOKEN }}
