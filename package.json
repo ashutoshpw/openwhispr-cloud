@@ -56,7 +56,7 @@
     "lucide-react": "^0.279.0",
     "mcp-handler": "^1.0.3",
     "mini-svg-data-uri": "^1.4.4",
-    "next": "16.0.7",
+    "next": "16.0.10",
     "next-mdx-remote": "^5.0.0",
     "next-themes": "^0.3.0",
     "postgres": "^3.4.7",
