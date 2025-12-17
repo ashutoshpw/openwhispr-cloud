@@ -2,6 +2,7 @@ import Provider from "@/app/provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { NextChatSDKBootstrap } from "@/components/NextChatSDKBootstrap";
+import { ClerkCaptchaContainer } from "@/components/auth/ClerkCaptchaContainer";
 import { baseURL } from "@/../baseUrl";
 import { Analytics } from "@vercel/analytics/react";
 import { GeistSans } from "geist/font/sans";
@@ -23,7 +24,8 @@ export default function RootLayout({
       <head>
         <NextChatSDKBootstrap baseUrl={baseURL} />
       </head>
-      <body className={GeistSans.className}>
+      <body className={GeistSans.className} suppressHydrationWarning>
+        <ClerkCaptchaContainer />
         <Provider>
           <ThemeProvider
             attribute="class"

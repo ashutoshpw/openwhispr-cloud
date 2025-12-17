@@ -10,18 +10,36 @@ import {
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useSession } from "@/lib/auth-client";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const UserProfilePage = () => {
-  const { data: session } = useSession();
+  const { data: session, isLoading } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && !session?.user) {
+      router.push("/sign-in");
+    }
+  }, [session, isLoading, router]);
+
+  if (isLoading) {
+    return (
+      <PageWrapper>
+        <div className="flex justify-center items-center p-9 h-full">
+          <div>Loading...</div>
+        </div>
+      </PageWrapper>
+    );
+  }
 
   if (!session?.user) {
-    redirect("/sign-in");
+    return null;
   }
 
   return (
     <PageWrapper>
-      <div className="h-full flex items-center justify-center p-9">
+      <div className="flex justify-center items-center p-9 h-full">
         <Card className="w-[600px]">
           <CardHeader>
             <CardTitle>User Profile</CardTitle>
@@ -34,15 +52,15 @@ const UserProfilePage = () => {
               <Avatar className="w-20 h-20">
                 <AvatarImage
                   src={session.user.image || ""}
-                  alt={session.user.name}
+                  alt={session.user.name || undefined}
                 />
                 <AvatarFallback className="text-2xl">
                   {session.user.name?.[0]?.toUpperCase() || "U"}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <h3 className="text-2xl font-semibold">{session.user.name}</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="font-semibold text-2xl">{session.user.name}</h3>
+                <p className="text-muted-foreground text-sm">
                   {session.user.email}
                 </p>
               </div>
@@ -69,7 +87,9 @@ const UserProfilePage = () => {
               <div className="space-y-2">
                 <Label>Account Created</Label>
                 <p className="text-sm">
-                  {new Date(session.user.createdAt).toLocaleDateString()}
+                  {session.user.createdAt
+                    ? new Date(session.user.createdAt).toLocaleDateString()
+                    : "N/A"}
                 </p>
               </div>
             </div>

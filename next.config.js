@@ -1,8 +1,5 @@
-const { baseURL } = require("./baseUrl");
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  assetPrefix: baseURL,
   images: {
     remotePatterns: [
       {

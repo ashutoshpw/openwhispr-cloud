@@ -72,8 +72,13 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
 export async function serializeMdx(
   content: string
 ): Promise<MDXRemoteSerializeResult> {
-  return await serialize(content, {
-    parseFrontmatter: false,
-  });
+  try {
+    return await serialize(content, {
+      parseFrontmatter: false,
+    });
+  } catch (error) {
+    console.error("MDX serialization error:", error);
+    throw error;
+  }
 }
 

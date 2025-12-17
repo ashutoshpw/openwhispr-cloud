@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { baseClient } from "@/lib/auth-client";
+import { signIn } from "@/lib/auth-client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -27,7 +27,7 @@ export default function SignInPage() {
     setIsLoading(true);
 
     try {
-      const { data, error } = await baseClient.signIn.email({
+      const { data, error } = await signIn.email({
         email,
         password,
       });

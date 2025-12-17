@@ -4,12 +4,7 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import { getAllPosts, getPostBySlug, serializeMdx } from "@/lib/mdx";
 import { mdxComponents } from "@/components/mdx-components";
 
-export async function generateStaticParams() {
-  const posts = await getAllPosts();
-  return posts.map((post) => ({
-    slug: post.slug,
-  }));
-}
+export const dynamic = "force-dynamic";
 
 export default async function BlogPostPage({
   params,

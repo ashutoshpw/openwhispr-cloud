@@ -3,7 +3,6 @@ import { baseURL } from "@/../baseUrl";
 export function NextChatSDKBootstrap({ baseUrl }: { baseUrl: string }) {
   return (
     <>
-      <base href={baseUrl} />
       <script
         dangerouslySetInnerHTML={{
           __html: `window.innerBaseUrl = "${baseUrl}";`,
@@ -15,6 +14,17 @@ export function NextChatSDKBootstrap({ baseUrl }: { baseUrl: string }) {
 (function() {
   const appOrigin = new URL("${baseUrl}").origin;
   const isInIframe = window.self !== window.top;
+  
+  // Only add base tag if we're in an iframe (ChatGPT Apps SDK context)
+  // The assetPrefix in next.config.js already handles base URL for direct browser access
+  if (isInIframe) {
+    const baseTag = document.createElement('base');
+    baseTag.href = "${baseUrl}";
+    const existingBase = document.querySelector('base');
+    if (!existingBase) {
+      document.head.insertBefore(baseTag, document.head.firstChild);
+    }
+  }
   
   // Protect HTML element from modifications
   const htmlElement = document.documentElement;

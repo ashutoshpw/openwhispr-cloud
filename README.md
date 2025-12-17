@@ -9,7 +9,7 @@ A modern, production-ready Next.js 16 starter template for building full-stack w
 ## ✨ Features
 
 - 🚀 **Next.js 16** with App Router for optimal performance
-- 🔐 **Authentication** powered by BetterAuth - Self-hosted, TypeScript-first auth solution
+- 🔐 **Unified Authentication** - Switchable auth layer supporting BetterAuth, NextAuth, AuthKit (WorkOS), and Clerk
 - 💾 **Database** with PostgreSQL and Drizzle ORM for type-safe queries
 - 🎨 **Beautiful UI** with Shadcn UI, TailwindCSS, and multiple component libraries
 - 📝 **Forms** with React Hook Form and Zod validation
@@ -28,14 +28,16 @@ A modern, production-ready Next.js 16 starter template for building full-stack w
 | Language | TypeScript (strict mode) |
 | Styling | TailwindCSS |
 | UI Components | Shadcn UI, Radix UI, Tremor, Magic UI |
-| Authentication | BetterAuth |
+| Authentication | Unified Auth Layer (BetterAuth, NextAuth, AuthKit/WorkOS, Clerk) |
 | Database | PostgreSQL |
 | ORM | Drizzle ORM |
 | Forms | React Hook Form + Zod |
 | State Management | TanStack Query (React Query) |
+| API Layer | tRPC (TypeScript RPC) |
 | Caching | Redis (Upstash) |
 | Payments | Stripe (optional) |
 | AI Integration | ChatGPT Apps SDK + MCP |
+| Content | MDX (next-mdx-remote) |
 | Icons | Lucide React, Tabler Icons |
 | Animations | Framer Motion |
 
@@ -45,7 +47,7 @@ A modern, production-ready Next.js 16 starter template for building full-stack w
 
 - Node.js 18+ and npm
 - PostgreSQL database (local or remote)
-- BetterAuth for authentication (self-hosted, no external account needed)
+- Unified Auth Layer - Switch between BetterAuth, NextAuth, AuthKit (WorkOS), or Clerk
 
 ### Quick Start with Docker (Recommended)
 
@@ -61,7 +63,7 @@ The fastest way to get started is using Docker Compose, which sets up everything
    ```bash
    cp .env.example .env.local
    ```
-   Edit `.env.local` and add your BetterAuth credentials (see [Environment Variables](#-environment-variables) section)
+   Edit `.env.local` and configure your authentication provider (see [Environment Variables](#-environment-variables) section)
 
 3. **Start with Docker Compose**
    ```bash
@@ -146,7 +148,7 @@ npm run db:push
 
 For production, use migrations:
 
-1. Make changes to `lib/db/schema.ts`
+1. Make changes to `src/lib/db/schema.ts`
 2. Generate migration: `npm run db:generate`
 3. Apply migration: `npm run db:migrate`
 
@@ -164,9 +166,21 @@ This opens a web interface at http://localhost:4983
 
 Create a `.env.local` file with the following variables:
 
-### Required - BetterAuth Authentication
+### Required - Database
 
-Generate a secure secret key and configure BetterAuth:
+```env
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/nextjs_starter
+```
+
+### Required - Authentication Provider
+
+The application supports multiple authentication providers. Choose **one** provider and set the corresponding environment variables:
+
+**Important**: Set the `NEXT_PUBLIC_AUTH_PROVIDER` environment variable to switch between providers. No code changes are required.
+
+#### Option 1: BetterAuth (Default)
+
+BetterAuth is a modern, self-hosted authentication solution with built-in organization support.
 
 ```bash
 # Generate a secure secret (run this command)
@@ -174,17 +188,78 @@ openssl rand -base64 32
 ```
 
 ```env
+NEXT_PUBLIC_AUTH_PROVIDER=better-auth
 BETTER_AUTH_SECRET=<your-generated-secret>
 BETTER_AUTH_URL=http://localhost:3000
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
-### Required - Database
+**Features**: Email/Password, OAuth, Organizations, Email Verification
+
+**Documentation**: See [BetterAuth Provider README](./src/lib/auth/providers/better-auth/README.md)
+
+#### Option 2: NextAuth (Auth.js v5)
+
+NextAuth is a popular authentication library for Next.js applications.
+
+```bash
+# Generate a secure secret (run this command)
+openssl rand -base64 32
+```
 
 ```env
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/nextjs_starter
-DIRECT_URL=postgresql://postgres:postgres@localhost:5432/nextjs_starter
+NEXT_PUBLIC_AUTH_PROVIDER=next-auth
+NEXTAUTH_SECRET=<your-generated-secret>
+NEXTAUTH_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
+
+**Features**: Email/Password, OAuth, JWT Sessions, Custom Organization Support
+
+**Documentation**: See [NextAuth Provider README](./src/lib/auth/providers/next-auth/README.md)
+
+#### Option 3: AuthKit (WorkOS)
+
+WorkOS AuthKit provides enterprise-grade authentication with SSO and organization management.
+
+```bash
+# Generate a secure cookie password (run this command)
+openssl rand -base64 32
+```
+
+```env
+NEXT_PUBLIC_AUTH_PROVIDER=authkit
+WORKOS_API_KEY=sk_xxx
+WORKOS_CLIENT_ID=client_xxx
+WORKOS_COOKIE_PASSWORD=<your-generated-password-min-32-chars>
+NEXT_PUBLIC_WORKOS_REDIRECT_URI=http://localhost:3000/api/auth/callback
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+**Features**: Email/Password, OAuth, SSO, Organizations, Magic Links
+
+**Get Credentials**: Sign up at [workos.com](https://workos.com)
+
+**Documentation**: See [AuthKit Provider README](./src/lib/auth/providers/authkit/README.md)
+
+#### Option 4: Clerk
+
+Clerk provides a complete authentication solution with pre-built UI components.
+
+```env
+NEXT_PUBLIC_AUTH_PROVIDER=clerk-dev
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_xxx
+CLERK_SECRET_KEY=sk_test_xxx
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+**Features**: Email/Password, OAuth, Organizations, Multi-Factor Authentication, Pre-built UI
+
+**Get Credentials**: Sign up at [clerk.com](https://clerk.com)
+
+**Documentation**: See [Clerk Provider README](./src/lib/auth/providers/clerk-dev/README.md)
+
+**Note**: You can switch providers at any time by changing the `NEXT_PUBLIC_AUTH_PROVIDER` environment variable. See [Unified Auth Layer Documentation](./src/lib/auth/README.md) for more details.
 
 ### Optional - Stripe Payments
 
@@ -204,33 +279,69 @@ UPSTASH_REDIS_REST_TOKEN=...
 
 ```
 nextjs16-starter-kit/
-├── app/                    # Next.js App Router
-│   ├── (auth)/            # Authentication routes
-│   ├── (marketing)/       # Public marketing pages
-│   ├── api/               # API routes and webhooks
-│   ├── dashboard/         # Protected dashboard routes
-│   └── layout.tsx         # Root layout
-├── components/            # React components
-│   ├── ui/               # Shadcn UI components
-│   ├── form/             # Form components
-│   ├── LandingPage/      # Landing page sections
-│   └── NavBar.tsx        # Navigation component
-├── lib/                   # Core utilities
-│   ├── db/               # Database config and schema
-│   └── utils.ts          # Helper functions
-├── utils/                 # Utility functions
-├── public/                # Static assets
-├── .env.example           # Example environment variables
-├── drizzle.config.ts      # Drizzle ORM configuration
-├── middleware.ts          # Next.js middleware (auth)
-└── tailwind.config.ts     # Tailwind configuration
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── (auth)/            # Authentication routes
+│   │   ├── (marketing)/       # Public marketing pages
+│   │   ├── adminx/            # Admin panel routes
+│   │   ├── api/               # API routes and webhooks
+│   │   │   ├── auth/          # Authentication endpoints
+│   │   │   ├── payments/      # Stripe webhooks
+│   │   │   └── admin/         # Admin API endpoints
+│   │   ├── blog/              # Blog pages
+│   │   ├── dashboard/         # Protected dashboard routes
+│   │   ├── mcp/               # Model Context Protocol endpoints
+│   │   ├── privacy/           # Privacy policy page
+│   │   ├── terms/             # Terms of service page
+│   │   ├── hooks/             # Custom React hooks
+│   │   ├── layout.tsx         # Root layout
+│   │   ├── page.tsx           # Home page
+│   │   └── provider.tsx       # App providers
+│   ├── components/            # React components
+│   │   ├── auth/              # Authentication components
+│   │   ├── admin/             # Admin components
+│   │   ├── dashboard/         # Dashboard components
+│   │   ├── form/              # Form components
+│   │   ├── LandingPage/       # Landing page sections
+│   │   ├── magicui/           # Magic UI components
+│   │   ├── ui/                # Shadcn UI components
+│   │   ├── AuthProviderWrapper.tsx
+│   │   ├── NavBar.tsx         # Navigation component
+│   │   └── Profile.tsx         # User profile component
+│   ├── lib/                   # Core utilities
+│   │   ├── auth/              # Unified authentication layer
+│   │   │   ├── core/          # Core interfaces and APIs
+│   │   │   └── providers/     # Provider implementations
+│   │   │       ├── better-auth/
+│   │   │       ├── next-auth/
+│   │   │       ├── authkit/   # WorkOS AuthKit
+│   │   │       └── clerk-dev/ # Clerk
+│   │   ├── db/                # Database config and schema
+│   │   ├── auth-client.ts     # Client-side auth utilities
+│   │   ├── auth-utils.ts      # Auth helper functions
+│   │   ├── mdx.ts             # MDX content processing
+│   │   ├── ratelimiter.ts    # Rate limiting with Upstash
+│   │   ├── redis.ts           # Redis client (Upstash)
+│   │   └── utils.ts           # Helper functions
+│   ├── types/                 # TypeScript type definitions
+│   ├── utils/                 # Utility functions
+│   └── middleware.ts          # Next.js middleware (auth)
+├── public/                    # Static assets
+├── drizzle/                   # Database migrations
+├── content/                   # MDX content files
+├── docs/                      # Documentation files
+├── .env.example               # Example environment variables
+├── drizzle.config.ts          # Drizzle ORM configuration
+├── tailwind.config.ts         # Tailwind configuration
+├── components.json            # Shadcn UI configuration
+└── package.json               # Dependencies and scripts
 ```
 
 ## 🔄 Migration from Prisma
 
 This project has been migrated from Prisma to Drizzle ORM. If you're coming from an older version:
 
-- ✅ Prisma schema → Drizzle schema in `lib/db/schema.ts`
+- ✅ Prisma schema → Drizzle schema in `src/lib/db/schema.ts`
 - ✅ All queries now use Drizzle ORM
 - ✅ Removed `@prisma/client` and Supabase dependencies
 - ✅ New database commands (see above)
@@ -337,7 +448,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 - Built with [Next.js](https://nextjs.org/)
 - UI components from [Shadcn UI](https://ui.shadcn.com)
-- Authentication by [BetterAuth](https://www.better-auth.com)
+- Unified Authentication Layer - Switchable auth system supporting multiple providers
 - Database management with [Drizzle ORM](https://orm.drizzle.team)
 
 ## 🤖 ChatGPT Apps SDK Integration

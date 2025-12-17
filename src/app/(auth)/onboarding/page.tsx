@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { baseClient } from "@/lib/auth-client";
+import { getSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -22,7 +22,7 @@ export default function OnboardingPage() {
 
   useEffect(() => {
     const checkSession = async () => {
-      const session = await baseClient.getSession();
+      const session = await getSession();
       if (!session?.data?.user) {
         router.push("/sign-in");
       }

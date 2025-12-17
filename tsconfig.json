@@ -4,6 +4,7 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
+    "types": [],
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
@@ -24,6 +25,7 @@
   },
   "include": [
     "next-env.d.ts",
+    "bcryptjs.d.ts",
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
