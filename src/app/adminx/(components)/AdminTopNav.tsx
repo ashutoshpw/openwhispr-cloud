@@ -19,6 +19,10 @@ import {
   CreditCard,
   Activity,
   Settings,
+  Package,
+  DollarSign,
+  Ticket,
+  Tag,
 } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -37,6 +41,13 @@ export default function AdminTopNav({ children }: { children: ReactNode }) {
     { href: "/adminx/settings", icon: Settings, label: "Settings" },
   ];
 
+  const stripeItems = [
+    { href: "/adminx/stripe/products", icon: Package, label: "Products" },
+    { href: "/adminx/stripe/prices", icon: DollarSign, label: "Prices" },
+    { href: "/adminx/stripe/coupons", icon: Ticket, label: "Coupons" },
+    { href: "/adminx/stripe/promo-codes", icon: Tag, label: "Promo Codes" },
+  ];
+
   return (
     <div className="flex flex-col">
       <header className="flex h-14 lg:h-[55px] items-center gap-4 border-b px-6">
@@ -53,6 +64,31 @@ export default function AdminTopNav({ children }: { children: ReactNode }) {
             </SheetHeader>
             <div className="flex flex-col space-y-3 mt-[1rem]">
               {navItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link key={item.href} href={item.href}>
+                    <Button
+                      variant={
+                        pathname === item.href || pathname.startsWith(item.href + "/")
+                          ? "default"
+                          : "outline"
+                      }
+                      className="w-full"
+                    >
+                      <Icon className="mr-2 h-4 w-4" />
+                      {item.label}
+                    </Button>
+                  </Link>
+                );
+              })}
+              
+              <div className="pt-3 pb-2">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-2">
+                  Stripe Management
+                </p>
+              </div>
+              
+              {stripeItems.map((item) => {
                 const Icon = item.icon;
                 return (
                   <Link key={item.href} href={item.href}>

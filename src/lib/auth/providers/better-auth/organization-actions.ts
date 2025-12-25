@@ -11,6 +11,7 @@ import type {
   SetActiveOrganizationParams,
   SetActiveOrganizationResult,
 } from "../../types";
+import { headers } from "next/headers";
 
 let serverInstance: BetterAuthServer | null = null;
 
@@ -122,8 +123,9 @@ export async function setActiveBetterAuthOrganization(
   try {
     const server = getServerInstance();
     const authInstance = server.getAuthInstance();
-
+    const headersObject = await headers();
     const result: any = await authInstance.api.setActiveOrganization({
+      headers: headersObject,
       body: {
         organizationId: params.organizationId,
       },

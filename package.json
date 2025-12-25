@@ -13,7 +13,10 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "stripe:verify": "node scripts/verify-stripe-keys.js",
+    "stripe:migrate": "tsx scripts/migrate-stripe-schema.ts",
+    "stripe:backfill": "tsx scripts/backfill-stripe-data.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.1",
@@ -22,6 +25,7 @@
     "@hookform/resolvers": "^3.3.4",
     "@modelcontextprotocol/sdk": "^1.22.0",
     "@radix-ui/react-accordion": "^1.1.2",
+    "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-avatar": "^1.0.4",
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
@@ -76,6 +80,7 @@
     "recharts": "^2.12.7",
     "sonner": "^1.4.41",
     "stripe": "^14.16.0",
+    "stripe-sync-engine": "file:packages/stripe-sync-engine",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.5"
@@ -92,6 +97,7 @@
     "drizzle-kit": "^0.31.7",
     "postcss": "latest",
     "tailwindcss": "^3.3.5",
+    "tsx": "^4.21.0",
     "typescript": "latest"
   }
 }

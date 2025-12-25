@@ -81,4 +81,3 @@ export async function serializeMdx(
     throw error;
   }
 }
-

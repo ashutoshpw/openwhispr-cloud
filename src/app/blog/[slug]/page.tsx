@@ -9,9 +9,9 @@ export const dynamic = "force-dynamic";
 export default async function BlogPostPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 }) {
-  const { slug } = await params;
+  const { slug } = params;
   const post = await getPostBySlug(slug);
 
   if (!post) {
@@ -19,6 +19,9 @@ export default async function BlogPostPage({
   }
 
   const mdxSource = await serializeMdx(post.content);
+  if (!mdxSource) {
+    notFound();
+  }
 
   return (
     <article className="container mx-auto px-4 py-8 max-w-3xl">
@@ -53,9 +56,8 @@ export default async function BlogPostPage({
         )}
       </header>
       <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-semibold prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:font-semibold">
-        <MDXRemote source={mdxSource.compiledSource} components={mdxComponents} />
+        <MDXRemote source={mdxSource} components={mdxComponents} />
       </div>
     </article>
   );
 }
-

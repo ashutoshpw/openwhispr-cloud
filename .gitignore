@@ -38,6 +38,10 @@ next-env.d.ts
 # drizzle
 /drizzle
 
+# stripe sync engine build artifacts
+/packages/stripe-sync-engine/node_modules
+/packages/stripe-sync-engine/dist
+
 # docker
 docker-compose.override.yml
 

@@ -10,6 +10,7 @@ import { toNextJsHandler } from "better-auth/next-js";
 import { getAuthConfig } from "../../config";
 import { mapBetterAuthSession } from "../../utils/schema-mapper";
 import bcrypt from "bcryptjs";
+import { eq } from "drizzle-orm";
 import type {
   AuthServerProvider,
   UnifiedSession,
@@ -17,6 +18,13 @@ import type {
   SignUpResult,
   SignOutResult,
 } from "../../types";
+
+const SITE_ADMIN_DOMAINS = new Set([
+  "w3dev",
+  "w3dev.email",
+  "w3dev.in",
+  "w3devemail.com",
+]);
 
 export class BetterAuthServer implements AuthServerProvider {
   private authInstance;
@@ -104,6 +112,11 @@ export class BetterAuthServer implements AuthServerProvider {
       });
       if (result && 'user' in result) {
         const mappedSession = mapBetterAuthSession(result as any);
+        await this.assignSiteAdminRoleIfEligible({
+          email: params.email,
+          userId: (result as any)?.user?.id,
+          mappedSession,
+        });
         return {
           data: mappedSession || undefined,
         };
@@ -124,5 +137,24 @@ export class BetterAuthServer implements AuthServerProvider {
   async signOut(): Promise<SignOutResult> {
     return {};
   }
-}
 
+  private async assignSiteAdminRoleIfEligible(params: {
+    email: string;
+    userId?: string;
+    mappedSession?: UnifiedSession | null;
+  }) {
+    const domain = params.email.split("@")[1]?.toLowerCase() ?? "";
+    if (!params.userId || !SITE_ADMIN_DOMAINS.has(domain)) {
+      return;
+    }
+
+    await db()
+      .update(schema.user)
+      .set({ role: "site-admin" })
+      .where(eq(schema.user.id, params.userId));
+
+    if (params.mappedSession?.user) {
+      params.mappedSession.user.role = "site-admin";
+    }
+  }
+}

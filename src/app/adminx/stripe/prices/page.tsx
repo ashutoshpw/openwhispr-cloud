@@ -1,0 +1,30 @@
+import { getStripePrices } from "@/lib/stripe/queries";
+// import { Button } from "@/components/ui/button";
+// import Link from "next/link";
+// import { Plus } from "lucide-react";
+import { PriceTable } from "@/components/admin/stripe/PriceTable";
+
+export default async function PricesPage() {
+  const prices = await getStripePrices({ limit: 100 });
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Prices</h1>
+          <p className="text-muted-foreground">
+            View and manage prices across your products
+          </p>
+        </div>
+        {/* <Button asChild>
+          <Link href="/adminx/stripe/prices/new">
+            <Plus className="mr-2 h-4 w-4" />
+            Create Price
+          </Link>
+        </Button> */}
+      </div>
+
+      <PriceTable prices={prices as any} />
+    </div>
+  );
+}
