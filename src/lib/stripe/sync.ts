@@ -1,5 +1,5 @@
 import { StripeSync } from "stripe-sync-engine";
-import "dotenv/config";
+
 const requireEnv = (key: string): string => {
   const value = process.env[key];
   if (!value) {
@@ -8,22 +8,35 @@ const requireEnv = (key: string): string => {
   return value;
 };
 
-const stripeWebhookSecret = requireEnv("STRIPE_WEBHOOK_SECRET");
-const databaseUrl = requireEnv("DATABASE_URL");
-const schema = process.env.STRIPE_SCHEMA ?? "stripe";
-const maxConnections = process.env.PG_POOL_MAX
-  ? Number(process.env.PG_POOL_MAX)
-  : 10;
+let stripeSyncInstance: StripeSync | null = null;
 
-export const stripeSync = new StripeSync({
-  poolConfig: {
-    connectionString: databaseUrl,
-    max: maxConnections,
-    keepAlive: true,
+function getStripeSync(): StripeSync {
+  if (!stripeSyncInstance) {
+    const stripeWebhookSecret = requireEnv("STRIPE_WEBHOOK_SECRET");
+    const databaseUrl = requireEnv("DATABASE_URL");
+    const schema = process.env.STRIPE_SCHEMA ?? "stripe";
+    const maxConnections = process.env.PG_POOL_MAX
+      ? Number(process.env.PG_POOL_MAX)
+      : 10;
+
+    stripeSyncInstance = new StripeSync({
+      poolConfig: {
+        connectionString: databaseUrl,
+        max: maxConnections,
+        keepAlive: true,
+      },
+      schema,
+      stripeSecretKey: requireEnv("STRIPE_SECRET_KEY"),
+      stripeWebhookSecret,
+      autoExpandLists: true,
+      backfillRelatedEntities: true,
+    });
+  }
+  return stripeSyncInstance;
+}
+
+export const stripeSync = new Proxy({} as StripeSync, {
+  get(_target, prop) {
+    return getStripeSync()[prop as keyof StripeSync];
   },
-  schema,
-  stripeSecretKey: requireEnv("STRIPE_SECRET_KEY"),
-  stripeWebhookSecret,
-  autoExpandLists: true,
-  backfillRelatedEntities: true,
 });

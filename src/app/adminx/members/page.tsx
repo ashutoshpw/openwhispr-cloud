@@ -4,6 +4,8 @@ import { eq } from "drizzle-orm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
+export const dynamic = "force-dynamic";
+
 async function getMembers() {
   const members = await db()
     .select({
@@ -40,12 +42,18 @@ export default async function MembersPage() {
         <table className="w-full">
           <thead>
             <tr className="border-b bg-muted/50">
-              <th className="h-12 px-4 text-left align-middle font-medium">User</th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                User
+              </th>
               <th className="h-12 px-4 text-left align-middle font-medium">
                 Organization
               </th>
-              <th className="h-12 px-4 text-left align-middle font-medium">Role</th>
-              <th className="h-12 px-4 text-left align-middle font-medium">Joined</th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                Role
+              </th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                Joined
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -89,4 +97,3 @@ export default async function MembersPage() {
     </div>
   );
 }
-

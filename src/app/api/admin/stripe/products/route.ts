@@ -128,7 +128,7 @@ export async function POST(req: NextRequest) {
           : undefined,
       statement_descriptor: validatedData.statementDescriptor || undefined,
       unit_label: validatedData.unitLabel || undefined,
-      marketing_features: validatedData.marketingFeatures
+      features: validatedData.marketingFeatures
         ? validatedData.marketingFeatures.map((name) => ({ name }))
         : undefined,
       metadata: {

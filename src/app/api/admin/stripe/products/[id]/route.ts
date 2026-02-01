@@ -22,7 +22,7 @@ const updateProductSchema = z.object({
 
 export async function GET(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await auth.api.getSession({
@@ -46,14 +46,14 @@ export async function GET(
     console.error("Error fetching product:", error);
     return NextResponse.json(
       { error: error.message || "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PUT(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await auth.api.getSession({
@@ -84,12 +84,12 @@ export async function PUT(
       statement_descriptor:
         validatedData.statementDescriptor === undefined
           ? undefined
-          : validatedData.statementDescriptor as string,
+          : (validatedData.statementDescriptor as string),
       unit_label:
         validatedData.unitLabel === undefined
           ? undefined
           : validatedData.unitLabel,
-      marketing_features:
+      features:
         validatedData.marketingFeatures !== undefined
           ? validatedData.marketingFeatures.map((name) => ({ name }))
           : undefined,
@@ -111,20 +111,20 @@ export async function PUT(
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     return NextResponse.json(
       { error: error.message || "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await auth.api.getSession({
@@ -152,7 +152,7 @@ export async function DELETE(
     console.error("Error archiving product:", error);
     return NextResponse.json(
       { error: error.message || "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

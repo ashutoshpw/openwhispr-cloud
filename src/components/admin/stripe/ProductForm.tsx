@@ -65,7 +65,7 @@ function createEntryId() {
 }
 
 function sanitizeMetadata(
-  entries: MetadataEntry[]
+  entries: MetadataEntry[],
 ): Record<string, string> | undefined {
   const result: Record<string, string> = {};
 
@@ -87,11 +87,11 @@ export function ProductForm({ product, mode }: ProductFormProps) {
   const initialStatementDescriptor = product?.statement_descriptor ?? "";
   const initialUnitLabel = product?.unit_label ?? "";
   const initialMarketingFeatures = useMemo(() => {
-    const features = product?.marketing_features ?? [];
+    const features = product?.features ?? [];
     return features
       .map((feature) => feature.name?.trim())
       .filter((name): name is string => Boolean(name));
-  }, [product?.marketing_features]);
+  }, [product?.features]);
 
   const [name, setName] = useState(product?.name ?? "");
   const [description, setDescription] = useState(product?.description ?? "");
@@ -101,7 +101,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
   const [isImagePreviewReady, setIsImagePreviewReady] = useState(false);
   const [isImageLoading, setIsImageLoading] = useState(false);
   const [statementDescriptor, setStatementDescriptor] = useState(
-    initialStatementDescriptor
+    initialStatementDescriptor,
   );
   const [unitLabel, setUnitLabel] = useState(initialUnitLabel);
   const [metadataEntries, setMetadataEntries] = useState<MetadataEntry[]>(() =>
@@ -110,10 +110,10 @@ export function ProductForm({ product, mode }: ProductFormProps) {
       key,
       value: String(value),
       isReserved: RESERVED_METADATA_KEYS.has(key),
-    }))
+    })),
   );
   const [marketingFeatures, setMarketingFeatures] = useState<string[]>(
-    initialMarketingFeatures
+    initialMarketingFeatures,
   );
   const [newFeature, setNewFeature] = useState("");
   const [enableInitialPrice, setEnableInitialPrice] = useState(false);
@@ -140,12 +140,12 @@ export function ProductForm({ product, mode }: ProductFormProps) {
   const handleMetadataChange = (
     id: string,
     field: "key" | "value",
-    value: string
+    value: string,
   ) => {
     setMetadataEntries((prev) =>
       prev.map((entry) =>
-        entry.id === id ? { ...entry, [field]: value } : entry
-      )
+        entry.id === id ? { ...entry, [field]: value } : entry,
+      ),
     );
   };
 
@@ -254,7 +254,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
 
     if (parsed > 999_999.99) {
       setPriceError(
-        "Maximum supported amount is $999,999.99. Enter a smaller value."
+        "Maximum supported amount is $999,999.99. Enter a smaller value.",
       );
       return;
     }
@@ -416,7 +416,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                 className={cn(
                   "flex-1",
                   imageError &&
-                    "border-destructive focus-visible:ring-destructive"
+                    "border-destructive focus-visible:ring-destructive",
                 )}
               />
               <Button
@@ -525,7 +525,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                             handleMetadataChange(
                               entry.id,
                               "key",
-                              e.target.value
+                              e.target.value,
                             )
                           }
                           placeholder="Key"
@@ -537,7 +537,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                             handleMetadataChange(
                               entry.id,
                               "value",
-                              e.target.value
+                              e.target.value,
                             )
                           }
                           placeholder="Value"
@@ -657,7 +657,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                               placeholder="9.99"
                               className={cn(
                                 priceError &&
-                                  "border-destructive focus-visible:ring-destructive"
+                                  "border-destructive focus-visible:ring-destructive",
                               )}
                             />
                             {priceError && (
@@ -720,7 +720,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
                                 value={priceInterval}
                                 onChange={(e) =>
                                   setPriceInterval(
-                                    e.target.value as BillingInterval
+                                    e.target.value as BillingInterval,
                                   )
                                 }
                                 className="h-10 w-full rounded border px-3"

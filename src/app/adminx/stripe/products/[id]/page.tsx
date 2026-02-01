@@ -64,14 +64,14 @@ export default async function ProductDetailPage({
 
   const productImages = Array.isArray(product.images) ? product.images : [];
   const marketingFeatures =
-    product.marketing_features
+    product.features
       ?.map((feature) => feature?.name)
       .filter((name): name is string => Boolean(name?.trim())) ?? [];
   const metadataEntries = Object.entries(product.metadata ?? {});
   const defaultPriceId =
     typeof product.default_price === "string"
       ? product.default_price
-      : product.default_price?.id ?? null;
+      : (product.default_price?.id ?? null);
 
   const formatDate = (timestamp: number | null | undefined) => {
     if (!timestamp) return "Unknown";

@@ -10,7 +10,7 @@ export interface Product {
   metadata?: Record<string, string>;
   statement_descriptor?: string | null;
   unit_label?: string | null;
-  marketing_features?: { name: string }[];
+  features?: { name?: string }[];
 }
 
 export interface Price {
