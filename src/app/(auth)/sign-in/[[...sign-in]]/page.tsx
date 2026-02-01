@@ -33,17 +33,21 @@ export default function SignInPage() {
       });
 
       if (error) {
-        toast.error(error.message || "Failed to sign in. Please check your credentials.");
+        toast.error(
+          error.message || "Failed to sign in. Please check your credentials.",
+        );
         return;
       }
 
       toast.success("Signed in successfully!");
       router.push("/dashboard");
       router.refresh();
-    } catch (error: any) {
-      toast.error(
-        error?.message || "Failed to sign in. Please check your credentials.",
-      );
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to sign in. Please check your credentials.";
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -73,7 +77,15 @@ export default function SignInPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Password</Label>
+                  <Link
+                    href="/forgot-password"
+                    className="text-sm underline text-muted-foreground hover:text-foreground"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
                 <Input
                   id="password"
                   type="password"

@@ -2,6 +2,8 @@ import "server-only";
 
 import { db } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
+import { sendPasswordResetEmail } from "@/lib/email";
+import { checkPasswordResetRateLimit } from "@/lib/rate-limit";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
@@ -19,12 +21,21 @@ import type {
   SignOutResult,
 } from "../../types";
 
-const SITE_ADMIN_DOMAINS = new Set([
-  "w3dev",
-  "w3dev.email",
-  "w3dev.in",
-  "w3devemail.com",
-]);
+// Read admin domains from environment variable
+// Format: ADMIN_EMAIL_DOMAINS=domain1.com,domain2.io
+function getSiteAdminDomains(): Set<string> {
+  const domainsEnv = process.env.ADMIN_EMAIL_DOMAINS;
+  if (!domainsEnv) return new Set();
+
+  return new Set(
+    domainsEnv
+      .split(",")
+      .map((d) => d.trim().toLowerCase())
+      .filter(Boolean),
+  );
+}
+
+const SITE_ADMIN_DOMAINS = getSiteAdminDomains();
 
 export class BetterAuthServer implements AuthServerProvider {
   private authInstance;
@@ -44,6 +55,23 @@ export class BetterAuthServer implements AuthServerProvider {
         requireEmailVerification: false,
         minPasswordLength: 8,
         autoSignIn: true,
+        resetPasswordTokenExpiresIn: 3600, // 1 hour
+        sendResetPassword: async ({ user, url, token }, request) => {
+          // Check rate limit before sending
+          const rateLimit = await checkPasswordResetRateLimit(user.email);
+          if (!rateLimit.success) {
+            console.log(`[Auth] Password reset rate limited for ${user.email}`);
+            // Still return success to prevent email enumeration
+            return;
+          }
+
+          // Send the password reset email (or log to console if not configured)
+          void sendPasswordResetEmail({
+            to: user.email,
+            resetUrl: url,
+            token,
+          });
+        },
         password: {
           hash: async (password) => {
             return await bcrypt.hash(password, 10);
@@ -77,12 +105,15 @@ export class BetterAuthServer implements AuthServerProvider {
     return this.authInstance;
   }
 
-  async signInEmail(params: { email: string; password: string }): Promise<SignInResult> {
+  async signInEmail(params: {
+    email: string;
+    password: string;
+  }): Promise<SignInResult> {
     try {
       const result = await this.authInstance.api.signInEmail({
         body: params,
       });
-      if (result && 'user' in result) {
+      if (result && "user" in result) {
         const mappedSession = mapBetterAuthSession(result as any);
         return {
           data: mappedSession || undefined,
@@ -110,7 +141,7 @@ export class BetterAuthServer implements AuthServerProvider {
       const result = await this.authInstance.api.signUpEmail({
         body: params,
       });
-      if (result && 'user' in result) {
+      if (result && "user" in result) {
         const mappedSession = mapBetterAuthSession(result as any);
         await this.assignSiteAdminRoleIfEligible({
           email: params.email,

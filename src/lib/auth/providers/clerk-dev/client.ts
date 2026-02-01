@@ -11,17 +11,22 @@ import type {
   SignOutResult,
   GetSessionResult,
   UseSessionResult,
+  RequestPasswordResetParams,
+  RequestPasswordResetResult,
+  ResetPasswordParams,
+  ResetPasswordResult,
 } from "../../types";
 
 export async function clerkSignInEmail(
   clerkClient: any,
-  params: { email: string; password: string }
+  params: { email: string; password: string },
 ): Promise<SignInResult> {
   try {
     if (!clerkClient) {
       return {
         error: {
-          message: "Clerk client is not available. Make sure ClerkProvider is configured.",
+          message:
+            "Clerk client is not available. Make sure ClerkProvider is configured.",
           code: "CLERK_NOT_AVAILABLE",
         },
       };
@@ -78,13 +83,14 @@ export async function clerkSignInEmail(
 
 export async function clerkSignUpEmail(
   clerkClient: any,
-  params: { email: string; password: string; name: string }
+  params: { email: string; password: string; name: string },
 ): Promise<SignUpResult> {
   try {
     if (!clerkClient) {
       return {
         error: {
-          message: "Clerk client is not available. Make sure ClerkProvider is configured.",
+          message:
+            "Clerk client is not available. Make sure ClerkProvider is configured.",
           code: "CLERK_NOT_AVAILABLE",
         },
       };
@@ -95,16 +101,17 @@ export async function clerkSignUpEmail(
     const lastName = nameParts.slice(1).join(" ") || "";
 
     const client = clerkClient.client || clerkClient;
-    
+
     if (!client || !client.signUp) {
       return {
         error: {
-          message: "Clerk signUp method is not available. Ensure ClerkProvider is properly configured and client is initialized.",
+          message:
+            "Clerk signUp method is not available. Ensure ClerkProvider is properly configured and client is initialized.",
           code: "SIGNUP_NOT_AVAILABLE",
         },
       };
     }
-    
+
     const signUpAttempt = await client.signUp.create({
       emailAddress: params.email,
       password: params.password,
@@ -124,37 +131,41 @@ export async function clerkSignUpEmail(
       const missingFields = signUpAttempt.missingFields || [];
       const unverifiedFields = signUpAttempt.unverifiedFields || [];
       const verifications = (signUpAttempt as any).verifications || {};
-      
+
       let errorMessage = "Missing required information for sign-up";
       let isCaptchaIssue = false;
-      
+
       // Check for CAPTCHA-related issues
-      if (missingFields.some((field: string) => 
-        field.toLowerCase().includes('captcha') || 
-        field.toLowerCase().includes('bot') ||
-        field === 'captcha_token'
-      )) {
-        errorMessage = "Security verification is required. Please wait a moment for verification to complete and try again.";
+      if (
+        missingFields.some(
+          (field: string) =>
+            field.toLowerCase().includes("captcha") ||
+            field.toLowerCase().includes("bot") ||
+            field === "captcha_token",
+        )
+      ) {
+        errorMessage =
+          "Security verification is required. Please wait a moment for verification to complete and try again.";
         isCaptchaIssue = true;
-      }
-      else if (unverifiedFields.includes('email_address') || 
-               verifications?.email_address?.next_action === 'needs_prepare') {
-        errorMessage = "Email verification is required. Please check your email for a verification code.";
-      }
-      else if (missingFields.length > 0) {
+      } else if (
+        unverifiedFields.includes("email_address") ||
+        verifications?.email_address?.next_action === "needs_prepare"
+      ) {
+        errorMessage =
+          "Email verification is required. Please check your email for a verification code.";
+      } else if (missingFields.length > 0) {
         const fieldNames = missingFields.map((f: string) => {
-          if (f === 'email_address') return 'email';
-          if (f === 'phone_number') return 'phone number';
-          if (f === 'first_name') return 'first name';
-          if (f === 'last_name') return 'last name';
-          return f.replace(/_/g, ' ');
+          if (f === "email_address") return "email";
+          if (f === "phone_number") return "phone number";
+          if (f === "first_name") return "first name";
+          if (f === "last_name") return "last name";
+          return f.replace(/_/g, " ");
         });
-        errorMessage = `Missing required fields: ${fieldNames.join(', ')}`;
+        errorMessage = `Missing required fields: ${fieldNames.join(", ")}`;
+      } else if (unverifiedFields.length > 0) {
+        errorMessage = `Please verify: ${unverifiedFields.join(", ")}`;
       }
-      else if (unverifiedFields.length > 0) {
-        errorMessage = `Please verify: ${unverifiedFields.join(', ')}`;
-      }
-      
+
       return {
         error: {
           message: errorMessage,
@@ -194,14 +205,13 @@ export async function clerkSignUpEmail(
   }
 }
 
-export async function clerkSignOut(
-  clerkClient: any
-): Promise<SignOutResult> {
+export async function clerkSignOut(clerkClient: any): Promise<SignOutResult> {
   try {
     if (!clerkClient) {
       return {
         error: {
-          message: "Clerk client is not available. Make sure ClerkProvider is configured.",
+          message:
+            "Clerk client is not available. Make sure ClerkProvider is configured.",
           code: "CLERK_NOT_AVAILABLE",
         },
       };
@@ -210,7 +220,8 @@ export async function clerkSignOut(
     if (typeof clerkClient.signOut !== "function") {
       return {
         error: {
-          message: "Clerk signOut method is not available. Ensure ClerkProvider is properly configured.",
+          message:
+            "Clerk signOut method is not available. Ensure ClerkProvider is properly configured.",
           code: "SIGN_OUT_METHOD_NOT_AVAILABLE",
         },
       };
@@ -244,7 +255,7 @@ export class ClerkClient implements AuthClientProvider {
   constructor() {
     const config = getAuthConfig("clerk-dev");
     this.baseURL = config.baseURL;
-    
+
     if (typeof window !== "undefined") {
       this.clerkClientRef = globalClerkClientRef;
     }
@@ -257,7 +268,7 @@ export class ClerkClient implements AuthClientProvider {
 
   async waitForClerkClient(timeoutMs: number = 3000): Promise<boolean> {
     const startTime = Date.now();
-    
+
     while (Date.now() - startTime < timeoutMs) {
       if (
         this.clerkClientRef ||
@@ -268,37 +279,46 @@ export class ClerkClient implements AuthClientProvider {
       }
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
-    
+
     return false;
   }
 
-  async signInEmail(params: { email: string; password: string }): Promise<SignInResult> {
+  async signInEmail(params: {
+    email: string;
+    password: string;
+  }): Promise<SignInResult> {
     try {
       try {
-        const serverResponse = await fetch(`${this.baseURL}/api/auth/sign-in/email`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+        const serverResponse = await fetch(
+          `${this.baseURL}/api/auth/sign-in/email`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+              email: params.email,
+              password: params.password,
+            }),
           },
-          credentials: "include",
-          body: JSON.stringify({
-            email: params.email,
-            password: params.password,
-          }),
-        });
+        );
 
         const serverResult = await serverResponse.json();
 
         if (serverResult.data && !serverResult.error) {
-          const clerkClient = this.clerkClientRef || 
-                            (typeof window !== "undefined" ? (window as any).__clerk_client__ : null);
+          const clerkClient =
+            this.clerkClientRef ||
+            (typeof window !== "undefined"
+              ? (window as any).__clerk_client__
+              : null);
 
           if (clerkClient) {
             await new Promise((resolve) => setTimeout(resolve, 300));
-            
+
             let retries = 3;
             let lastError: any = null;
-            
+
             while (retries > 0) {
               try {
                 const result = await clerkSignInEmail(clerkClient, params);
@@ -314,17 +334,19 @@ export class ClerkClient implements AuthClientProvider {
               } catch (error: any) {
                 lastError = error;
               }
-              
+
               if (retries > 1) {
                 await new Promise((resolve) => setTimeout(resolve, 500));
               }
               retries--;
             }
-            
+
             if (lastError) {
               return {
                 error: {
-                  message: lastError.message || "Failed to authenticate with Clerk after migration",
+                  message:
+                    lastError.message ||
+                    "Failed to authenticate with Clerk after migration",
                   code: lastError.code || "AUTHENTICATION_FAILED",
                 },
               };
@@ -336,8 +358,10 @@ export class ClerkClient implements AuthClientProvider {
           }
         }
 
-        if (serverResult.error?.code === "CLIENT_SIDE_REQUIRED" || 
-            serverResult.error?.code === "INVALID_CREDENTIALS") {
+        if (
+          serverResult.error?.code === "CLIENT_SIDE_REQUIRED" ||
+          serverResult.error?.code === "INVALID_CREDENTIALS"
+        ) {
         } else if (serverResult.error) {
           return {
             error: {
@@ -350,8 +374,11 @@ export class ClerkClient implements AuthClientProvider {
         // Server-side failed, fall through to client-side
       }
 
-      const clerkClient = this.clerkClientRef || 
-                        (typeof window !== "undefined" ? (window as any).__clerk_client__ : null);
+      const clerkClient =
+        this.clerkClientRef ||
+        (typeof window !== "undefined"
+          ? (window as any).__clerk_client__
+          : null);
 
       if (clerkClient) {
         return await clerkSignInEmail(clerkClient, params);
@@ -389,7 +416,7 @@ export class ClerkClient implements AuthClientProvider {
       }
       if (clerkClient) {
         const result = await clerkSignUpEmail(clerkClient, params);
-        
+
         if (result.data !== undefined && !result.error) {
           await new Promise((resolve) => setTimeout(resolve, 300));
           const session = await this.getSession();
@@ -397,7 +424,7 @@ export class ClerkClient implements AuthClientProvider {
             return { data: session.data };
           }
         }
-        
+
         return result;
       }
 
@@ -405,7 +432,10 @@ export class ClerkClient implements AuthClientProvider {
         try {
           await import("@clerk/nextjs");
         } catch (importError) {
-          console.error('[ClerkClient] Failed to import @clerk/nextjs:', importError);
+          console.error(
+            "[ClerkClient] Failed to import @clerk/nextjs:",
+            importError,
+          );
         }
       }
 
@@ -417,7 +447,7 @@ export class ClerkClient implements AuthClientProvider {
         },
       };
     } catch (error: any) {
-      console.error('[ClerkClient] Exception in signUpEmail:', error);
+      console.error("[ClerkClient] Exception in signUpEmail:", error);
       return {
         error: {
           message: error?.message || "Failed to sign up",
@@ -436,13 +466,12 @@ export class ClerkClient implements AuthClientProvider {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-      return {
-        error: {
-          message:
-              errorData.error?.message || "Failed to sign out",
+        return {
+          error: {
+            message: errorData.error?.message || "Failed to sign out",
             code: errorData.error?.code || "SIGN_OUT_ERROR",
-        },
-      };
+          },
+        };
       }
 
       return {};
@@ -475,7 +504,8 @@ export class ClerkClient implements AuthClientProvider {
     } catch (error) {
       return {
         error: {
-          message: error instanceof Error ? error.message : "Failed to get session",
+          message:
+            error instanceof Error ? error.message : "Failed to get session",
         },
       };
     }
@@ -483,8 +513,32 @@ export class ClerkClient implements AuthClientProvider {
 
   useSession(): UseSessionResult {
     throw new Error(
-      "useSession must be called via the exported useSession hook, not directly on the class"
+      "useSession must be called via the exported useSession hook, not directly on the class",
     );
+  }
+
+  async requestPasswordReset(
+    _params: RequestPasswordResetParams,
+  ): Promise<RequestPasswordResetResult> {
+    // Clerk handles password reset through their hosted UI
+    // Redirect to Clerk's forgot password flow
+    if (typeof window !== "undefined") {
+      window.location.href = "/sign-in#/forgot-password";
+    }
+    return { success: true };
+  }
+
+  async resetPassword(
+    _params: ResetPasswordParams,
+  ): Promise<ResetPasswordResult> {
+    // Clerk handles password reset through their hosted UI
+    return {
+      error: {
+        message:
+          "Password reset is handled by Clerk. Please use the forgot password flow.",
+        code: "CLERK_HOSTED_UI",
+      },
+    };
   }
 
   getBaseClient() {
@@ -515,7 +569,7 @@ export function useClerkClient() {
 
 export function useInitializeClerkClient() {
   const clerk = useClerk();
-  
+
   useEffect(() => {
     if (clerk) {
       setGlobalClerkClient(clerk);
@@ -523,13 +577,13 @@ export function useInitializeClerkClient() {
       client.setClerkClient(clerk);
     }
   }, [clerk]);
-  
+
   return clerk;
 }
 
 export const useSession = (): UseSessionResult => {
   const provider = process.env.NEXT_PUBLIC_AUTH_PROVIDER || "better-auth";
-  
+
   if (provider !== "clerk-dev") {
     return {
       data: null,

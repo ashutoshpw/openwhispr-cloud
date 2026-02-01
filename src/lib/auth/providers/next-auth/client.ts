@@ -1,6 +1,11 @@
 "use client";
 
-import { signIn as nextAuthSignIn, signOut as nextAuthSignOut, useSession as useNextAuthSession, getSession as getNextAuthSession } from "next-auth/react";
+import {
+  signIn as nextAuthSignIn,
+  signOut as nextAuthSignOut,
+  useSession as useNextAuthSession,
+  getSession as getNextAuthSession,
+} from "next-auth/react";
 import { getAuthConfig } from "../../config";
 import { mapNextAuthSession } from "../../utils/schema-mapper";
 import type {
@@ -10,6 +15,10 @@ import type {
   SignOutResult,
   GetSessionResult,
   UseSessionResult,
+  RequestPasswordResetParams,
+  RequestPasswordResetResult,
+  ResetPasswordParams,
+  ResetPasswordResult,
 } from "../../types";
 
 export class NextAuthClient implements AuthClientProvider {
@@ -29,7 +38,10 @@ export class NextAuthClient implements AuthClientProvider {
     };
   }
 
-  async signInEmail(params: { email: string; password: string }): Promise<SignInResult> {
+  async signInEmail(params: {
+    email: string;
+    password: string;
+  }): Promise<SignInResult> {
     try {
       const result = await nextAuthSignIn("credentials", {
         email: params.email,
@@ -103,10 +115,13 @@ export class NextAuthClient implements AuthClientProvider {
       });
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ error: { message: "Failed to sign up" } }));
+        const error = await response
+          .json()
+          .catch(() => ({ error: { message: "Failed to sign up" } }));
         return {
           error: {
-            message: error.error?.message || error.message || "Failed to sign up",
+            message:
+              error.error?.message || error.message || "Failed to sign up",
           },
         };
       }
@@ -123,7 +138,7 @@ export class NextAuthClient implements AuthClientProvider {
           },
         };
       }
-      
+
       return signInResult;
     } catch (error) {
       return {
@@ -141,7 +156,8 @@ export class NextAuthClient implements AuthClientProvider {
     } catch (error) {
       return {
         error: {
-          message: error instanceof Error ? error.message : "Failed to sign out",
+          message:
+            error instanceof Error ? error.message : "Failed to sign out",
         },
       };
     }
@@ -150,7 +166,12 @@ export class NextAuthClient implements AuthClientProvider {
   async getSession(): Promise<GetSessionResult> {
     try {
       const session = await getNextAuthSession();
-      if (!session || !session.user || !session.user.id || !session.user.email) {
+      if (
+        !session ||
+        !session.user ||
+        !session.user.id ||
+        !session.user.email
+      ) {
         return { data: undefined };
       }
       const mappedSession = mapNextAuthSession({
@@ -168,7 +189,8 @@ export class NextAuthClient implements AuthClientProvider {
     } catch (error) {
       return {
         error: {
-          message: error instanceof Error ? error.message : "Failed to get session",
+          message:
+            error instanceof Error ? error.message : "Failed to get session",
         },
       };
     }
@@ -196,6 +218,79 @@ export class NextAuthClient implements AuthClientProvider {
       data: mappedSession,
       isLoading,
     };
+  }
+
+  async requestPasswordReset(
+    params: RequestPasswordResetParams,
+  ): Promise<RequestPasswordResetResult> {
+    try {
+      const response = await fetch(`${this.baseURL}/api/auth/forgot-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: params.email }),
+      });
+
+      const result = await response.json();
+
+      if (result.error) {
+        return {
+          error: {
+            message: result.error.message || "Failed to request password reset",
+            code: result.error.code,
+          },
+        };
+      }
+
+      return { success: true };
+    } catch (error) {
+      return {
+        error: {
+          message:
+            error instanceof Error
+              ? error.message
+              : "Failed to request password reset",
+        },
+      };
+    }
+  }
+
+  async resetPassword(
+    params: ResetPasswordParams,
+  ): Promise<ResetPasswordResult> {
+    try {
+      const response = await fetch(`${this.baseURL}/api/auth/reset-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          token: params.token,
+          newPassword: params.newPassword,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.error) {
+        return {
+          error: {
+            message: result.error.message || "Failed to reset password",
+            code: result.error.code,
+          },
+        };
+      }
+
+      return { success: true };
+    } catch (error) {
+      return {
+        error: {
+          message:
+            error instanceof Error ? error.message : "Failed to reset password",
+        },
+      };
+    }
   }
 }
 

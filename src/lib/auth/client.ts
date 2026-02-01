@@ -7,6 +7,10 @@ import type {
   SignOutResult,
   GetSessionResult,
   UseSessionResult,
+  RequestPasswordResetParams,
+  RequestPasswordResetResult,
+  ResetPasswordParams,
+  ResetPasswordResult,
 } from "./types";
 
 class BaseAuthClient {
@@ -18,16 +22,21 @@ class BaseAuthClient {
     if (this.loading) return this.loading;
 
     this.loading = (async () => {
-      const providerName = process.env.NEXT_PUBLIC_AUTH_PROVIDER || "better-auth";
+      const providerName =
+        process.env.NEXT_PUBLIC_AUTH_PROVIDER || "better-auth";
 
       switch (providerName) {
         case "better-auth": {
-          const { BetterAuthClient } = await import("./providers/better-auth/client");
+          const { BetterAuthClient } = await import(
+            "./providers/better-auth/client"
+          );
           this.provider = new BetterAuthClient();
           break;
         }
         case "next-auth": {
-          const { NextAuthClient } = await import("./providers/next-auth/client");
+          const { NextAuthClient } = await import(
+            "./providers/next-auth/client"
+          );
           this.provider = new NextAuthClient();
           break;
         }
@@ -36,8 +45,10 @@ class BaseAuthClient {
           this.provider = new AuthKitClient();
           break;
         }
-        case "clerk-dev": { 
-          const { getClientInstance } = await import("./providers/clerk-dev/client");
+        case "clerk-dev": {
+          const { getClientInstance } = await import(
+            "./providers/clerk-dev/client"
+          );
           this.provider = getClientInstance();
           break;
         }
@@ -52,8 +63,11 @@ class BaseAuthClient {
     return this.loading;
   }
 
-  async signInEmail(params: { email: string; password: string }): Promise<SignInResult> {
-    const provider = await this.loadProvider();    
+  async signInEmail(params: {
+    email: string;
+    password: string;
+  }): Promise<SignInResult> {
+    const provider = await this.loadProvider();
     return provider.signInEmail(params);
   }
 
@@ -62,9 +76,9 @@ class BaseAuthClient {
     password: string;
     name: string;
   }): Promise<SignUpResult> {
-    const provider = await this.loadProvider();    
+    const provider = await this.loadProvider();
     const result = await provider.signUpEmail(params);
-    
+
     return result;
   }
 
@@ -80,7 +94,7 @@ class BaseAuthClient {
 
   useSession(): UseSessionResult {
     const providerName = process.env.NEXT_PUBLIC_AUTH_PROVIDER || "better-auth";
-    
+
     try {
       switch (providerName) {
         case "better-auth": {
@@ -102,16 +116,20 @@ class BaseAuthClient {
         default:
           throw new Error(`Unknown auth provider: ${providerName}`);
       }
-    } catch (error: any) {
-      const errorMessage = error?.message || String(error);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
 
-      if (errorMessage.includes("ClerkProvider") || errorMessage.includes("useAuth")) {
+      if (
+        errorMessage.includes("ClerkProvider") ||
+        errorMessage.includes("useAuth")
+      ) {
         return {
           data: null,
           isLoading: false,
         };
       }
-      
+
       return {
         data: null,
         isLoading: false,
@@ -126,12 +144,43 @@ class BaseAuthClient {
     }
     return null;
   }
+
+  async requestPasswordReset(
+    params: RequestPasswordResetParams,
+  ): Promise<RequestPasswordResetResult> {
+    const provider = await this.loadProvider();
+    if (provider.requestPasswordReset) {
+      return provider.requestPasswordReset(params);
+    }
+    return {
+      error: {
+        message: "Password reset not supported by this auth provider",
+        code: "NOT_SUPPORTED",
+      },
+    };
+  }
+
+  async resetPassword(
+    params: ResetPasswordParams,
+  ): Promise<ResetPasswordResult> {
+    const provider = await this.loadProvider();
+    if (provider.resetPassword) {
+      return provider.resetPassword(params);
+    }
+    return {
+      error: {
+        message: "Password reset not supported by this auth provider",
+        code: "NOT_SUPPORTED",
+      },
+    };
+  }
 }
 
 const baseClient = new BaseAuthClient();
 
 export const signIn = {
-  email: (params: { email: string; password: string }) => baseClient.signInEmail(params),
+  email: (params: { email: string; password: string }) =>
+    baseClient.signInEmail(params),
 };
 
 export const signUp = {
@@ -144,3 +193,8 @@ export const getSession = () => baseClient.getSession();
 export const useSession = () => baseClient.useSession();
 export const getBaseClient = () => baseClient.getBaseClient();
 
+export const forgotPassword = {
+  request: (params: RequestPasswordResetParams) =>
+    baseClient.requestPasswordReset(params),
+  reset: (params: ResetPasswordParams) => baseClient.resetPassword(params),
+};

@@ -11,6 +11,10 @@ import type {
   SignOutResult,
   GetSessionResult,
   UseSessionResult,
+  RequestPasswordResetParams,
+  RequestPasswordResetResult,
+  ResetPasswordParams,
+  ResetPasswordResult,
 } from "../../types";
 
 export class BetterAuthClient implements AuthClientProvider {
@@ -29,7 +33,10 @@ export class BetterAuthClient implements AuthClientProvider {
     return this.client;
   }
 
-  async signInEmail(params: { email: string; password: string }): Promise<SignInResult> {
+  async signInEmail(params: {
+    email: string;
+    password: string;
+  }): Promise<SignInResult> {
     try {
       const result = await this.client.signIn.email(params);
       if (result.error) {
@@ -40,7 +47,9 @@ export class BetterAuthClient implements AuthClientProvider {
           },
         };
       }
-      const mappedSession = result.data ? mapBetterAuthSession(result.data) : null;
+      const mappedSession = result.data
+        ? mapBetterAuthSession(result.data)
+        : null;
       return {
         data: mappedSession || undefined,
       };
@@ -68,7 +77,9 @@ export class BetterAuthClient implements AuthClientProvider {
           },
         };
       }
-      const mappedSession = result.data ? mapBetterAuthSession(result.data) : null;
+      const mappedSession = result.data
+        ? mapBetterAuthSession(result.data)
+        : null;
       return {
         data: mappedSession || undefined,
       };
@@ -88,7 +99,8 @@ export class BetterAuthClient implements AuthClientProvider {
     } catch (error) {
       return {
         error: {
-          message: error instanceof Error ? error.message : "Failed to sign out",
+          message:
+            error instanceof Error ? error.message : "Failed to sign out",
         },
       };
     }
@@ -105,14 +117,17 @@ export class BetterAuthClient implements AuthClientProvider {
           },
         };
       }
-      const mappedSession = result.data ? mapBetterAuthSession(result.data) : null;
+      const mappedSession = result.data
+        ? mapBetterAuthSession(result.data)
+        : null;
       return {
         data: mappedSession || undefined,
       };
     } catch (error) {
       return {
         error: {
-          message: error instanceof Error ? error.message : "Failed to get session",
+          message:
+            error instanceof Error ? error.message : "Failed to get session",
         },
       };
     }
@@ -132,6 +147,62 @@ export class BetterAuthClient implements AuthClientProvider {
       isLoading: isPending,
     };
   }
+
+  async requestPasswordReset(
+    params: RequestPasswordResetParams,
+  ): Promise<RequestPasswordResetResult> {
+    try {
+      const result = await this.client.forgetPassword({
+        email: params.email,
+        redirectTo: params.redirectTo,
+      });
+      if (result.error) {
+        return {
+          error: {
+            message: result.error.message || "Failed to request password reset",
+            code: result.error.code,
+          },
+        };
+      }
+      return { success: true };
+    } catch (error) {
+      return {
+        error: {
+          message:
+            error instanceof Error
+              ? error.message
+              : "Failed to request password reset",
+        },
+      };
+    }
+  }
+
+  async resetPassword(
+    params: ResetPasswordParams,
+  ): Promise<ResetPasswordResult> {
+    try {
+      const result = await this.client.resetPassword({
+        newPassword: params.newPassword,
+        token: params.token,
+      });
+      if (result.error) {
+        return {
+          error: {
+            message: result.error.message || "Failed to reset password",
+            code: result.error.code,
+          },
+        };
+      }
+      return { success: true };
+    } catch (error) {
+      return {
+        error: {
+          message:
+            error instanceof Error ? error.message : "Failed to reset password",
+        },
+      };
+    }
+  }
 }
 
 let clientInstance: BetterAuthClient | null = null;
@@ -147,4 +218,3 @@ export const useSession = () => {
   const client = getClientInstance();
   return client.useSession();
 };
-

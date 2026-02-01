@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 8801",
     "build": "next build",
     "start": "next start",
     "lint": "biome check .",
@@ -14,9 +14,11 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
+    "db:seed": "tsx scripts/seed-admin.ts",
     "stripe:verify": "node scripts/verify-stripe-keys.js",
     "stripe:migrate": "tsx scripts/migrate-stripe-schema.ts",
-    "stripe:backfill": "tsx scripts/backfill-stripe-data.ts"
+    "stripe:backfill": "tsx scripts/backfill-stripe-data.ts",
+    "setup": "tsx scripts/setup.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.1",
@@ -79,6 +81,7 @@
     "react-hook-form": "^7.51.3",
     "react-icons": "^4.11.0",
     "recharts": "^2.12.7",
+    "resend": "^6.9.1",
     "sonner": "^1.4.41",
     "stripe": "^14.16.0",
     "stripe-sync-engine": "^0.1.0",
@@ -88,6 +91,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
+    "@inquirer/prompts": "^8.2.0",
     "@types/bcryptjs": "^3.0.0",
     "@types/node": "^20",
     "@types/react": "^19",

@@ -16,7 +16,7 @@ export interface UnifiedSession {
 export interface AuthError {
   message: string;
   code?: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
 }
 
 export interface SignInResult {
@@ -30,6 +30,26 @@ export interface SignUpResult {
 }
 
 export interface SignOutResult {
+  error?: AuthError;
+}
+
+export interface RequestPasswordResetParams {
+  email: string;
+  redirectTo?: string;
+}
+
+export interface RequestPasswordResetResult {
+  success?: boolean;
+  error?: AuthError;
+}
+
+export interface ResetPasswordParams {
+  token: string;
+  newPassword: string;
+}
+
+export interface ResetPasswordResult {
+  success?: boolean;
   error?: AuthError;
 }
 
@@ -80,16 +100,29 @@ export interface SetActiveOrganizationResult {
 export interface OrganizationAdapter {
   list(): Promise<ListOrganizationsResult>;
   create(params: CreateOrganizationParams): Promise<CreateOrganizationResult>;
-  setActive(params: SetActiveOrganizationParams): Promise<SetActiveOrganizationResult>;
+  setActive(
+    params: SetActiveOrganizationParams,
+  ): Promise<SetActiveOrganizationResult>;
 }
 
 export interface AuthClientProvider {
-  signInEmail(params: { email: string; password: string }): Promise<SignInResult>;
-  signUpEmail(params: { email: string; password: string; name: string }): Promise<SignUpResult>;
+  signInEmail(params: {
+    email: string;
+    password: string;
+  }): Promise<SignInResult>;
+  signUpEmail(params: {
+    email: string;
+    password: string;
+    name: string;
+  }): Promise<SignUpResult>;
   signOut(): Promise<SignOutResult>;
   getSession(): Promise<GetSessionResult>;
   useSession(): UseSessionResult;
-  getBaseClient?(): any;
+  requestPasswordReset?(
+    params: RequestPasswordResetParams,
+  ): Promise<RequestPasswordResetResult>;
+  resetPassword?(params: ResetPasswordParams): Promise<ResetPasswordResult>;
+  getBaseClient?(): unknown;
 }
 
 export interface AuthServerProvider {
@@ -98,9 +131,15 @@ export interface AuthServerProvider {
     GET: (req: Request) => Promise<Response>;
     POST: (req: Request) => Promise<Response>;
   };
-  getAuthInstance?(): any;
-  signInEmail?(params: { email: string; password: string }): Promise<SignInResult>;
-  signUpEmail?(params: { email: string; password: string; name: string }): Promise<SignUpResult>;
+  getAuthInstance?(): unknown;
+  signInEmail?(params: {
+    email: string;
+    password: string;
+  }): Promise<SignInResult>;
+  signUpEmail?(params: {
+    email: string;
+    password: string;
+    name: string;
+  }): Promise<SignUpResult>;
   signOut?(): Promise<SignOutResult>;
 }
-

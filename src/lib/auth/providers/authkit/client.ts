@@ -1,7 +1,11 @@
 "use client";
 
 import { useAuth as useAuthKitAuth } from "@workos-inc/authkit-nextjs/components";
-import { getSignInUrl, getSignUpUrl, signOut as authKitSignOut } from "@workos-inc/authkit-nextjs";
+import {
+  getSignInUrl,
+  getSignUpUrl,
+  signOut as authKitSignOut,
+} from "@workos-inc/authkit-nextjs";
 import { getAuthConfig } from "../../config";
 import { mapAuthKitSession } from "../../utils/schema-mapper";
 import type {
@@ -11,6 +15,10 @@ import type {
   SignOutResult,
   GetSessionResult,
   UseSessionResult,
+  RequestPasswordResetParams,
+  RequestPasswordResetResult,
+  ResetPasswordParams,
+  ResetPasswordResult,
 } from "../../types";
 
 export class AuthKitClient implements AuthClientProvider {
@@ -21,7 +29,10 @@ export class AuthKitClient implements AuthClientProvider {
     this.baseURL = config.baseURL;
   }
 
-  async signInEmail(params: { email: string; password: string }): Promise<SignInResult> {
+  async signInEmail(params: {
+    email: string;
+    password: string;
+  }): Promise<SignInResult> {
     try {
       const response = await fetch(`${this.baseURL}/api/auth/sign-in/email`, {
         method: "POST",
@@ -32,16 +43,19 @@ export class AuthKitClient implements AuthClientProvider {
       });
 
       const result = await response.json();
-      
+
       if (result.error) {
-        if (result.error.code === "user_not_found" || result.error.message?.includes("not found")) {
+        if (
+          result.error.code === "user_not_found" ||
+          result.error.message?.includes("not found")
+        ) {
           const signInUrl = await getSignInUrl();
           window.location.href = signInUrl;
           return {
             data: undefined,
           };
         }
-        
+
         return {
           error: {
             message: result.error.message || "Failed to sign in",
@@ -72,7 +86,8 @@ export class AuthKitClient implements AuthClientProvider {
       } catch (redirectError) {
         return {
           error: {
-            message: error instanceof Error ? error.message : "Failed to sign in",
+            message:
+              error instanceof Error ? error.message : "Failed to sign in",
           },
         };
       }
@@ -106,7 +121,8 @@ export class AuthKitClient implements AuthClientProvider {
     } catch (error) {
       return {
         error: {
-          message: error instanceof Error ? error.message : "Failed to sign out",
+          message:
+            error instanceof Error ? error.message : "Failed to sign out",
         },
       };
     }
@@ -131,7 +147,8 @@ export class AuthKitClient implements AuthClientProvider {
     } catch (error) {
       return {
         error: {
-          message: error instanceof Error ? error.message : "Failed to get session",
+          message:
+            error instanceof Error ? error.message : "Failed to get session",
         },
       };
     }
@@ -168,6 +185,42 @@ export class AuthKitClient implements AuthClientProvider {
     };
   }
 
+  async requestPasswordReset(
+    _params: RequestPasswordResetParams,
+  ): Promise<RequestPasswordResetResult> {
+    // AuthKit/WorkOS handles password reset through their hosted UI
+    try {
+      const signInUrl = await getSignInUrl();
+      if (typeof window !== "undefined") {
+        // WorkOS handles forgot password in their hosted sign-in flow
+        window.location.href = signInUrl;
+      }
+      return { success: true };
+    } catch (error) {
+      return {
+        error: {
+          message:
+            error instanceof Error
+              ? error.message
+              : "Failed to redirect to password reset",
+        },
+      };
+    }
+  }
+
+  async resetPassword(
+    _params: ResetPasswordParams,
+  ): Promise<ResetPasswordResult> {
+    // AuthKit/WorkOS handles password reset through their hosted UI
+    return {
+      error: {
+        message:
+          "Password reset is handled by WorkOS. Please use the forgot password flow.",
+        code: "WORKOS_HOSTED_UI",
+      },
+    };
+  }
+
   getBaseClient() {
     return null;
   }
@@ -186,4 +239,3 @@ export const useSession = () => {
   const client = getClientInstance();
   return client.useSession();
 };
-
