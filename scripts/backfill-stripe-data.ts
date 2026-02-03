@@ -1,4 +1,4 @@
-import { stripeSync } from "../src/lib/stripe/sync";
+import { stripeSync } from "../apps/next-app/src/lib/stripe/sync";
 
 async function backfillStripeData() {
   console.log("🔄 Backfilling Stripe data...");

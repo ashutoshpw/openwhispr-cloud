@@ -16,11 +16,14 @@
   },
   "files": {
     "ignore": [
-      ".next/**",
-      "node_modules/**",
-      "out/**",
-      "build/**",
-      "next-env.d.ts"
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/build/**",
+      "**/.next/**",
+      "**/out/**",
+      "**/drizzle/**",
+      "**/.turbo/**",
+      "**/next-env.d.ts"
     ]
   }
 }

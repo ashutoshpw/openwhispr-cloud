@@ -54,8 +54,8 @@ async function main() {
   }
 
   // Dynamic imports to avoid loading db before env is configured
-  const { db } = await import("../src/lib/db");
-  const { user, account } = await import("../src/lib/db/schema");
+  const { db } = await import("@repo/database");
+  const { user, account } = await import("@repo/database/schema");
 
   // Check if user already exists
   const existingUser = await db()

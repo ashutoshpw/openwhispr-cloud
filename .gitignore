@@ -1,19 +1,23 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
-/.pnp
+node_modules
+.pnp
 .pnp.js
 
 # testing
-/coverage
+coverage
 
 # next.js
-/.next/
-/out/
+.next/
+out/
 
 # production
-/build
+build
+dist
+
+# turbo
+.turbo
 
 # misc
 .DS_Store
@@ -35,8 +39,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# drizzle
-/drizzle
+# drizzle migrations (generated locally)
+packages/database/drizzle
 
 # stripe sync engine build artifacts
 /packages/stripe-sync-engine/node_modules
@@ -45,6 +49,16 @@ next-env.d.ts
 # docker
 docker-compose.override.yml
 
-# cursor (override global gitignore)
+# cursor/ai agents (override global gitignore)
 !.cursor/
 !.cursor/**
+!.agents/
+!.agents/**
+!.agent/
+!.agent/**
+!.claude/
+!.claude/**
+!.gemini/
+!.gemini/**
+!.codex/
+!.codex/**

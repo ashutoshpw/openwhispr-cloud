@@ -1,18 +1,22 @@
-FROM node:20-alpine
+FROM oven/bun:1 AS base
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Copy root workspace files
+COPY package.json bun.lock turbo.json ./
+COPY apps/next-app/package.json ./apps/next-app/
+COPY packages/database/package.json ./packages/database/
 
 # Install dependencies
-RUN npm install --legacy-peer-deps
+RUN bun install
 
-# Copy the rest of the application
+# Copy all source files
 COPY . .
 
-# Expose port
-EXPOSE 3000
+# Build the app
+RUN bun run build
 
-# Start the development server
-CMD ["npm", "run", "dev"]
+EXPOSE 8801
+
+WORKDIR /app/apps/next-app
+CMD ["bun", "run", "start"]

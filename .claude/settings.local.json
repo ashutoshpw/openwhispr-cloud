@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__next-devtools__upgrade_nextjs_16",
+      "Bash(node --version:*)",
+      "Bash(npm view:*)",
+      "Bash(ls:*)",
+      "Bash(bun add:*)",
+      "Bash(bun run:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(bunx path-to-port:*)"
+    ]
+  }
+}
