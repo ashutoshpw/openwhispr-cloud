@@ -1,7 +1,7 @@
 import { StatsCards } from "@/components/admin/StatsCards";
 import { db } from "@repo/database";
 import { user, organization, payments, session } from "@repo/database/schema";
-import { sql, gt } from "/database";
+import { sql, gt } from "@repo/database";
 
 async function getStats() {
   try {

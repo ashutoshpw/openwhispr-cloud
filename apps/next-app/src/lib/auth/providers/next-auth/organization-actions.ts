@@ -2,7 +2,7 @@
 
 import { db } from "@repo/database";
 import { organization, member, project } from "@repo/database/schema";
-import { eq, inArray } from "/database";
+import { eq, inArray } from "@repo/database";
 import { auth } from "@/lib/auth";
 import type {
   ListOrganizationsResult,

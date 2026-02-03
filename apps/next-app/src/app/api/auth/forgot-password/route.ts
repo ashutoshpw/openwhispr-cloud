@@ -3,7 +3,7 @@ import * as schema from "@repo/database/schema";
 import { sendPasswordResetEmail } from "@/lib/email";
 import { checkPasswordResetRateLimit } from "@/lib/rate-limit";
 import { randomBytes } from "node:crypto";
-import { eq } from "/database";
+import { eq } from "@repo/database";
 import { nanoid } from "nanoid";
 import { NextResponse } from "next/server";
 

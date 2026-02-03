@@ -1,5 +1,5 @@
 import { db } from "@repo/database";
-import { sql } from "/database";
+import { sql } from "@repo/database";
 import { stripe } from "./client";
 
 const STRIPE_SCHEMA = process.env.STRIPE_SCHEMA ?? "stripe";

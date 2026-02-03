@@ -3,7 +3,7 @@
 import { BetterAuthServer } from "./server";
 import { db } from "@repo/database";
 import { organization, member, project } from "@repo/database/schema";
-import { eq, inArray } from "/database";
+import { eq, inArray } from "@repo/database";
 import type {
   ListOrganizationsResult,
   CreateOrganizationParams,

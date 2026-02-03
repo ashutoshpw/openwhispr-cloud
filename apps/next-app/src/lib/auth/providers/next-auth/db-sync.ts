@@ -1,6 +1,6 @@
 import { db } from "@repo/database";
 import * as schema from "@repo/database/schema";
-import { eq } from "/database";
+import { eq } from "@repo/database";
 import { nanoid } from "nanoid";
 
 export async function createNextAuthSessionInDb(

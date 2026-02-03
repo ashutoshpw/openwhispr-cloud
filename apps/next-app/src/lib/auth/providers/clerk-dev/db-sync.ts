@@ -2,7 +2,7 @@ import "server-only";
 
 import { db } from "@repo/database";
 import * as schema from "@repo/database/schema";
-import { eq, and } from "/database";
+import { eq, and } from "@repo/database";
 import { nanoid } from "nanoid";
 
 export interface ClerkUserData {

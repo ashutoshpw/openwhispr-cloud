@@ -4,7 +4,7 @@ import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "@repo/database";
 import * as schema from "@repo/database/schema";
 import { getAuthConfig } from "../../config";
-import { eq, and } from "/database";
+import { eq, and } from "@repo/database";
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   adapter: DrizzleAdapter(db(), {

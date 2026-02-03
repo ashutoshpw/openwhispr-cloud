@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@repo/database";
 import { organization, project } from "@repo/database/schema";
-import { eq } from "/database";
+import { eq } from "@repo/database";
 import { ProjectTable } from "@/components/admin/ProjectTable";
 
 async function getOrganization(id: string) {

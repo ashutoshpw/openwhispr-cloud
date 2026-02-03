@@ -4,7 +4,7 @@ import { NextAuthServer } from "./server";
 import type { UnifiedSession, SignUpResult, SignInResult, SignOutResult } from "../../types";
 import { db } from "@repo/database";
 import * as schema from "@repo/database/schema";
-import { eq, and } from "/database";
+import { eq, and } from "@repo/database";
 
 let serverInstance: NextAuthServer | null = null;
 

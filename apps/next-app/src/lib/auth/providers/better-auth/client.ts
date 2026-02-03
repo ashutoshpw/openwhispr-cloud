@@ -153,6 +153,7 @@ export class BetterAuthClient implements AuthClientProvider {
     params: RequestPasswordResetParams,
   ): Promise<RequestPasswordResetResult> {
     try {
+      // @ts-expect-error - forgetPassword exists but may not be in types
       const result = await this.client.forgetPassword({
         email: params.email,
         redirectTo: params.redirectTo,

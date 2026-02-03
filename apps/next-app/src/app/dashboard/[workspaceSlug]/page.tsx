@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { db } from "@repo/database";
 import { member, organization, project } from "@repo/database/schema";
-import { and, eq } from "/database";
+import { and, eq } from "@repo/database";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@repo/database";
 import { project, organization } from "@repo/database/schema";
-import { eq } from "/database";
+import { eq } from "@repo/database";
 
 async function getProject(id: string) {
   try {

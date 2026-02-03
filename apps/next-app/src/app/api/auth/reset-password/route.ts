@@ -1,7 +1,7 @@
 import { db } from "@repo/database";
 import * as schema from "@repo/database/schema";
 import bcrypt from "bcryptjs";
-import { and, eq, gt } from "/database";
+import { and, eq, gt } from "@repo/database";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {

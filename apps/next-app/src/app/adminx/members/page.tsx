@@ -1,6 +1,6 @@
 import { db } from "@repo/database";
 import { member, user, organization } from "@repo/database/schema";
-import { eq } from "/database";
+import { eq } from "@repo/database";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 

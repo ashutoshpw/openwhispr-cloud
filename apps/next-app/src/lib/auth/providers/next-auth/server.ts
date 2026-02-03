@@ -2,7 +2,7 @@ import "server-only";
 
 import { db } from "@repo/database";
 import * as schema from "@repo/database/schema";
-import { eq } from "/database";
+import { eq } from "@repo/database";
 import { NextRequest } from "next/server";
 import { auth, handlers, signIn, signOut } from "./config";
 import { mapNextAuthSession } from "../../utils/schema-mapper";

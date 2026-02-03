@@ -11,7 +11,7 @@ import type {
 } from "../../types";
 import { db } from "@repo/database";
 import * as schema from "@repo/database/schema";
-import { eq, and } from "/database";
+import { eq, and } from "@repo/database";
 import { checkUserExistsInClerk, createUserInClerk } from "./user-migration";
 
 export class ClerkServer implements AuthServerProvider {

@@ -5,7 +5,7 @@ import { WorkOS } from "@workos-inc/node";
 import { NextRequest } from "next/server";
 import { db } from "@repo/database";
 import * as schema from "@repo/database/schema";
-import { eq } from "/database";
+import { eq } from "@repo/database";
 import { getAuthConfig } from "../../config";
 import { mapAuthKitSession } from "../../utils/schema-mapper";
 import type {

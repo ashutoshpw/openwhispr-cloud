@@ -33,7 +33,7 @@ async function checkUserWorkspaces(
   try {
     const { db } = await import("@repo/database");
     const { member } = await import("@repo/database/schema");
-    const { eq } = await import("drizzle-orm");
+    const { eq } = await import("@repo/database");
 
     const userMembers = await db()
       .select({ organizationId: member.organizationId })
@@ -235,7 +235,7 @@ async function clerkWrappedMiddleware(
               // Check admin status by email in our database
               const { db } = await import("@repo/database");
               const { user } = await import("@repo/database/schema");
-              const { eq } = await import("drizzle-orm");
+              const { eq } = await import("@repo/database");
 
               const userRecord = await db()
                 .select({ role: user.role })

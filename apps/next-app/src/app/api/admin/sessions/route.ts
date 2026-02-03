@@ -4,7 +4,7 @@ import { getSiteAdminStatus } from "@/lib/auth-utils";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { sql } from "/database";
+import { sql } from "@repo/database";
 
 export async function GET() {
   try {

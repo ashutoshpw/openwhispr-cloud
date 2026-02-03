@@ -5,7 +5,7 @@ import { user, organization, payments, session } from "@repo/database/schema";
 import { getSiteAdminStatus } from "@/lib/auth-utils";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { sql, eq } from "/database";
+import { sql, eq } from "@repo/database";
 
 async function requireAdmin() {
   const session = await auth.api.getSession({

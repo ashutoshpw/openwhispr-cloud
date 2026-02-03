@@ -12,7 +12,7 @@ import { toNextJsHandler } from "better-auth/next-js";
 import { getAuthConfig } from "../../config";
 import { mapBetterAuthSession } from "../../utils/schema-mapper";
 import bcrypt from "bcryptjs";
-import { eq } from "/database";
+import { eq } from "@repo/database";
 import type {
   AuthServerProvider,
   UnifiedSession,

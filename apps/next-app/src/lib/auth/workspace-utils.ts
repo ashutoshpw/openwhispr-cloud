@@ -2,7 +2,7 @@ import "server-only";
 
 import { db } from "@repo/database";
 import { member, organization } from "@repo/database/schema";
-import { eq, inArray } from "/database";
+import { eq, inArray } from "@repo/database";
 import { auth } from "@/lib/auth";
 
 // Cookie name for caching workspace status
