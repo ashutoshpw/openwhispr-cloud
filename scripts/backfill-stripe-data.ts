@@ -1,5 +1,5 @@
 import { stripeSync } from "../src/lib/stripe/sync";
-import "dotenv/config";
+
 async function backfillStripeData() {
   console.log("🔄 Backfilling Stripe data...");
 
@@ -10,7 +10,7 @@ async function backfillStripeData() {
 
     console.log("\n✅ Stripe data backfill completed successfully!");
     console.log("\n📊 Synced entities:");
-    
+
     if (result.products) {
       console.log(`  - Products: ${result.products.synced}`);
     }
@@ -38,9 +38,11 @@ async function backfillStripeData() {
 
     console.log("\n✨ All Stripe data has been synced to your database!");
     process.exit(0);
-  } catch (error: any) {
-    console.error("❌ Backfill failed:", error.message);
-    console.error(error.stack);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : "";
+    console.error("❌ Backfill failed:", errorMessage);
+    console.error(errorStack);
     process.exit(1);
   }
 }

@@ -2,6 +2,7 @@
 
 import { ModeToggle } from "@/components/ModeToggle";
 import { Profile } from "@/components/Profile";
+import { AdminCommandMenu } from "@/components/admin/admin-command-menu";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -23,6 +24,7 @@ import {
   DollarSign,
   Ticket,
   Tag,
+  FolderKanban,
 } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -35,6 +37,7 @@ export default function AdminTopNav({ children }: { children: ReactNode }) {
     { href: "/adminx/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { href: "/adminx/users", icon: Users, label: "Users" },
     { href: "/adminx/organizations", icon: Building2, label: "Organizations" },
+    { href: "/adminx/projects", icon: FolderKanban, label: "Projects" },
     { href: "/adminx/members", icon: UserCog, label: "Members" },
     { href: "/adminx/payments", icon: CreditCard, label: "Payments" },
     { href: "/adminx/sessions", icon: Activity, label: "Sessions" },
@@ -69,7 +72,8 @@ export default function AdminTopNav({ children }: { children: ReactNode }) {
                   <Link key={item.href} href={item.href}>
                     <Button
                       variant={
-                        pathname === item.href || pathname.startsWith(item.href + "/")
+                        pathname === item.href ||
+                        pathname.startsWith(item.href + "/")
                           ? "default"
                           : "outline"
                       }
@@ -81,20 +85,21 @@ export default function AdminTopNav({ children }: { children: ReactNode }) {
                   </Link>
                 );
               })}
-              
+
               <div className="pt-3 pb-2">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-2">
                   Stripe Management
                 </p>
               </div>
-              
+
               {stripeItems.map((item) => {
                 const Icon = item.icon;
                 return (
                   <Link key={item.href} href={item.href}>
                     <Button
                       variant={
-                        pathname === item.href || pathname.startsWith(item.href + "/")
+                        pathname === item.href ||
+                        pathname.startsWith(item.href + "/")
                           ? "default"
                           : "outline"
                       }
@@ -110,6 +115,7 @@ export default function AdminTopNav({ children }: { children: ReactNode }) {
           </SheetContent>
         </Sheet>
         <div className="flex justify-center items-center gap-3 ml-auto">
+          <AdminCommandMenu />
           <Profile />
           <ModeToggle />
         </div>
@@ -118,4 +124,3 @@ export default function AdminTopNav({ children }: { children: ReactNode }) {
     </div>
   );
 }
-

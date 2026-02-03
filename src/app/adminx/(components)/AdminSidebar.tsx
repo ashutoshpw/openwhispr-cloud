@@ -14,6 +14,7 @@ import {
   DollarSign,
   Ticket,
   Tag,
+  FolderKanban,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -25,6 +26,7 @@ export default function AdminSidebar() {
     { href: "/adminx/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { href: "/adminx/users", icon: Users, label: "Users" },
     { href: "/adminx/organizations", icon: Building2, label: "Organizations" },
+    { href: "/adminx/projects", icon: FolderKanban, label: "Projects" },
     { href: "/adminx/members", icon: UserCog, label: "Members" },
     { href: "/adminx/payments", icon: CreditCard, label: "Payments" },
     { href: "/adminx/sessions", icon: Activity, label: "Sessions" },
@@ -50,7 +52,8 @@ export default function AdminSidebar() {
           <nav className="grid items-start px-4 text-sm font-medium">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+              const isActive =
+                pathname === item.href || pathname.startsWith(item.href + "/");
               return (
                 <Link
                   key={item.href}
@@ -70,17 +73,18 @@ export default function AdminSidebar() {
                 </Link>
               );
             })}
-            
+
             <Separator className="my-3" />
             <div className="px-3 py-2">
               <h2 className="mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Stripe Management
               </h2>
             </div>
-            
+
             {stripeItems.map((item) => {
               const Icon = item.icon;
-              const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+              const isActive =
+                pathname === item.href || pathname.startsWith(item.href + "/");
               return (
                 <Link
                   key={item.href}
@@ -106,4 +110,3 @@ export default function AdminSidebar() {
     </div>
   );
 }
-

@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
-import { organization } from "@/lib/db/schema";
+import { organization, project } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { ProjectTable } from "@/components/admin/ProjectTable";
 
 async function getOrganization(id: string) {
   try {
@@ -20,15 +21,31 @@ async function getOrganization(id: string) {
   }
 }
 
+async function getOrganizationProjects(organizationId: string) {
+  try {
+    const projects = await db()
+      .select()
+      .from(project)
+      .where(eq(project.organizationId, organizationId));
+    return projects;
+  } catch (error) {
+    console.error("Error fetching organization projects:", error);
+    return [];
+  }
+}
+
 export default async function OrganizationDetailPage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const organization = await getOrganization(id);
+  const [organizationData, projects] = await Promise.all([
+    getOrganization(id),
+    getOrganizationProjects(id),
+  ]);
 
-  if (!organization) {
+  if (!organizationData) {
     notFound();
   }
 
@@ -51,40 +68,53 @@ export default async function OrganizationDetailPage({
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-muted-foreground">ID</label>
-            <p className="font-mono text-sm">{organization.id}</p>
+            <span className="text-sm font-medium text-muted-foreground block">
+              ID
+            </span>
+            <p className="font-mono text-sm">{organizationData.id}</p>
           </div>
           <div>
-            <label className="text-sm font-medium text-muted-foreground">Name</label>
-            <p>{organization.name}</p>
+            <span className="text-sm font-medium text-muted-foreground block">
+              Name
+            </span>
+            <p>{organizationData.name}</p>
           </div>
           <div>
-            <label className="text-sm font-medium text-muted-foreground">Slug</label>
-            <p className="font-mono">{organization.slug}</p>
+            <span className="text-sm font-medium text-muted-foreground block">
+              Slug
+            </span>
+            <p className="font-mono">{organizationData.slug}</p>
           </div>
-          {organization.logo && (
+          {organizationData.logo && (
             <div>
-              <label className="text-sm font-medium text-muted-foreground">
+              <span className="text-sm font-medium text-muted-foreground block">
                 Logo
-              </label>
-              <p>{organization.logo}</p>
+              </span>
+              <p>{organizationData.logo}</p>
             </div>
           )}
           <div>
-            <label className="text-sm font-medium text-muted-foreground">
+            <span className="text-sm font-medium text-muted-foreground block">
               Created At
-            </label>
-            <p>{new Date(organization.createdAt).toLocaleString()}</p>
+            </span>
+            <p>{new Date(organizationData.createdAt).toLocaleString()}</p>
           </div>
           <div>
-            <label className="text-sm font-medium text-muted-foreground">
+            <span className="text-sm font-medium text-muted-foreground block">
               Updated At
-            </label>
-            <p>{new Date(organization.updatedAt).toLocaleString()}</p>
+            </span>
+            <p>{new Date(organizationData.updatedAt).toLocaleString()}</p>
           </div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Projects ({projects.length})</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ProjectTable projects={projects} showOrganization={false} />
         </CardContent>
       </Card>
     </div>
   );
 }
-

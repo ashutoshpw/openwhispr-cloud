@@ -18,7 +18,8 @@
     "stripe:verify": "node scripts/verify-stripe-keys.js",
     "stripe:migrate": "tsx scripts/migrate-stripe-schema.ts",
     "stripe:backfill": "tsx scripts/backfill-stripe-data.ts",
-    "setup": "tsx scripts/setup.ts"
+    "setup": "tsx scripts/setup.ts",
+    "setup:stripe": "tsx scripts/setup-stripe.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.1",
