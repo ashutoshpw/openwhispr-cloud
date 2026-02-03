@@ -1,9 +1,9 @@
-import { stripe } from "./client";
-import { db } from "@repo/database";
-import { organization, member, project } from "@repo/database/schema";
-import { eq } from "@repo/database";
-import { TRIAL_DURATION_DAYS, ORG_STATUS } from "@/lib/billing/constants";
+import { ORG_STATUS, TRIAL_DURATION_DAYS } from "@/lib/billing/constants";
 import type { CheckoutMetadata, CheckoutResult } from "@/lib/billing/types";
+import { db } from "@repo/database";
+import { eq } from "@repo/database";
+import { member, organization, project } from "@repo/database/schema";
+import { stripe } from "./client";
 import { getOrCreateStripeCustomer } from "./customer";
 
 /**
@@ -90,13 +90,14 @@ export async function createWorkspaceCheckout(params: {
     },
   };
 
-  // Add trial if requested (14 days, no card required)
+  // Add trial if requested (14 days, card required upfront)
   if (params.withTrial !== false) {
     sessionParams.subscription_data = {
       ...sessionParams.subscription_data,
       trial_period_days: TRIAL_DURATION_DAYS,
     };
-    sessionParams.payment_method_collection = "if_required";
+    // Require credit card upfront for trials to reduce fraud and ensure conversion
+    sessionParams.payment_method_collection = "always";
   }
 
   const session = await stripe.checkout.sessions.create(sessionParams);
@@ -175,7 +176,8 @@ export async function createUpgradeCheckout(params: {
       ...sessionParams.subscription_data,
       trial_period_days: TRIAL_DURATION_DAYS,
     };
-    sessionParams.payment_method_collection = "if_required";
+    // Require credit card upfront for trials to reduce fraud and ensure conversion
+    sessionParams.payment_method_collection = "always";
   }
 
   const session = await stripe.checkout.sessions.create(sessionParams);

@@ -1,13 +1,13 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { Copy } from "lucide-react";
-import { toast } from "sonner";
 import { ActionsMenu } from "@/components/admin/stripe/ActionsMenu";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Copy } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface Coupon {
   id: string;
@@ -36,7 +36,7 @@ export function CouponTable({ coupons: initialCoupons }: CouponTableProps) {
   const filteredCoupons = coupons.filter(
     (coupon) =>
       coupon.id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      coupon.name?.toLowerCase().includes(searchQuery.toLowerCase())
+      coupon.name?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const formatDiscount = (coupon: Coupon) => {
@@ -112,7 +112,9 @@ export function CouponTable({ coupons: initialCoupons }: CouponTableProps) {
               <tr
                 key={coupon.id}
                 className="border-b transition-colors hover:bg-muted/50 cursor-pointer"
-                onClick={() => router.push(`/adminx/stripe/coupons/${coupon.id}`)}
+                onClick={() =>
+                  router.push(`/adminx/stripe/coupons/${coupon.id}`)
+                }
               >
                 <td className="p-4 align-middle">
                   <div className="flex items-center gap-2">

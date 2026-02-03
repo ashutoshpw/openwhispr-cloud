@@ -2,16 +2,16 @@
 
 import type {
   AuthClientProvider,
-  SignInResult,
-  SignUpResult,
-  SignOutResult,
   GetSessionResult,
-  UseSessionResult,
   RequestPasswordResetParams,
   RequestPasswordResetResult,
   ResetPasswordParams,
   ResetPasswordResult,
+  SignInResult,
   SignInSocialParams,
+  SignOutResult,
+  SignUpResult,
+  UseSessionResult,
 } from "./types";
 
 class BaseAuthClient {

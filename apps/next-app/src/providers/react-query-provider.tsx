@@ -23,7 +23,7 @@ export function ReactQueryProvider({
             retry: 1,
           },
         },
-      })
+      }),
   );
 
   return (

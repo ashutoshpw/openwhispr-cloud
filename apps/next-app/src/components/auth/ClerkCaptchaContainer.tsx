@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 export function ClerkCaptchaContainer() {
   const [shouldRender, setShouldRender] = useState(false);
-  
+
   useEffect(() => {
     // Only render on client-side and if Clerk is the provider
     const provider = process.env.NEXT_PUBLIC_AUTH_PROVIDER || "better-auth";
@@ -17,6 +17,5 @@ export function ClerkCaptchaContainer() {
     return null;
   }
 
-  return <div id="cl-captcha" style={{ display: 'none' }} aria-hidden="true" />;
+  return <div id="cl-captcha" style={{ display: "none" }} aria-hidden="true" />;
 }
-

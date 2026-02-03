@@ -1,22 +1,22 @@
 "use client";
 
-import { createAuthClient } from "better-auth/react";
 import { organizationClient } from "better-auth/client/plugins";
+import { createAuthClient } from "better-auth/react";
 import { getAuthConfig } from "../../config";
-import { mapBetterAuthSession } from "../../utils/schema-mapper";
 import type {
   AuthClientProvider,
-  SignInResult,
-  SignUpResult,
-  SignOutResult,
   GetSessionResult,
-  UseSessionResult,
   RequestPasswordResetParams,
   RequestPasswordResetResult,
   ResetPasswordParams,
   ResetPasswordResult,
+  SignInResult,
   SignInSocialParams,
+  SignOutResult,
+  SignUpResult,
+  UseSessionResult,
 } from "../../types";
+import { mapBetterAuthSession } from "../../utils/schema-mapper";
 
 export class BetterAuthClient implements AuthClientProvider {
   private client;

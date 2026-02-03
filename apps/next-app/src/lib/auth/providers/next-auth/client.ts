@@ -1,25 +1,25 @@
 "use client";
 
 import {
+  getSession as getNextAuthSession,
   signIn as nextAuthSignIn,
   signOut as nextAuthSignOut,
   useSession as useNextAuthSession,
-  getSession as getNextAuthSession,
 } from "next-auth/react";
 import { getAuthConfig } from "../../config";
-import { mapNextAuthSession } from "../../utils/schema-mapper";
 import type {
   AuthClientProvider,
-  SignInResult,
-  SignUpResult,
-  SignOutResult,
   GetSessionResult,
-  UseSessionResult,
   RequestPasswordResetParams,
   RequestPasswordResetResult,
   ResetPasswordParams,
   ResetPasswordResult,
+  SignInResult,
+  SignOutResult,
+  SignUpResult,
+  UseSessionResult,
 } from "../../types";
+import { mapNextAuthSession } from "../../utils/schema-mapper";
 
 export class NextAuthClient implements AuthClientProvider {
   private baseURL: string;

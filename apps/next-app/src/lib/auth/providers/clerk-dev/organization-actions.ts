@@ -1,17 +1,17 @@
 "use server";
 
+import { canUserCreateFreeWorkspace } from "@/lib/billing";
 import { createClerkClient } from "@clerk/backend";
 import { getAuthConfig } from "@repo/auth/config";
-import { db } from "@repo/database";
-import { project } from "@repo/database/schema";
 import type {
-  ListOrganizationsResult,
   CreateOrganizationParams,
   CreateOrganizationResult,
+  ListOrganizationsResult,
   SetActiveOrganizationParams,
   SetActiveOrganizationResult,
 } from "@repo/auth/types";
-import { canUserCreateFreeWorkspace } from "@/lib/billing";
+import { db } from "@repo/database";
+import { project } from "@repo/database/schema";
 
 function getClerkClient() {
   const config = getAuthConfig("clerk-dev");

@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { signIn, signUp } from "@repo/auth/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 // Inner component that uses Clerk hooks - must call hooks unconditionally

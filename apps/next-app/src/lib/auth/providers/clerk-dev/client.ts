@@ -1,21 +1,21 @@
 "use client";
 
+import { useAuth, useClerk, useUser } from "@clerk/nextjs";
 import { useEffect } from "react";
-import { useAuth, useUser, useClerk } from "@clerk/nextjs";
 import { getAuthConfig } from "../../config";
-import { mapClerkSession } from "../../utils/schema-mapper";
 import type {
   AuthClientProvider,
-  SignInResult,
-  SignUpResult,
-  SignOutResult,
   GetSessionResult,
-  UseSessionResult,
   RequestPasswordResetParams,
   RequestPasswordResetResult,
   ResetPasswordParams,
   ResetPasswordResult,
+  SignInResult,
+  SignOutResult,
+  SignUpResult,
+  UseSessionResult,
 } from "../../types";
+import { mapClerkSession } from "../../utils/schema-mapper";
 
 export async function clerkSignInEmail(
   clerkClient: any,
@@ -266,7 +266,7 @@ export class ClerkClient implements AuthClientProvider {
     globalClerkClientRef = client;
   }
 
-  async waitForClerkClient(timeoutMs: number = 3000): Promise<boolean> {
+  async waitForClerkClient(timeoutMs = 3000): Promise<boolean> {
     const startTime = Date.now();
 
     while (Date.now() - startTime < timeoutMs) {

@@ -1,11 +1,11 @@
-import { createMcpHandler } from "mcp-handler";
-import { z } from "zod";
-import { db } from "@repo/database";
-import { user, organization, payments, session } from "@repo/database/schema";
 import { getSiteAdminStatus } from "@/lib/auth-utils";
 import { auth } from "@repo/auth/server";
+import { db } from "@repo/database";
+import { eq, sql } from "@repo/database";
+import { organization, payments, session, user } from "@repo/database/schema";
+import { createMcpHandler } from "mcp-handler";
 import { headers } from "next/headers";
-import { sql, eq } from "@repo/database";
+import { z } from "zod";
 
 async function requireAdmin() {
   const session = await auth.api.getSession({

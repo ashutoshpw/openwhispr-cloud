@@ -1,7 +1,7 @@
-import { db } from "@repo/database";
-import { user } from "@repo/database/schema";
 import { getSiteAdminStatus } from "@/lib/auth-utils";
 import { auth } from "@repo/auth/server";
+import { db } from "@repo/database";
+import { user } from "@repo/database/schema";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 

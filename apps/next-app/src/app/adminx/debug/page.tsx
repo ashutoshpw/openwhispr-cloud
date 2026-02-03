@@ -1,8 +1,8 @@
-import { auth } from "@repo/auth/server";
-import { getSiteAdminStatus, getCurrentUserRole } from "@/lib/auth-utils";
-import { headers } from "next/headers";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getCurrentUserRole, getSiteAdminStatus } from "@/lib/auth-utils";
+import { auth } from "@repo/auth/server";
+import { headers } from "next/headers";
 
 export default async function DebugPage() {
   const session = await auth.api.getSession({

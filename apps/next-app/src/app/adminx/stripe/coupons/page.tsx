@@ -1,8 +1,8 @@
-import { Button } from "@/components/ui/button";
 import { CouponTable } from "@/components/admin/stripe/CouponTable";
+import { Button } from "@/components/ui/button";
 import { getStripeCoupons } from "@/lib/stripe/queries";
-import Link from "next/link";
 import { Plus } from "lucide-react";
+import Link from "next/link";
 
 export default async function CouponsPage() {
   const coupons = await getStripeCoupons({ valid: true });

@@ -1,6 +1,6 @@
 import { db, sql } from "@repo/database";
-import { organization } from "@repo/database/schema";
 import { eq } from "@repo/database";
+import { organization } from "@repo/database/schema";
 import { STRIPE_SCHEMA } from "./constants";
 import type { PlanInfo, StripeSubscription, SubscriptionStatus } from "./types";
 

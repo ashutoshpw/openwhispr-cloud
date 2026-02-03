@@ -1,10 +1,10 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
 import type { Payment } from "@repo/database/schema";
+import { useState } from "react";
 
 interface PaymentTableProps {
   payments: Payment[];
@@ -34,12 +34,24 @@ export function PaymentTable({ payments: initialPayments }: PaymentTableProps) {
         <table className="w-full">
           <thead>
             <tr className="border-b bg-muted/50">
-              <th className="h-12 px-4 text-left align-middle font-medium">Email</th>
-              <th className="h-12 px-4 text-left align-middle font-medium">Amount</th>
-              <th className="h-12 px-4 text-left align-middle font-medium">Type</th>
-              <th className="h-12 px-4 text-left align-middle font-medium">Currency</th>
-              <th className="h-12 px-4 text-left align-middle font-medium">Date</th>
-              <th className="h-12 px-4 text-left align-middle font-medium">Status</th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                Email
+              </th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                Amount
+              </th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                Type
+              </th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                Currency
+              </th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                Date
+              </th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                Status
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -63,10 +75,11 @@ export function PaymentTable({ payments: initialPayments }: PaymentTableProps) {
           </tbody>
         </table>
         {filteredPayments.length === 0 && (
-          <div className="p-8 text-center text-muted-foreground">No payments found</div>
+          <div className="p-8 text-center text-muted-foreground">
+            No payments found
+          </div>
         )}
       </div>
     </div>
   );
 }
-

@@ -1,17 +1,17 @@
 import "server-only";
 
 import { createClerkClient } from "@clerk/backend";
+import { db } from "@repo/database";
+import { and, eq } from "@repo/database";
+import * as schema from "@repo/database/schema";
 import { getAuthConfig } from "../../config";
 import type {
   AuthServerProvider,
-  UnifiedSession,
   SignInResult,
-  SignUpResult,
   SignOutResult,
+  SignUpResult,
+  UnifiedSession,
 } from "../../types";
-import { db } from "@repo/database";
-import * as schema from "@repo/database/schema";
-import { eq, and } from "@repo/database";
 import { checkUserExistsInClerk, createUserInClerk } from "./user-migration";
 
 export class ClerkServer implements AuthServerProvider {
@@ -58,9 +58,11 @@ export class ClerkServer implements AuthServerProvider {
 
       if (users.length === 0) {
         try {
-      const user = await currentUser();
+          const user = await currentUser();
           if (user) {
-            const { syncClerkUserToDb, syncClerkAccountToDb } = await import("./db-sync");
+            const { syncClerkUserToDb, syncClerkAccountToDb } = await import(
+              "./db-sync"
+            );
             const clerkUser = {
               id: user.id,
               emailAddresses: user.emailAddresses.map((e) => ({
@@ -75,19 +77,19 @@ export class ClerkServer implements AuthServerProvider {
             };
             await syncClerkUserToDb(clerkUser);
             await syncClerkAccountToDb(clerkUser);
-            
+
             const syncedUsers = await db()
               .select()
               .from(schema.user)
               .where(eq(schema.user.id, userId))
               .limit(1);
-            
+
             if (syncedUsers.length === 0) {
               return null;
             }
-            
+
             const syncedUser = syncedUsers[0];
-            
+
             return {
               user: {
                 id: syncedUser.id,
@@ -105,7 +107,7 @@ export class ClerkServer implements AuthServerProvider {
       }
 
       const user = users[0];
-      
+
       return {
         user: {
           id: user.id,
@@ -124,20 +126,24 @@ export class ClerkServer implements AuthServerProvider {
     return {
       GET: async (req: Request) => {
         return new Response(
-          JSON.stringify({ error: "Clerk authentication is handled client-side" }),
+          JSON.stringify({
+            error: "Clerk authentication is handled client-side",
+          }),
           {
             status: 405,
             headers: { "Content-Type": "application/json" },
-          }
+          },
         );
       },
       POST: async (req: Request) => {
         return new Response(
-          JSON.stringify({ error: "Clerk authentication is handled client-side" }),
+          JSON.stringify({
+            error: "Clerk authentication is handled client-side",
+          }),
           {
             status: 405,
             headers: { "Content-Type": "application/json" },
-          }
+          },
         );
       },
     };
@@ -171,8 +177,8 @@ export class ClerkServer implements AuthServerProvider {
         .where(
           and(
             eq(schema.account.userId, localUser.id),
-            eq(schema.account.providerId, "credential")
-          )
+            eq(schema.account.providerId, "credential"),
+          ),
         )
         .limit(1);
 
@@ -186,7 +192,10 @@ export class ClerkServer implements AuthServerProvider {
       }
 
       const bcrypt = await import("bcryptjs");
-      const isValid = await bcrypt.compare(params.password, accounts[0].password);
+      const isValid = await bcrypt.compare(
+        params.password,
+        accounts[0].password,
+      );
 
       if (!isValid) {
         return {
@@ -199,9 +208,8 @@ export class ClerkServer implements AuthServerProvider {
 
       const userExistsInClerk = await checkUserExistsInClerk(
         params.email,
-        this.clerkClient
+        this.clerkClient,
       );
-
 
       if (!userExistsInClerk) {
         try {
@@ -213,7 +221,7 @@ export class ClerkServer implements AuthServerProvider {
               image: localUser.image,
             },
             params.password,
-            this.clerkClient
+            this.clerkClient,
           );
 
           await new Promise((resolve) => setTimeout(resolve, 500));
@@ -221,7 +229,10 @@ export class ClerkServer implements AuthServerProvider {
           let retries = 3;
           let verified = false;
           while (retries > 0 && !verified) {
-            const exists = await checkUserExistsInClerk(params.email, this.clerkClient);
+            const exists = await checkUserExistsInClerk(
+              params.email,
+              this.clerkClient,
+            );
             if (exists) {
               verified = true;
               break;
@@ -231,10 +242,14 @@ export class ClerkServer implements AuthServerProvider {
           }
 
           if (!verified) {
-            console.warn("[ClerkServer] User created but verification failed, proceeding anyway");
+            console.warn(
+              "[ClerkServer] User created but verification failed, proceeding anyway",
+            );
           }
 
-          const { syncClerkUserToDb, syncClerkAccountToDb } = await import("./db-sync");
+          const { syncClerkUserToDb, syncClerkAccountToDb } = await import(
+            "./db-sync"
+          );
           const clerkUserList = await this.clerkClient.users.getUserList({
             emailAddress: [params.email],
             limit: 1,
@@ -318,11 +333,12 @@ export class ClerkServer implements AuthServerProvider {
 
       return {};
     } catch (error) {
-    return {
-      error: {
-          message: error instanceof Error ? error.message : "Failed to sign out",
-      },
-    };
+      return {
+        error: {
+          message:
+            error instanceof Error ? error.message : "Failed to sign out",
+        },
+      };
     }
   }
 
@@ -330,4 +346,3 @@ export class ClerkServer implements AuthServerProvider {
     return null;
   }
 }
-

@@ -1,20 +1,20 @@
 import "server-only";
 
+import { db } from "@repo/database";
+import { eq } from "@repo/database";
+import * as schema from "@repo/database/schema";
 import { authkit } from "@workos-inc/authkit-nextjs";
 import { WorkOS } from "@workos-inc/node";
-import { NextRequest } from "next/server";
-import { db } from "@repo/database";
-import * as schema from "@repo/database/schema";
-import { eq } from "@repo/database";
+import type { NextRequest } from "next/server";
 import { getAuthConfig } from "../../config";
-import { mapAuthKitSession } from "../../utils/schema-mapper";
 import type {
   AuthServerProvider,
-  UnifiedSession,
   SignInResult,
-  SignUpResult,
   SignOutResult,
+  SignUpResult,
+  UnifiedSession,
 } from "../../types";
+import { mapAuthKitSession } from "../../utils/schema-mapper";
 
 export class AuthKitServer implements AuthServerProvider {
   private workos: WorkOS;
@@ -32,11 +32,13 @@ export class AuthKitServer implements AuthServerProvider {
       cookiePassword: string;
       baseURL: string;
     };
-    
+
     if (!config.apiKey || !config.clientId || !config.cookiePassword) {
-      throw new Error("AuthKit configuration is incomplete. Missing required environment variables.");
+      throw new Error(
+        "AuthKit configuration is incomplete. Missing required environment variables.",
+      );
     }
-    
+
     this.config = config;
     this.workos = new WorkOS(this.config.apiKey);
   }
@@ -70,20 +72,24 @@ export class AuthKitServer implements AuthServerProvider {
     return {
       GET: async (req: Request) => {
         return new Response(
-          JSON.stringify({ error: "AuthKit uses redirect-based authentication" }),
+          JSON.stringify({
+            error: "AuthKit uses redirect-based authentication",
+          }),
           {
             status: 405,
             headers: { "Content-Type": "application/json" },
-          }
+          },
         );
       },
       POST: async (req: Request) => {
         return new Response(
-          JSON.stringify({ error: "AuthKit uses redirect-based authentication" }),
+          JSON.stringify({
+            error: "AuthKit uses redirect-based authentication",
+          }),
           {
             status: 405,
             headers: { "Content-Type": "application/json" },
-          }
+          },
         );
       },
     };
@@ -102,12 +108,14 @@ export class AuthKitServer implements AuthServerProvider {
 
       if (localUsers.length > 0) {
         const localUser = localUsers[0];
-        
+
         try {
           await this.workos.userManagement.getUser(localUser.id);
         } catch (error: any) {
           if (error?.code === "user_not_found" || error?.statusCode === 404) {
-            const [firstName, ...lastNameParts] = (localUser.name || "").split(" ");
+            const [firstName, ...lastNameParts] = (localUser.name || "").split(
+              " ",
+            );
             const lastName = lastNameParts.join(" ") || null;
 
             try {
@@ -128,15 +136,16 @@ export class AuthKitServer implements AuthServerProvider {
         }
       }
 
-      const response = await this.workos.userManagement.authenticateWithPassword({
-        email: params.email,
-        password: params.password,
-        clientId: this.config.clientId,
-        session: {
-          sealSession: true,
-          cookiePassword: this.config.cookiePassword,
-        },
-      });
+      const response =
+        await this.workos.userManagement.authenticateWithPassword({
+          email: params.email,
+          password: params.password,
+          clientId: this.config.clientId,
+          session: {
+            sealSession: true,
+            cookiePassword: this.config.cookiePassword,
+          },
+        });
 
       if (response.user) {
         const session = mapAuthKitSession(response.user);
@@ -151,7 +160,10 @@ export class AuthKitServer implements AuthServerProvider {
         },
       };
     } catch (error: any) {
-      if (error?.code === "invalid_credentials" || error?.code === "invalid_password") {
+      if (
+        error?.code === "invalid_credentials" ||
+        error?.code === "invalid_password"
+      ) {
         return {
           error: {
             message: "Invalid email or password",
@@ -159,7 +171,7 @@ export class AuthKitServer implements AuthServerProvider {
           },
         };
       }
-      
+
       return {
         error: {
           message: error?.message || "Failed to sign in",
@@ -222,4 +234,3 @@ export class AuthKitServer implements AuthServerProvider {
     return this.workos;
   }
 }
-

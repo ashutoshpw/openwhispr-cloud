@@ -1,11 +1,11 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import Link from "next/link";
 import type { User } from "@repo/database/schema";
+import Link from "next/link";
+import { useState } from "react";
 
 interface UserTableProps {
   users: User[];
@@ -35,21 +35,40 @@ export function UserTable({ users: initialUsers }: UserTableProps) {
         <table className="w-full">
           <thead>
             <tr className="border-b bg-muted/50">
-              <th className="h-12 px-4 text-left align-middle font-medium">Name</th>
-              <th className="h-12 px-4 text-left align-middle font-medium">Email</th>
-              <th className="h-12 px-4 text-left align-middle font-medium">Role</th>
-              <th className="h-12 px-4 text-left align-middle font-medium">Verified</th>
-              <th className="h-12 px-4 text-left align-middle font-medium">Created</th>
-              <th className="h-12 px-4 text-left align-middle font-medium">Actions</th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                Name
+              </th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                Email
+              </th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                Role
+              </th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                Verified
+              </th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                Created
+              </th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
             {filteredUsers.map((user) => (
-              <tr key={user.id} className="border-b transition-colors hover:bg-muted/50">
+              <tr
+                key={user.id}
+                className="border-b transition-colors hover:bg-muted/50"
+              >
                 <td className="p-4 align-middle">{user.name}</td>
                 <td className="p-4 align-middle">{user.email}</td>
                 <td className="p-4 align-middle">
-                  <Badge variant={user.role === "site-admin" ? "default" : "secondary"}>
+                  <Badge
+                    variant={
+                      user.role === "site-admin" ? "default" : "secondary"
+                    }
+                  >
                     {user.role}
                   </Badge>
                 </td>
@@ -71,10 +90,11 @@ export function UserTable({ users: initialUsers }: UserTableProps) {
           </tbody>
         </table>
         {filteredUsers.length === 0 && (
-          <div className="p-8 text-center text-muted-foreground">No users found</div>
+          <div className="p-8 text-center text-muted-foreground">
+            No users found
+          </div>
         )}
       </div>
     </div>
   );
 }
-

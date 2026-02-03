@@ -29,4 +29,3 @@ export function ClerkAuthInitializer() {
 
   return null;
 }
-

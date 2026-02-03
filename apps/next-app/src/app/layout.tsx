@@ -1,9 +1,9 @@
+import { baseURL } from "@/../baseUrl";
 import Provider from "@/app/provider";
-import { ThemeProvider } from "@/components/theme-provider";
-import { Toaster } from "@/components/ui/sonner";
 import { NextChatSDKBootstrap } from "@/components/NextChatSDKBootstrap";
 import { ClerkCaptchaContainer } from "@/components/auth/ClerkCaptchaContainer";
-import { baseURL } from "@/../baseUrl";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
 import { Analytics } from "@vercel/analytics/react";
 import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";

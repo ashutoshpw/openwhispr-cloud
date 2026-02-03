@@ -1,8 +1,8 @@
 import "server-only";
 
 import { db } from "@repo/database";
+import { and, eq } from "@repo/database";
 import * as schema from "@repo/database/schema";
-import { eq, and } from "@repo/database";
 import { nanoid } from "nanoid";
 
 export interface ClerkUserData {
@@ -16,21 +16,25 @@ export interface ClerkUserData {
 }
 
 export async function syncClerkUserToDb(
-  clerkUser: ClerkUserData
+  clerkUser: ClerkUserData,
 ): Promise<string> {
   try {
     const primaryEmail =
-      clerkUser.emailAddresses.find((e) => e.id === clerkUser.emailAddresses[0]?.id)
-        ?.emailAddress || clerkUser.emailAddresses[0]?.emailAddress || "";
+      clerkUser.emailAddresses.find(
+        (e) => e.id === clerkUser.emailAddresses[0]?.id,
+      )?.emailAddress ||
+      clerkUser.emailAddresses[0]?.emailAddress ||
+      "";
 
     if (!primaryEmail) {
       throw new Error("No email address found for Clerk user");
     }
 
-    const name = [clerkUser.firstName, clerkUser.lastName]
-      .filter(Boolean)
-      .join(" ")
-      .trim() || primaryEmail.split("@")[0];
+    const name =
+      [clerkUser.firstName, clerkUser.lastName]
+        .filter(Boolean)
+        .join(" ")
+        .trim() || primaryEmail.split("@")[0];
 
     const existingUsers = await db()
       .select()
@@ -76,7 +80,7 @@ export async function syncClerkUserToDb(
 }
 
 export async function syncClerkAccountToDb(
-  clerkUser: ClerkUserData
+  clerkUser: ClerkUserData,
 ): Promise<string> {
   try {
     const existingAccounts = await db()
@@ -85,8 +89,8 @@ export async function syncClerkAccountToDb(
       .where(
         and(
           eq(schema.account.userId, clerkUser.id),
-          eq(schema.account.providerId, "clerk")
-        )
+          eq(schema.account.providerId, "clerk"),
+        ),
       )
       .limit(1);
 
@@ -114,7 +118,7 @@ export async function syncClerkSessionToDb(
   userId: string,
   expiresAt: Date,
   ipAddress?: string | null,
-  userAgent?: string | null
+  userAgent?: string | null,
 ): Promise<string> {
   try {
     const existingSessions = await db()
@@ -136,14 +140,16 @@ export async function syncClerkSessionToDb(
       return sessionId;
     }
 
-    await db().insert(schema.session).values({
-      id: sessionId,
-      token: sessionId,
-      userId: userId,
-      expiresAt: expiresAt,
-      ipAddress: ipAddress || null,
-      userAgent: userAgent || null,
-    });
+    await db()
+      .insert(schema.session)
+      .values({
+        id: sessionId,
+        token: sessionId,
+        userId: userId,
+        expiresAt: expiresAt,
+        ipAddress: ipAddress || null,
+        userAgent: userAgent || null,
+      });
 
     return sessionId;
   } catch (error) {
@@ -153,7 +159,7 @@ export async function syncClerkSessionToDb(
 }
 
 export async function deleteClerkSessionFromDb(
-  sessionId: string
+  sessionId: string,
 ): Promise<void> {
   try {
     await db().delete(schema.session).where(eq(schema.session.id, sessionId));
@@ -162,4 +168,3 @@ export async function deleteClerkSessionFromDb(
     throw error;
   }
 }
-

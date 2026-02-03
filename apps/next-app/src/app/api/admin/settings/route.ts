@@ -1,11 +1,11 @@
-import { db } from "@repo/database";
-import { appSettings } from "@repo/database/schema";
-import { eq } from "@repo/database";
 import { getSiteAdminStatus } from "@/lib/auth-utils";
 import { auth } from "@repo/auth/server";
+import { db } from "@repo/database";
+import { eq } from "@repo/database";
+import { appSettings } from "@repo/database/schema";
+import { nanoid } from "nanoid";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { nanoid } from "nanoid";
 
 // Well-known app settings keys
 export const APP_SETTINGS_KEYS = {

@@ -1,8 +1,8 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { PromoCodeForm } from "@/components/admin/stripe/PromoCodeForm";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { stripe } from "@/lib/stripe/client";
+import Link from "next/link";
 
 async function getActiveCoupons() {
   try {
@@ -38,7 +38,8 @@ export default async function NewPromoCodePage() {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground mb-4">
-              You need to create at least one coupon before creating promo codes.
+              You need to create at least one coupon before creating promo
+              codes.
             </p>
             <Button asChild>
               <Link href="/adminx/stripe/coupons/new">Create Coupon</Link>

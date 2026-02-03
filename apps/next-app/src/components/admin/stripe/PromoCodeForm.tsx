@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface PromoCodeFormProps {
   coupons: Array<{
@@ -33,7 +33,7 @@ export function PromoCodeForm({
   const [couponId, setCouponId] = useState(promoCode?.coupon?.id || "");
   const [active, setActive] = useState(promoCode?.active ?? true);
   const [maxRedemptions, setMaxRedemptions] = useState(
-    promoCode?.max_redemptions?.toString() || ""
+    promoCode?.max_redemptions?.toString() || "",
   );
   const [expiresAt, setExpiresAt] = useState(() => {
     if (promoCode?.expires_at) {
@@ -42,15 +42,15 @@ export function PromoCodeForm({
     return "";
   });
   const [firstTimeTransaction, setFirstTimeTransaction] = useState(
-    promoCode?.restrictions?.first_time_transaction || false
+    promoCode?.restrictions?.first_time_transaction || false,
   );
   const [minimumAmount, setMinimumAmount] = useState(
     promoCode?.restrictions?.minimum_amount
       ? (promoCode.restrictions.minimum_amount / 100).toString()
-      : ""
+      : "",
   );
   const [minimumAmountCurrency, setMinimumAmountCurrency] = useState(
-    promoCode?.restrictions?.minimum_amount_currency || "usd"
+    promoCode?.restrictions?.minimum_amount_currency || "usd",
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -76,12 +76,12 @@ export function PromoCodeForm({
       };
 
       if (maxRedemptions) {
-        promoCodeData.max_redemptions = parseInt(maxRedemptions);
+        promoCodeData.max_redemptions = Number.parseInt(maxRedemptions);
       }
 
       if (expiresAt) {
         promoCodeData.expires_at = Math.floor(
-          new Date(expiresAt).getTime() / 1000
+          new Date(expiresAt).getTime() / 1000,
         );
       }
 
@@ -93,7 +93,7 @@ export function PromoCodeForm({
 
       if (minimumAmount) {
         promoCodeData.restrictions.minimum_amount = Math.round(
-          parseFloat(minimumAmount) * 100
+          Number.parseFloat(minimumAmount) * 100,
         );
         promoCodeData.restrictions.minimum_amount_currency =
           minimumAmountCurrency;
@@ -122,10 +122,10 @@ export function PromoCodeForm({
       toast.success(
         mode === "create"
           ? "Promo code created successfully!"
-          : "Promo code updated successfully!"
+          : "Promo code updated successfully!",
       );
 
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       router.push("/adminx/stripe/promo-codes");
       router.refresh();

@@ -1,9 +1,9 @@
-import { Button } from "@/components/ui/button";
 import { ProductTable } from "@/components/admin/stripe/ProductTable";
+import { Button } from "@/components/ui/button";
 import { getStripeProducts } from "@/lib/stripe/queries";
-import Link from "next/link";
+import type { Product } from "@/lib/stripe/types";
 import { Plus } from "lucide-react";
-import { Product } from "@/lib/stripe/types";
+import Link from "next/link";
 
 export default async function ProductsPage() {
   const products = await getStripeProducts();

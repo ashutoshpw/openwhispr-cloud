@@ -1,9 +1,9 @@
 "use client";
 
+import { ActionsMenu } from "@/components/admin/stripe/ActionsMenu";
+import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Badge } from "@/components/ui/badge";
-import { ActionsMenu } from "@/components/admin/stripe/ActionsMenu";
 
 interface PriceRecord {
   id: string;
@@ -15,7 +15,9 @@ interface PriceRecord {
     interval_count: number;
   } | null;
   nickname: string | null;
-  product: string | { id: string; name?: string; default_price?: string | { id: string } };
+  product:
+    | string
+    | { id: string; name?: string; default_price?: string | { id: string } };
 }
 
 interface PriceTableProps {
@@ -93,7 +95,9 @@ export function PriceTable({ prices }: PriceTableProps) {
                   </div>
                 </td>
                 <td className="p-4 align-middle">
-                  <Badge variant="outline">{formatInterval(price.recurring)}</Badge>
+                  <Badge variant="outline">
+                    {formatInterval(price.recurring)}
+                  </Badge>
                   {price.nickname && (
                     <p className="text-xs text-muted-foreground mt-1">
                       {price.nickname}

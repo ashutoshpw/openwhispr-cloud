@@ -13,22 +13,22 @@ import {
 } from "@/components/ui/sheet";
 import { HamburgerMenuIcon } from "@radix-ui/react-icons";
 import {
-  LayoutDashboard,
-  Users,
-  Building2,
-  UserCog,
-  CreditCard,
   Activity,
-  Settings,
-  Package,
+  Building2,
+  CreditCard,
   DollarSign,
-  Ticket,
-  Tag,
   FolderKanban,
+  LayoutDashboard,
+  Package,
+  Settings,
+  Tag,
+  Ticket,
+  UserCog,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
-import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
+import type { ReactNode } from "react";
 
 export default function AdminTopNav({ children }: { children: ReactNode }) {
   const pathname = usePathname();

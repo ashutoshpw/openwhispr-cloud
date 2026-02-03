@@ -1,8 +1,8 @@
-import { getStripePrices } from "@/lib/stripe/queries";
 // import { Button } from "@/components/ui/button";
 // import Link from "next/link";
 // import { Plus } from "lucide-react";
 import { PriceTable } from "@/components/admin/stripe/PriceTable";
+import { getStripePrices } from "@/lib/stripe/queries";
 
 export default async function PricesPage() {
   const prices = await getStripePrices({ limit: 100 });

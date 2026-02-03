@@ -1,8 +1,8 @@
-import { notFound } from "next/navigation";
-import Image from "next/image";
-import { MDXRemote } from "next-mdx-remote/rsc";
-import { getAllPosts, getPostBySlug, serializeMdx } from "@/lib/mdx";
 import { mdxComponents } from "@/components/mdx-components";
+import { getAllPosts, getPostBySlug, serializeMdx } from "@/lib/mdx";
+import { MDXRemote } from "next-mdx-remote/rsc";
+import Image from "next/image";
+import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 

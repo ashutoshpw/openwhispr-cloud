@@ -1,7 +1,7 @@
 import { ProductForm } from "@/components/admin/stripe/ProductForm";
 import { getStripeProduct } from "@/lib/stripe/queries";
 import { notFound } from "next/navigation";
-import Stripe from "stripe";
+import type Stripe from "stripe";
 
 export default async function EditProductPage({
   params,

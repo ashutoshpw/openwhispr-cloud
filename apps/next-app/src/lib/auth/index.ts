@@ -11,18 +11,23 @@ class BaseAuthServer {
     if (this.loading) return this.loading;
 
     this.loading = (async () => {
-      const providerName = process.env.NEXT_PUBLIC_AUTH_PROVIDER || "better-auth";
+      const providerName =
+        process.env.NEXT_PUBLIC_AUTH_PROVIDER || "better-auth";
 
       let provider: AuthServerProvider;
 
       switch (providerName) {
         case "better-auth": {
-          const { BetterAuthServer } = await import("./providers/better-auth/server");
+          const { BetterAuthServer } = await import(
+            "./providers/better-auth/server"
+          );
           provider = new BetterAuthServer();
           break;
         }
         case "next-auth": {
-          const { NextAuthServer } = await import("./providers/next-auth/server");
+          const { NextAuthServer } = await import(
+            "./providers/next-auth/server"
+          );
           provider = new NextAuthServer();
           break;
         }

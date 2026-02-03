@@ -1,10 +1,10 @@
+import { PriceEditForm } from "@/components/admin/stripe/PriceEditForm";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { notFound } from "next/navigation";
 import { getStripePrice, getStripeProduct } from "@/lib/stripe/queries";
 import { ArrowLeft, ExternalLink } from "lucide-react";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import type Stripe from "stripe";
-import { PriceEditForm } from "@/components/admin/stripe/PriceEditForm";
 
 function isStripePrice(price: unknown): price is Stripe.Price {
   return (

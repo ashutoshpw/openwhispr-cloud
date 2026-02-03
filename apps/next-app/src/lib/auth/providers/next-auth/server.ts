@@ -1,28 +1,28 @@
 import "server-only";
 
 import { db } from "@repo/database";
-import * as schema from "@repo/database/schema";
 import { eq } from "@repo/database";
-import { NextRequest } from "next/server";
-import { auth, handlers, signIn, signOut } from "./config";
-import { mapNextAuthSession } from "../../utils/schema-mapper";
+import * as schema from "@repo/database/schema";
+import type { NextRequest } from "next/server";
 import type {
   AuthServerProvider,
-  UnifiedSession,
   SignInResult,
-  SignUpResult,
   SignOutResult,
+  SignUpResult,
+  UnifiedSession,
 } from "../../types";
+import { mapNextAuthSession } from "../../utils/schema-mapper";
+import { auth, handlers, signIn, signOut } from "./config";
 
 export class NextAuthServer implements AuthServerProvider {
   async getSession(headers: Headers): Promise<UnifiedSession | null> {
     try {
       const session = await auth();
-      
+
       if (!session || !session.user || !session.user.id) {
         return null;
       }
-      
+
       let expiresString: string | null = null;
       if (session.expires) {
         const expires = session.expires as unknown;
@@ -34,7 +34,7 @@ export class NextAuthServer implements AuthServerProvider {
           expiresString = new Date(session.expires).toISOString();
         }
       }
-      
+
       return mapNextAuthSession({
         user: {
           id: session.user.id,
@@ -64,7 +64,10 @@ export class NextAuthServer implements AuthServerProvider {
     return { auth, handlers, signIn, signOut };
   }
 
-  async signInEmail(params: { email: string; password: string }): Promise<SignInResult> {
+  async signInEmail(params: {
+    email: string;
+    password: string;
+  }): Promise<SignInResult> {
     try {
       const result = await signIn("credentials", {
         email: params.email,
@@ -210,7 +213,8 @@ export class NextAuthServer implements AuthServerProvider {
     } catch (error) {
       return {
         error: {
-          message: error instanceof Error ? error.message : "Failed to sign out",
+          message:
+            error instanceof Error ? error.message : "Failed to sign out",
         },
       };
     }

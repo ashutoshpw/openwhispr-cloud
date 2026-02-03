@@ -44,6 +44,8 @@ export {
   removeOrgFeatureOverride,
   setTierFeature,
   removeTierFeature,
+  getAppSetting,
+  setAppSetting,
 } from "./features";
 
 // Re-export usage utilities

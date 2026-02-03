@@ -1,17 +1,17 @@
 "use server";
 
-import { db } from "@repo/database";
-import { organization, member, project } from "@repo/database/schema";
-import { eq, inArray } from "@repo/database";
+import { canUserCreateFreeWorkspace } from "@/lib/billing";
 import { auth } from "@repo/auth/server";
 import type {
-  ListOrganizationsResult,
   CreateOrganizationParams,
   CreateOrganizationResult,
+  ListOrganizationsResult,
   SetActiveOrganizationParams,
   SetActiveOrganizationResult,
 } from "@repo/auth/types";
-import { canUserCreateFreeWorkspace } from "@/lib/billing";
+import { db } from "@repo/database";
+import { eq, inArray } from "@repo/database";
+import { member, organization, project } from "@repo/database/schema";
 
 export async function listNextAuthOrganizations(): Promise<ListOrganizationsResult> {
   try {

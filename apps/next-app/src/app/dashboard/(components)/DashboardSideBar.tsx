@@ -3,7 +3,7 @@
 import { WorkspaceSwitcher } from "@/components/dashboard/workspace-switcher";
 import { Separator } from "@/components/ui/separator";
 import clsx from "clsx";
-import { Folder, HomeIcon, Settings } from "lucide-react";
+import { Folder, HomeIcon, Settings, CreditCard } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 
@@ -25,13 +25,18 @@ export default function DashboardSideBar() {
   const settingsUrl = workspaceSlug
     ? `/dashboard/${workspaceSlug}/~/settings`
     : "/dashboard";
+  const billingUrl = workspaceSlug
+    ? `/dashboard/${workspaceSlug}/~/settings/billing`
+    : "/dashboard";
 
   // Check active states
   const isHomeActive =
     pathname === homeUrl ||
     pathname === `/dashboard/${workspaceSlug}/${projectSlug}`;
   const isFinanceActive = pathname === financeUrl;
-  const isSettingsActive = pathname === settingsUrl;
+  const isSettingsActive =
+    pathname === settingsUrl || pathname.startsWith(`${settingsUrl}/`);
+  const isBillingActive = pathname === billingUrl;
 
   return (
     <div className="lg:block hidden border-r h-full">
@@ -78,7 +83,7 @@ export default function DashboardSideBar() {
                 "flex items-center gap-2 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50",
                 {
                   "flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-2 text-gray-900  transition-all hover:text-gray-900 dark:bg-gray-800 dark:text-gray-50 dark:hover:text-gray-50":
-                    isSettingsActive,
+                    isSettingsActive && !isBillingActive,
                 },
               )}
               href={settingsUrl}
@@ -88,6 +93,21 @@ export default function DashboardSideBar() {
                 <Settings className="h-3 w-3" />
               </div>
               Settings
+            </Link>
+            <Link
+              className={clsx(
+                "flex items-center gap-2 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50",
+                {
+                  "flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-2 text-gray-900  transition-all hover:text-gray-900 dark:bg-gray-800 dark:text-gray-50 dark:hover:text-gray-50":
+                    isBillingActive,
+                },
+              )}
+              href={billingUrl}
+            >
+              <div className="border rounded-lg dark:bg-black dark:border-gray-800 border-gray-400 p-1 bg-white">
+                <CreditCard className="h-3 w-3" />
+              </div>
+              Billing
             </Link>
           </nav>
         </div>

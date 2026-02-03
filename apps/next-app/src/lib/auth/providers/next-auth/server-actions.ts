@@ -1,10 +1,15 @@
 "use server";
 
-import { NextAuthServer } from "./server";
-import type { UnifiedSession, SignUpResult, SignInResult, SignOutResult } from "../../types";
 import { db } from "@repo/database";
+import { and, eq } from "@repo/database";
 import * as schema from "@repo/database/schema";
-import { eq, and } from "@repo/database";
+import type {
+  SignInResult,
+  SignOutResult,
+  SignUpResult,
+  UnifiedSession,
+} from "../../types";
+import { NextAuthServer } from "./server";
 
 let serverInstance: NextAuthServer | null = null;
 
@@ -16,7 +21,7 @@ function getNextAuthServerInstance(): NextAuthServer {
 }
 
 export async function getNextAuthSession(
-  headers: Headers
+  headers: Headers,
 ): Promise<UnifiedSession | null> {
   const server = getNextAuthServerInstance();
   return server.getSession(headers);
@@ -76,7 +81,8 @@ export async function signUpNextAuth(params: {
     if (signInResult.error) {
       return {
         error: {
-          message: "Account created but failed to sign in. Please try signing in manually.",
+          message:
+            "Account created but failed to sign in. Please try signing in manually.",
         },
       };
     }
@@ -116,8 +122,8 @@ export async function signInNextAuth(params: {
       .where(
         and(
           eq(schema.account.userId, users[0].id),
-          eq(schema.account.providerId, "credential")
-        )
+          eq(schema.account.providerId, "credential"),
+        ),
       )
       .limit(1);
 
@@ -170,4 +176,3 @@ export async function signOutNextAuth(): Promise<SignOutResult> {
     };
   }
 }
-

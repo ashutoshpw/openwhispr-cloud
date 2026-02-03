@@ -1,12 +1,13 @@
-import { db, sql } from "@repo/database";
+import { db } from "@repo/database";
+import { and, eq, gt, isNull, or } from "@repo/database";
 import {
+  appSettings,
+  orgFeatures,
   organization,
   pricingTierFeatures,
-  orgFeatures,
 } from "@repo/database/schema";
-import { eq, and, gt } from "@repo/database";
+import { FEATURE_KEYS, FREE_TIER_FEATURES, STRIPE_SCHEMA } from "./constants";
 import { getSubscriptionWithProduct } from "./subscription";
-import { FREE_TIER_FEATURES, FEATURE_KEYS, STRIPE_SCHEMA } from "./constants";
 import type { FeatureMap } from "./types";
 
 /**
@@ -40,7 +41,7 @@ export async function getOrgFeatureOverrides(
       and(
         eq(orgFeatures.organizationId, orgId),
         // Only get non-expired features
-        sql`(${orgFeatures.expiresAt} IS NULL OR ${orgFeatures.expiresAt} > ${now})`,
+        or(isNull(orgFeatures.expiresAt), gt(orgFeatures.expiresAt, now)),
       ),
     );
 
@@ -273,4 +274,44 @@ export async function removeTierFeature(
         eq(pricingTierFeatures.featureKey, featureKey),
       ),
     );
+}
+
+/**
+ * Get an app setting value
+ */
+export async function getAppSetting(key: string): Promise<string | null> {
+  const result = await db()
+    .select()
+    .from(appSettings)
+    .where(eq(appSettings.key, key))
+    .limit(1);
+
+  return result[0]?.value ?? null;
+}
+
+/**
+ * Set an app setting value
+ */
+export async function setAppSetting(
+  key: string,
+  value: string,
+  description?: string,
+): Promise<void> {
+  const { nanoid } = await import("nanoid");
+
+  await db()
+    .insert(appSettings)
+    .values({
+      id: nanoid(),
+      key,
+      value,
+      description,
+    })
+    .onConflictDoUpdate({
+      target: appSettings.key,
+      set: {
+        value,
+        description,
+      },
+    });
 }

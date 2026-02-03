@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import {
   CommandDialog,
   CommandEmpty,
@@ -9,7 +10,6 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
-import { Button } from "@/components/ui/button";
 import { signOut } from "@repo/auth/client";
 import {
   Activity,

@@ -1,7 +1,7 @@
 import { auth } from "@repo/auth/server";
 import { db } from "@repo/database";
-import { member, organization } from "@repo/database/schema";
 import { eq, inArray } from "@repo/database";
+import { member, organization } from "@repo/database/schema";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 

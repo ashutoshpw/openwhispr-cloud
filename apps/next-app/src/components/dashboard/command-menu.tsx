@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import {
   CommandDialog,
   CommandEmpty,
@@ -9,14 +10,13 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
-import { Button } from "@/components/ui/button";
 import { signOut } from "@repo/auth/client";
 import {
   Building2,
   Home,
   LogOut,
-  Moon,
   Monitor,
+  Moon,
   Search,
   Settings,
   Sun,
@@ -214,7 +214,7 @@ export function CommandMenu() {
                 )}
               </CommandItem>
             ))}
-            <CommandItem onSelect={() => handleNavigation("/onboarding")}>
+            <CommandItem onSelect={() => handleNavigation("/workspace/new")}>
               <Building2 className="mr-2 h-4 w-4" />
               <span>Create New Workspace</span>
             </CommandItem>

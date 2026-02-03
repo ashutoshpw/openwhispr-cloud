@@ -2,9 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import Link from "next/link";
 import type { Organization } from "@repo/database/schema";
+import Link from "next/link";
+import { useState } from "react";
 
 interface OrganizationTableProps {
   organizations: Organization[];
@@ -36,10 +36,18 @@ export function OrganizationTable({
         <table className="w-full">
           <thead>
             <tr className="border-b bg-muted/50">
-              <th className="h-12 px-4 text-left align-middle font-medium">Name</th>
-              <th className="h-12 px-4 text-left align-middle font-medium">Slug</th>
-              <th className="h-12 px-4 text-left align-middle font-medium">Created</th>
-              <th className="h-12 px-4 text-left align-middle font-medium">Actions</th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                Name
+              </th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                Slug
+              </th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                Created
+              </th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -71,4 +79,3 @@ export function OrganizationTable({
     </div>
   );
 }
-

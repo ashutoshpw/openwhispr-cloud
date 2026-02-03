@@ -1,7 +1,7 @@
 "use server";
 
-import { BetterAuthServer } from "./server";
 import type { UnifiedSession } from "../../types";
+import { BetterAuthServer } from "./server";
 
 let serverInstance: BetterAuthServer | null = null;
 
@@ -13,7 +13,7 @@ function getServerInstance(): BetterAuthServer {
 }
 
 export async function getBetterAuthSession(
-  headers: Headers
+  headers: Headers,
 ): Promise<UnifiedSession | null> {
   const server = getServerInstance();
   return server.getSession(headers);
@@ -23,4 +23,3 @@ export async function getBetterAuthApiHandler() {
   const server = getServerInstance();
   return server.getApiHandler();
 }
-

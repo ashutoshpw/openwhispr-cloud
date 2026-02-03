@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export interface Price {
@@ -65,7 +65,7 @@ export function usePrice(priceId?: string) {
     queryKey: [QUERY_KEY, priceId],
     queryFn: async () => {
       if (!priceId) throw new Error("Price ID is required");
-      
+
       const response = await fetch(`/api/admin/stripe/prices/${priceId}`);
       if (!response.ok) {
         const error = await response.json();

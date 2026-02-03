@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export interface PromoCode {
@@ -45,7 +45,10 @@ export interface UpdatePromoCodeInput {
 
 const QUERY_KEY = "promo-codes";
 
-export function usePromoCodes(filters?: { active?: boolean; couponId?: string }) {
+export function usePromoCodes(filters?: {
+  active?: boolean;
+  couponId?: string;
+}) {
   return useQuery<PromoCode[]>({
     queryKey: [QUERY_KEY, filters],
     queryFn: async () => {
@@ -72,8 +75,10 @@ export function usePromoCode(promoCodeId?: string) {
     queryKey: [QUERY_KEY, promoCodeId],
     queryFn: async () => {
       if (!promoCodeId) throw new Error("Promo code ID is required");
-      
-      const response = await fetch(`/api/admin/stripe/promo-codes/${promoCodeId}`);
+
+      const response = await fetch(
+        `/api/admin/stripe/promo-codes/${promoCodeId}`,
+      );
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || "Failed to fetch promo code");
@@ -117,11 +122,14 @@ export function useUpdatePromoCode(promoCodeId: string) {
 
   return useMutation<PromoCode, Error, UpdatePromoCodeInput>({
     mutationFn: async (data) => {
-      const response = await fetch(`/api/admin/stripe/promo-codes/${promoCodeId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      const response = await fetch(
+        `/api/admin/stripe/promo-codes/${promoCodeId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        },
+      );
 
       if (!response.ok) {
         const error = await response.json();
@@ -146,9 +154,12 @@ export function useDeactivatePromoCode() {
 
   return useMutation<void, Error, string>({
     mutationFn: async (promoCodeId) => {
-      const response = await fetch(`/api/admin/stripe/promo-codes/${promoCodeId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `/api/admin/stripe/promo-codes/${promoCodeId}`,
+        {
+          method: "DELETE",
+        },
+      );
 
       if (!response.ok) {
         const error = await response.json();

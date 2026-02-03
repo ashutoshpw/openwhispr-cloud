@@ -103,26 +103,21 @@ export default function Footer() {
             <div className="mt-8 border-t   pt-8">
               <ul className="flex flex-wrap gap-4 text-xs">
                 <li>
-                  <a
-                    href="/terms"
-                    className="transition hover:opacity-75"
-                  >
+                  <a href="/terms" className="transition hover:opacity-75">
                     Terms & Conditions{" "}
                   </a>
                 </li>
 
                 <li>
-                  <a
-                    href="/privacy"
-                    className="transition hover:opacity-75"
-                  >
+                  <a href="/privacy" className="transition hover:opacity-75">
                     Privacy Policy{" "}
                   </a>
                 </li>
               </ul>
 
               <p className="mt-8 text-xs  ">
-                &copy; {new Date().getFullYear()}. SomeCompany LLC. All rights reserved.
+                &copy; {new Date().getFullYear()}. SomeCompany LLC. All rights
+                reserved.
               </p>
             </div>
           </div>

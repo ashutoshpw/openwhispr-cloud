@@ -1,6 +1,6 @@
+import { getProviderName } from "@repo/auth/config";
 import { baseServer } from "@repo/auth/server";
 import { NextResponse } from "next/server";
-import { getProviderName } from "@repo/auth/config";
 
 export async function POST(request: Request) {
   try {

@@ -1,6 +1,6 @@
 import { db } from "@repo/database";
-import { organization } from "@repo/database/schema";
 import { eq } from "@repo/database";
+import { organization } from "@repo/database/schema";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {

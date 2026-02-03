@@ -1,8 +1,8 @@
-import { db } from "@repo/database";
-import { user } from "@repo/database/schema";
 import { auth } from "@repo/auth/server";
-import { headers } from "next/headers";
+import { db } from "@repo/database";
 import { eq } from "@repo/database";
+import { user } from "@repo/database/schema";
+import { headers } from "next/headers";
 
 export async function getSiteAdminStatus(userId: string): Promise<boolean> {
   const userRecord = await db()

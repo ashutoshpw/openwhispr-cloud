@@ -1,6 +1,6 @@
-import { handleAuth } from "@workos-inc/authkit-nextjs";
 import { getAuthConfig } from "@repo/auth/config";
-import { NextRequest } from "next/server";
+import { handleAuth } from "@workos-inc/authkit-nextjs";
+import type { NextRequest } from "next/server";
 
 function getBaseURL(request: NextRequest): string {
   const config = getAuthConfig("authkit");

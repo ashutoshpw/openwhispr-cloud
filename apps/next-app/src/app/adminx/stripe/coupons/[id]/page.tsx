@@ -1,15 +1,15 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ActionsMenu } from "@/components/admin/stripe/ActionsMenu";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-// import { getStripeCoupon, getStripeProduct } from "@/lib/stripe/queries";
-import { getStripeCoupon } from "@/lib/stripe/queries";
-import { ExternalLink } from "lucide-react";
-import { ActionsMenu } from "@/components/admin/stripe/ActionsMenu";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 // import { ProductTable } from "@/components/admin/stripe/ProductTable";
 // import type { Product } from "@/lib/stripe/types";
 import { Label } from "@/components/ui/label";
+// import { getStripeCoupon, getStripeProduct } from "@/lib/stripe/queries";
+import { getStripeCoupon } from "@/lib/stripe/queries";
+import { ExternalLink } from "lucide-react";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
 export default async function CouponDetailPage({
   params,

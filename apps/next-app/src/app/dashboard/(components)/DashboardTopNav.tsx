@@ -1,9 +1,9 @@
 "use client";
 
-import { CommandMenu } from "@/components/dashboard/command-menu";
-import { ProjectSwitcher } from "@/components/dashboard/project-switcher";
 import { ModeToggle } from "@/components/ModeToggle";
 import { Profile } from "@/components/Profile";
+import { CommandMenu } from "@/components/dashboard/command-menu";
+import { ProjectSwitcher } from "@/components/dashboard/project-switcher";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";

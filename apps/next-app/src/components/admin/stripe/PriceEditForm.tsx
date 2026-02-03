@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 const MAX_BILLING_DAYS = 365 * 3;
 const intervalToDays: Record<"day" | "week" | "month" | "year", number> = {
@@ -41,23 +41,23 @@ export function PriceEditForm({ price }: PriceEditFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [priceName, setPriceName] = useState(price.priceName || "");
   const [unitAmount, setUnitAmount] = useState(
-    price.unitAmount !== null ? (price.unitAmount / 100).toString() : ""
+    price.unitAmount !== null ? (price.unitAmount / 100).toString() : "",
   );
   const [currency, setCurrency] = useState(price.currency.toLowerCase());
   const [type, setType] = useState<"one_time" | "recurring">(price.type);
   const [interval, setInterval] = useState<"day" | "week" | "month" | "year">(
-    price.interval || "month"
+    price.interval || "month",
   );
   const [intervalCount, setIntervalCount] = useState(
-    (price.intervalCount ?? 1).toString()
+    (price.intervalCount ?? 1).toString(),
   );
   const [nickname, setNickname] = useState(price.nickname || "");
   const [active, setActive] = useState(price.active);
   const [setAsDefault, setSetAsDefault] = useState(
-    price.defaultPriceId === price.id
+    price.defaultPriceId === price.id,
   );
   const [billingPeriodError, setBillingPeriodError] = useState<string | null>(
-    null
+    null,
   );
 
   useEffect(() => {
@@ -67,12 +67,16 @@ export function PriceEditForm({ price }: PriceEditFormProps) {
     }
     const count = Number(intervalCount);
     if (!Number.isFinite(count) || count < 1) {
-      setBillingPeriodError("Billing period must be between 1 day and 3 years.");
+      setBillingPeriodError(
+        "Billing period must be between 1 day and 3 years.",
+      );
       return;
     }
     const totalDays = count * intervalToDays[interval];
     if (totalDays < 1 || totalDays > MAX_BILLING_DAYS) {
-      setBillingPeriodError("Billing period must be between 1 day and 3 years.");
+      setBillingPeriodError(
+        "Billing period must be between 1 day and 3 years.",
+      );
       return;
     }
     setBillingPeriodError(null);
@@ -89,7 +93,7 @@ export function PriceEditForm({ price }: PriceEditFormProps) {
   }, [price]);
 
   const parsedCurrentAmount = useMemo(() => {
-    const parsed = parseFloat(unitAmount);
+    const parsed = Number.parseFloat(unitAmount);
     if (!Number.isFinite(parsed)) {
       return null;
     }
@@ -367,8 +371,8 @@ export function PriceEditForm({ price }: PriceEditFormProps) {
 
           {requiresReplacement && (
             <p className="text-xs text-muted-foreground">
-              Updating the amount, currency, or billing settings will create a new
-              price and archive this one automatically.
+              Updating the amount, currency, or billing settings will create a
+              new price and archive this one automatically.
             </p>
           )}
         </CardContent>

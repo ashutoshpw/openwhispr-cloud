@@ -1,11 +1,11 @@
+import { checkBillingPermission, createErrorResponse } from "@/lib/billing";
+import {
+  createUpgradeCheckout,
+  createWorkspaceCheckout,
+} from "@/lib/stripe/checkout";
 import { auth } from "@repo/auth/server";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import {
-  createWorkspaceCheckout,
-  createUpgradeCheckout,
-} from "@/lib/stripe/checkout";
-import { checkBillingPermission, createErrorResponse } from "@/lib/billing";
 
 /**
  * POST /api/billing/checkout

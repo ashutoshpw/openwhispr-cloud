@@ -1,16 +1,16 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ActionsMenu } from "@/components/admin/stripe/ActionsMenu";
+import { PriceList } from "@/components/admin/stripe/PriceList";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { notFound } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  getStripeProduct,
   getStripePricesForProduct,
+  getStripeProduct,
 } from "@/lib/stripe/queries";
 import { Plus } from "lucide-react";
-import { PriceList } from "@/components/admin/stripe/PriceList";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import type Stripe from "stripe";
-import { ActionsMenu } from "@/components/admin/stripe/ActionsMenu";
 
 function isStripeProduct(product: unknown): product is Stripe.Product {
   return (

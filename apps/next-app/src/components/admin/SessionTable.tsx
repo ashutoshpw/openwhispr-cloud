@@ -1,10 +1,10 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
 import type { Session } from "@repo/database/schema";
+import { useState } from "react";
 
 interface SessionTableProps {
   sessions: Session[];
@@ -38,12 +38,24 @@ export function SessionTable({ sessions: initialSessions }: SessionTableProps) {
         <table className="w-full">
           <thead>
             <tr className="border-b bg-muted/50">
-              <th className="h-12 px-4 text-left align-middle font-medium">User ID</th>
-              <th className="h-12 px-4 text-left align-middle font-medium">IP Address</th>
-              <th className="h-12 px-4 text-left align-middle font-medium">User Agent</th>
-              <th className="h-12 px-4 text-left align-middle font-medium">Created</th>
-              <th className="h-12 px-4 text-left align-middle font-medium">Expires</th>
-              <th className="h-12 px-4 text-left align-middle font-medium">Status</th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                User ID
+              </th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                IP Address
+              </th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                User Agent
+              </th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                Created
+              </th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                Expires
+              </th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                Status
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -57,7 +69,9 @@ export function SessionTable({ sessions: initialSessions }: SessionTableProps) {
                   <td className="p-4 align-middle font-mono text-sm">
                     {session.userId.substring(0, 8)}...
                   </td>
-                  <td className="p-4 align-middle">{session.ipAddress || "N/A"}</td>
+                  <td className="p-4 align-middle">
+                    {session.ipAddress || "N/A"}
+                  </td>
                   <td className="p-4 align-middle text-sm max-w-xs truncate">
                     {session.userAgent || "N/A"}
                   </td>
@@ -78,10 +92,11 @@ export function SessionTable({ sessions: initialSessions }: SessionTableProps) {
           </tbody>
         </table>
         {filteredSessions.length === 0 && (
-          <div className="p-8 text-center text-muted-foreground">No sessions found</div>
+          <div className="p-8 text-center text-muted-foreground">
+            No sessions found
+          </div>
         )}
       </div>
     </div>
   );
 }
-

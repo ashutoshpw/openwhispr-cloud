@@ -1,28 +1,28 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import type Stripe from "stripe";
-import { Loader2, Plus, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
-  useCreateProduct,
-  useUpdateProduct,
   type BillingInterval,
   type PriceType,
+  useCreateProduct,
+  useUpdateProduct,
 } from "@/hooks/stripe/useProducts";
 import { cn } from "@/lib/utils";
+import { Loader2, Plus, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import type Stripe from "stripe";
 
 interface ProductFormProps {
   product?: Stripe.Product;

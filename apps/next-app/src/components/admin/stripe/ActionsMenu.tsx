@@ -1,28 +1,6 @@
 "use client";
 
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import {
-  MoreVertical,
-  Eye,
-  Edit,
-  ExternalLink,
-  Trash2,
-  Copy,
-  Archive,
-  Star,
-} from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -32,6 +10,28 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Archive,
+  Copy,
+  Edit,
+  ExternalLink,
+  Eye,
+  MoreVertical,
+  Star,
+  Trash2,
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface ActionsMenuProps {
   itemType: "product" | "price" | "coupon" | "promo-code";
@@ -62,7 +62,7 @@ export function ActionsMenu({
 }: ActionsMenuProps) {
   const [showDialog, setShowDialog] = useState(false);
   const [dialogMode, setDialogMode] = useState<"archive" | "delete" | null>(
-    null
+    null,
   );
   const [isDeleting, setIsDeleting] = useState(false);
   const router = useRouter();
@@ -124,26 +124,26 @@ export function ActionsMenu({
       `/api/admin/stripe/products/${itemId}/${endpoint}`,
       {
         method: "POST",
-      }
+      },
     );
 
     if (!response.ok) {
       const error = await response.json();
       throw new Error(
         error.error ||
-          `Failed to ${isActive ? "archive" : "unarchive"} product`
+          `Failed to ${isActive ? "archive" : "unarchive"} product`,
       );
     }
 
     toast.success(
-      `Product ${isActive ? "archived" : "unarchived"} successfully!`
+      `Product ${isActive ? "archived" : "unarchived"} successfully!`,
     );
   };
 
   const handleProductDelete = async () => {
     const response = await fetch(
       `/api/admin/stripe/products/${itemId}/delete`,
-      { method: "POST" }
+      { method: "POST" },
     );
     const result = await response.json();
 
@@ -180,26 +180,35 @@ export function ActionsMenu({
 
         if (!response.ok) {
           const error = await response.json();
-          throw new Error(error.error || `Failed to ${isActive ? "archive" : "unarchive"} price`);
+          throw new Error(
+            error.error ||
+              `Failed to ${isActive ? "archive" : "unarchive"} price`,
+          );
         }
 
         toast.success(
-          `Price ${isActive ? "archived" : "unarchived"} successfully!`
+          `Price ${isActive ? "archived" : "unarchived"} successfully!`,
         );
       } else if (itemType === "promo-code") {
-        const response = await fetch(`/api/admin/stripe/promo-codes/${itemId}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ active: !isActive }),
-        });
+        const response = await fetch(
+          `/api/admin/stripe/promo-codes/${itemId}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ active: !isActive }),
+          },
+        );
 
         if (!response.ok) {
           const error = await response.json();
-          throw new Error(error.error || `Failed to ${isActive ? "deactivate" : "activate"} promo code`);
+          throw new Error(
+            error.error ||
+              `Failed to ${isActive ? "deactivate" : "activate"} promo code`,
+          );
         }
 
         toast.success(
-          `Promo code ${isActive ? "deactivated" : "activated"} successfully!`
+          `Promo code ${isActive ? "deactivated" : "activated"} successfully!`,
         );
       } else {
         const endpoint = `/api/admin/stripe/${itemType}s/${itemId}`;
@@ -213,7 +222,7 @@ export function ActionsMenu({
         }
 
         toast.success(
-          `${itemType.charAt(0).toUpperCase() + itemType.slice(1)} deleted successfully!`
+          `${itemType.charAt(0).toUpperCase() + itemType.slice(1)} deleted successfully!`,
         );
       }
 
@@ -224,7 +233,10 @@ export function ActionsMenu({
       await refreshAfterAction(itemType === "coupon");
     } catch (error: any) {
       console.error("Archive/Delete error:", error);
-      toast.error(error.message || `Failed to ${(itemType === "product" || itemType === "price") && isActive ? "archive" : itemType === "coupon" ? "delete" : "unarchive"} ${itemType}`);
+      toast.error(
+        error.message ||
+          `Failed to ${(itemType === "product" || itemType === "price") && isActive ? "archive" : itemType === "coupon" ? "delete" : "unarchive"} ${itemType}`,
+      );
     }
   };
 

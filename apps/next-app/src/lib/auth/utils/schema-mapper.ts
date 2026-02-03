@@ -16,35 +16,46 @@ export function normalizeUser(user: {
   };
 }
 
-export function mapBetterAuthSession(session: {
-  user?: {
-    id: string;
-    email: string;
-    name?: string | null;
-    image?: string | null;
-    role?: string | null;
-  } | null;
-  expiresAt?: Date;
-} | null | undefined): UnifiedSession | null {
+export function mapBetterAuthSession(
+  session:
+    | {
+        user?: {
+          id: string;
+          email: string;
+          name?: string | null;
+          image?: string | null;
+          role?: string | null;
+        } | null;
+        expiresAt?: Date;
+      }
+    | null
+    | undefined,
+): UnifiedSession | null {
   if (!session || !session.user) {
     return null;
   }
 
   return {
     user: normalizeUser(session.user),
-    expiresAt: session.expiresAt || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    expiresAt:
+      session.expiresAt || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
   };
 }
 
-export function mapNextAuthSession(session: {
-  user: {
-    id: string;
-    email: string;
-    name?: string | null;
-    image?: string | null;
-  };
-  expires?: string | null;
-} | null | undefined): UnifiedSession | null {
+export function mapNextAuthSession(
+  session:
+    | {
+        user: {
+          id: string;
+          email: string;
+          name?: string | null;
+          image?: string | null;
+        };
+        expires?: string | null;
+      }
+    | null
+    | undefined,
+): UnifiedSession | null {
   if (!session) return null;
 
   const expiresAt = session.expires
@@ -63,16 +74,22 @@ export function mapNextAuthSession(session: {
   };
 }
 
-export function mapAuthKitSession(user: {
-  id: string;
-  email: string;
-  firstName?: string | null;
-  lastName?: string | null;
-  profilePictureUrl?: string | null;
-} | null | undefined): UnifiedSession | null {
+export function mapAuthKitSession(
+  user:
+    | {
+        id: string;
+        email: string;
+        firstName?: string | null;
+        lastName?: string | null;
+        profilePictureUrl?: string | null;
+      }
+    | null
+    | undefined,
+): UnifiedSession | null {
   if (!user) return null;
 
-  const name = [user.firstName, user.lastName].filter(Boolean).join(" ") || null;
+  const name =
+    [user.firstName, user.lastName].filter(Boolean).join(" ") || null;
 
   return {
     user: normalizeUser({
@@ -86,19 +103,25 @@ export function mapAuthKitSession(user: {
   };
 }
 
-export function mapClerkSession(user: {
-  id: string;
-  emailAddresses: Array<{ emailAddress: string }>;
-  firstName?: string | null;
-  lastName?: string | null;
-  imageUrl?: string | null;
-} | null | undefined): UnifiedSession | null {
+export function mapClerkSession(
+  user:
+    | {
+        id: string;
+        emailAddresses: Array<{ emailAddress: string }>;
+        firstName?: string | null;
+        lastName?: string | null;
+        imageUrl?: string | null;
+      }
+    | null
+    | undefined,
+): UnifiedSession | null {
   if (!user) return null;
 
   const email = user.emailAddresses?.[0]?.emailAddress || "";
   if (!email) return null;
 
-  const name = [user.firstName, user.lastName].filter(Boolean).join(" ") || null;
+  const name =
+    [user.firstName, user.lastName].filter(Boolean).join(" ") || null;
 
   return {
     user: normalizeUser({
@@ -111,4 +134,3 @@ export function mapClerkSession(user: {
     expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
   };
 }
-

@@ -1,9 +1,9 @@
-import { auth } from "@repo/auth/server";
 import { getSiteAdminStatus } from "@/lib/auth-utils";
+import { auth } from "@repo/auth/server";
 import { headers } from "next/headers";
 import {
-  type NextRequest,
   type NextFetchEvent,
+  type NextRequest,
   NextResponse,
 } from "next/server";
 

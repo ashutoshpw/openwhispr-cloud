@@ -1,7 +1,7 @@
+import { ReactQueryProvider } from "@/providers/react-query-provider";
 import type { ReactNode } from "react";
 import AdminSidebar from "./(components)/AdminSidebar";
 import AdminTopNav from "./(components)/AdminTopNav";
-import { ReactQueryProvider } from "@/providers/react-query-provider";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
@@ -15,4 +15,3 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     </ReactQueryProvider>
   );
 }
-

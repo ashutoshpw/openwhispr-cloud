@@ -1,11 +1,11 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ActionsMenu } from "@/components/admin/stripe/ActionsMenu";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { notFound } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getStripePromotionCode } from "@/lib/stripe/queries";
 import { ExternalLink } from "lucide-react";
-import { ActionsMenu } from "@/components/admin/stripe/ActionsMenu";
+import Link from "next/link";
+import { notFound } from "next/navigation";
 
 export default async function PromoCodeDetailPage({
   params,
@@ -132,8 +132,7 @@ export default async function PromoCodeDetailPage({
             </label>
             <p className="text-lg font-semibold">
               {promoCode.times_redeemed || 0}
-              {promoCode.max_redemptions &&
-                ` / ${promoCode.max_redemptions}`}
+              {promoCode.max_redemptions && ` / ${promoCode.max_redemptions}`}
             </p>
           </div>
 

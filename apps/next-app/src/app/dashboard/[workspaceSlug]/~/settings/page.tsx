@@ -1,26 +1,55 @@
-"use client";
+import { redirect, notFound } from "next/navigation";
+import { auth } from "@repo/auth/server";
+import { headers } from "next/headers";
+import { db } from "@repo/database";
+import { organization, member } from "@repo/database/schema";
+import { eq, and } from "@repo/database";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useSession } from "@repo/auth/client";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { CreditCard } from "lucide-react";
 
-export default function WorkspaceSettings() {
-  const { data: session, isLoading } = useSession();
+interface PageProps {
+  params: Promise<{ workspaceSlug: string }>;
+}
 
-  if (isLoading) {
-    return (
-      <div className="flex flex-wrap justify-start items-center gap-4 px-4 pt-5">
-        <div>Loading...</div>
-      </div>
-    );
+export default async function WorkspaceSettings({ params }: PageProps) {
+  const { workspaceSlug } = await params;
+
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user?.id) {
+    redirect(`/sign-in?redirect=/dashboard/${workspaceSlug}/~/settings`);
   }
 
-  if (!session?.user) {
-    // Middleware handles auth - this is just a fallback loading state
-    return (
-      <div className="flex flex-wrap justify-start items-center gap-4 px-4 pt-5">
-        <div>Loading...</div>
-      </div>
-    );
+  // Get organization by slug
+  const org = await db()
+    .select()
+    .from(organization)
+    .where(eq(organization.slug, workspaceSlug))
+    .limit(1);
+
+  if (!org[0]) {
+    notFound();
+  }
+
+  // Check user membership
+  const membership = await db()
+    .select()
+    .from(member)
+    .where(
+      and(
+        eq(member.organizationId, org[0].id),
+        eq(member.userId, session.user.id),
+      ),
+    )
+    .limit(1);
+
+  if (!membership[0]) {
+    notFound();
   }
 
   const user = session.user;
@@ -34,6 +63,16 @@ export default function WorkspaceSettings() {
         <p className="text-muted-foreground">
           Manage your workspace settings, members, and billing.
         </p>
+
+        {/* Quick links */}
+        <div className="flex gap-2 mt-2">
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/dashboard/${workspaceSlug}/~/settings/billing`}>
+              <CreditCard className="h-4 w-4 mr-2" />
+              Billing & Subscription
+            </Link>
+          </Button>
+        </div>
 
         <h3 className="mt-8 pb-2 border-b w-full font-semibold text-xl tracking-tight scroll-m-20">
           My Profile
@@ -54,6 +93,32 @@ export default function WorkspaceSettings() {
           <div className="flex flex-col gap-3">
             <Label>Email Verified</Label>
             <Input disabled defaultValue={user?.emailVerified ? "Yes" : "No"} />
+          </div>
+        </div>
+
+        <h3 className="mt-8 pb-2 border-b w-full font-semibold text-xl tracking-tight scroll-m-20">
+          Workspace Info
+        </h3>
+        <div className="flex gap-3 mt-3 w-full">
+          <div className="flex flex-col gap-3 w-full">
+            <Label>Workspace Name</Label>
+            <Input disabled defaultValue={org[0].name || ""} />
+          </div>
+        </div>
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3">
+            <Label>Workspace Slug</Label>
+            <Input disabled defaultValue={org[0].slug || ""} />
+          </div>
+        </div>
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3">
+            <Label>Your Role</Label>
+            <Input
+              disabled
+              defaultValue={membership[0].role || ""}
+              className="capitalize"
+            />
           </div>
         </div>
       </div>

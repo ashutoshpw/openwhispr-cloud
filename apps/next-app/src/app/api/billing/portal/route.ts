@@ -1,8 +1,8 @@
+import { checkBillingPermission, createErrorResponse } from "@/lib/billing";
+import { createOrganizationPortalSession } from "@/lib/stripe/portal";
 import { auth } from "@repo/auth/server";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { createOrganizationPortalSession } from "@/lib/stripe/portal";
-import { checkBillingPermission, createErrorResponse } from "@/lib/billing";
 
 /**
  * POST /api/billing/portal

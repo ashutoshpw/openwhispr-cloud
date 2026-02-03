@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
-import { auth } from "@repo/auth/server";
 import { getSiteAdminStatus } from "@/lib/auth-utils";
-import { headers } from "next/headers";
 import { stripe } from "@/lib/stripe/client";
-import Stripe from "stripe";
+import { auth } from "@repo/auth/server";
+import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
+import { NextResponse } from "next/server";
+import type Stripe from "stripe";
 
 async function listAllPrices(productId: string) {
   const prices: Stripe.Price[] = [];

@@ -1,11 +1,11 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { db } from "@repo/database";
+import { eq } from "@repo/database";
+import { user } from "@repo/database/schema";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { db } from "@repo/database";
-import { user } from "@repo/database/schema";
-import { eq } from "@repo/database";
 
 async function getUser(id: string) {
   try {
@@ -38,7 +38,9 @@ export default async function UserDetailPage({
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">User Details</h1>
-          <p className="text-muted-foreground">View and edit user information</p>
+          <p className="text-muted-foreground">
+            View and edit user information
+          </p>
         </div>
         <Button asChild variant="outline">
           <Link href="/adminx/users">Back to Users</Link>
@@ -50,21 +52,31 @@ export default async function UserDetailPage({
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-muted-foreground">ID</label>
+            <label className="text-sm font-medium text-muted-foreground">
+              ID
+            </label>
             <p className="font-mono text-sm">{user.id}</p>
           </div>
           <div>
-            <label className="text-sm font-medium text-muted-foreground">Name</label>
+            <label className="text-sm font-medium text-muted-foreground">
+              Name
+            </label>
             <p>{user.name}</p>
           </div>
           <div>
-            <label className="text-sm font-medium text-muted-foreground">Email</label>
+            <label className="text-sm font-medium text-muted-foreground">
+              Email
+            </label>
             <p>{user.email}</p>
           </div>
           <div>
-            <label className="text-sm font-medium text-muted-foreground">Role</label>
+            <label className="text-sm font-medium text-muted-foreground">
+              Role
+            </label>
             <div>
-              <Badge variant={user.role === "site-admin" ? "default" : "secondary"}>
+              <Badge
+                variant={user.role === "site-admin" ? "default" : "secondary"}
+              >
                 {user.role}
               </Badge>
             </div>
@@ -96,4 +108,3 @@ export default async function UserDetailPage({
     </div>
   );
 }
-

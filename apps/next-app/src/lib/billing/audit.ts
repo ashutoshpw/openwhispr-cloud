@@ -1,6 +1,6 @@
 import { db } from "@repo/database";
+import { desc, eq } from "@repo/database";
 import { orgAuditLogs } from "@repo/database/schema";
-import { eq, desc } from "@repo/database";
 import type { AuditAction } from "./types";
 
 export interface LogBillingEventParams {

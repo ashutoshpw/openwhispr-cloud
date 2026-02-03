@@ -38,7 +38,7 @@ export async function POST(request: Request) {
             if (lowerKey === "path") {
               options.path = val || "/";
             } else if (lowerKey === "max-age") {
-              options.maxAge = parseInt(val, 10);
+              options.maxAge = Number.parseInt(val, 10);
             } else if (lowerKey === "httponly") {
               options.httpOnly = true;
             } else if (lowerKey === "secure") {

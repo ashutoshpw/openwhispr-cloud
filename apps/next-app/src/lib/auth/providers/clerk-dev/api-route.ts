@@ -7,4 +7,3 @@ const handler = server.getApiHandler();
 
 export const GET = handler.GET;
 export const POST = handler.POST;
-

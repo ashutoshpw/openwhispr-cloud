@@ -1,7 +1,7 @@
-import { stripe } from "./client";
 import { db } from "@repo/database";
-import { organization } from "@repo/database/schema";
 import { eq } from "@repo/database";
+import { organization } from "@repo/database/schema";
+import { stripe } from "./client";
 
 /**
  * Get the base URL for the application

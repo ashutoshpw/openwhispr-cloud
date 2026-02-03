@@ -1,7 +1,7 @@
 import { auth } from "@repo/auth/server";
 import { db } from "@repo/database";
-import { member, project } from "@repo/database/schema";
 import { and, eq } from "@repo/database";
+import { member, project } from "@repo/database/schema";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 

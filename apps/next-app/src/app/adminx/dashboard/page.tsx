@@ -1,7 +1,7 @@
 import { StatsCards } from "@/components/admin/StatsCards";
 import { db } from "@repo/database";
-import { user, organization, payments, session } from "@repo/database/schema";
-import { sql, gt } from "@repo/database";
+import { gt, sql } from "@repo/database";
+import { organization, payments, session, user } from "@repo/database/schema";
 
 async function getStats() {
   try {
@@ -59,4 +59,3 @@ export default async function AdminDashboard() {
     </div>
   );
 }
-

@@ -1,13 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { Loader2, Plus, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 interface PriceFormProps {
   productId: string;
@@ -33,7 +33,7 @@ export function PriceForm({ productId, productName }: PriceFormProps) {
   const [priceName, setPriceName] = useState("");
   const [currency, setCurrency] = useState("usd");
   const [billingType, setBillingType] = useState<"recurring" | "one_time">(
-    "recurring"
+    "recurring",
   );
 
   const [pricingModel, setPricingModel] = useState<
@@ -42,7 +42,9 @@ export function PriceForm({ productId, productName }: PriceFormProps) {
 
   const [unitAmount, setUnitAmount] = useState("");
   const [packageUnitAmount, setPackageUnitAmount] = useState("");
-  const [tiersMode, setTiersMode] = useState<"graduated" | "volume">("graduated");
+  const [tiersMode, setTiersMode] = useState<"graduated" | "volume">(
+    "graduated",
+  );
   const [tiers, setTiers] = useState<
     { id: string; upTo: string; amount: string }[]
   >([{ id: createTierId(), upTo: "10", amount: "" }]);
@@ -61,7 +63,7 @@ export function PriceForm({ productId, productName }: PriceFormProps) {
   const [active, setActive] = useState(true);
 
   const [billingPeriodError, setBillingPeriodError] = useState<string | null>(
-    null
+    null,
   );
 
   const MAX_BILLING_DAYS = 365 * 3;
@@ -85,7 +87,7 @@ export function PriceForm({ productId, productName }: PriceFormProps) {
       unit = customIntervalUnit;
     } else {
       const preset = intervalPresets.find(
-        (option) => option.value === intervalOption
+        (option) => option.value === intervalOption,
       );
       if (preset) {
         count = preset.count;
@@ -94,13 +96,17 @@ export function PriceForm({ productId, productName }: PriceFormProps) {
     }
 
     if (!Number.isFinite(count) || count < 1) {
-      setBillingPeriodError("Billing period must be between 1 day and 3 years.");
+      setBillingPeriodError(
+        "Billing period must be between 1 day and 3 years.",
+      );
       return;
     }
 
     const totalDays = count * intervalToDays[unit];
     if (totalDays < 1 || totalDays > MAX_BILLING_DAYS) {
-      setBillingPeriodError("Billing period must be between 1 day and 3 years.");
+      setBillingPeriodError(
+        "Billing period must be between 1 day and 3 years.",
+      );
       return;
     }
 
@@ -110,12 +116,12 @@ export function PriceForm({ productId, productName }: PriceFormProps) {
   const handleTierChange = (
     tierId: string,
     field: "upTo" | "amount",
-    value: string
+    value: string,
   ) => {
     setTiers((prev) =>
       prev.map((tier) =>
-        tier.id === tierId ? { ...tier, [field]: value } : tier
-      )
+        tier.id === tierId ? { ...tier, [field]: value } : tier,
+      ),
     );
   };
 
@@ -128,7 +134,7 @@ export function PriceForm({ productId, productName }: PriceFormProps) {
 
   const handleRemoveTier = (tierId: string) => {
     setTiers((prev) =>
-      prev.length === 1 ? prev : prev.filter((tier) => tier.id !== tierId)
+      prev.length === 1 ? prev : prev.filter((tier) => tier.id !== tierId),
     );
   };
 
@@ -167,7 +173,7 @@ export function PriceForm({ productId, productName }: PriceFormProps) {
           intervalCount = Number(customIntervalValue) || 1;
         } else {
           const preset = intervalPresets.find(
-            (option) => option.value === intervalOption
+            (option) => option.value === intervalOption,
           );
           if (preset) {
             interval = preset.interval;
@@ -183,14 +189,14 @@ export function PriceForm({ productId, productName }: PriceFormProps) {
       }
 
       if (pricingModel === "flat") {
-        const parsedAmount = parseFloat(unitAmount);
+        const parsedAmount = Number.parseFloat(unitAmount);
         const amountInCents = Math.round(parsedAmount * 100);
         if (!Number.isFinite(parsedAmount) || amountInCents <= 0) {
           throw new Error("Enter a valid price amount greater than 0.");
         }
         payload.unit_amount = amountInCents;
       } else if (pricingModel === "package") {
-        const parsedAmount = parseFloat(packageUnitAmount);
+        const parsedAmount = Number.parseFloat(packageUnitAmount);
         const amountInCents = Math.round(parsedAmount * 100);
         if (!Number.isFinite(parsedAmount) || amountInCents <= 0) {
           throw new Error("Enter a valid price per unit greater than 0.");
@@ -199,7 +205,9 @@ export function PriceForm({ productId, productName }: PriceFormProps) {
       } else if (pricingModel === "tiered") {
         payload.tiers_mode = tiersMode;
         const parsedTiers = tiers.map((tier, index) => {
-          const amount = Math.round(parseFloat(tier.amount || "0") * 100);
+          const amount = Math.round(
+            Number.parseFloat(tier.amount || "0") * 100,
+          );
           if (!Number.isFinite(amount) || amount <= 0) {
             throw new Error("Enter valid tier amounts.");
           }
@@ -214,7 +222,7 @@ export function PriceForm({ productId, productName }: PriceFormProps) {
         });
         payload.tiers = parsedTiers;
       } else if (pricingModel === "usage") {
-        const parsedAmount = parseFloat(unitAmount);
+        const parsedAmount = Number.parseFloat(unitAmount);
         const amountInCents = Math.round(parsedAmount * 100);
         if (!Number.isFinite(parsedAmount) || amountInCents <= 0) {
           throw new Error("Enter a valid price amount greater than 0.");
@@ -237,9 +245,9 @@ export function PriceForm({ productId, productName }: PriceFormProps) {
       }
 
       toast.success("Price created successfully!");
-      
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       router.push(`/adminx/stripe/products/${productId}`);
       router.refresh();
     } catch (error: any) {
@@ -354,8 +362,8 @@ export function PriceForm({ productId, productName }: PriceFormProps) {
                 required
               />
               <p className="text-xs text-muted-foreground">
-                Charge per seat, license, or package. Quantity is provided during
-                checkout.
+                Charge per seat, license, or package. Quantity is provided
+                during checkout.
               </p>
             </div>
           )}
@@ -389,13 +397,15 @@ export function PriceForm({ productId, productName }: PriceFormProps) {
                         | "sum"
                         | "last_during_period"
                         | "max"
-                        | "last_ever"
+                        | "last_ever",
                     )
                   }
                   className="w-full rounded border p-2 h-10"
                 >
                   <option value="sum">Sum usage during period</option>
-                  <option value="last_during_period">Last entry in period</option>
+                  <option value="last_during_period">
+                    Last entry in period
+                  </option>
                   <option value="max">Maximum value during period</option>
                   <option value="last_ever">Last reported value</option>
                 </select>
@@ -425,7 +435,9 @@ export function PriceForm({ productId, productName }: PriceFormProps) {
                     }
                     className="w-full rounded border p-2 h-10"
                   >
-                    <option value="graduated">Graduated (per tier pricing)</option>
+                    <option value="graduated">
+                      Graduated (per tier pricing)
+                    </option>
                     <option value="volume">
                       Volume (same rate for all units)
                     </option>
@@ -475,8 +487,8 @@ export function PriceForm({ productId, productName }: PriceFormProps) {
                   Add tier
                 </Button>
                 <p className="text-xs text-muted-foreground">
-                  Set the final tier&apos;s limit to &quot;inf&quot; to cover unlimited
-                  usage.
+                  Set the final tier&apos;s limit to &quot;inf&quot; to cover
+                  unlimited usage.
                 </p>
               </div>
             </div>
@@ -535,7 +547,7 @@ export function PriceForm({ productId, productName }: PriceFormProps) {
                     value={customIntervalUnit}
                     onChange={(e) =>
                       setCustomIntervalUnit(
-                        e.target.value as "day" | "week" | "month" | "year"
+                        e.target.value as "day" | "week" | "month" | "year",
                       )
                     }
                     className="rounded border p-2 h-10"
@@ -598,8 +610,8 @@ export function PriceForm({ productId, productName }: PriceFormProps) {
             </Label>
           </div>
           <p className="text-xs text-muted-foreground">
-            Prices in Stripe are immutable. To change amount, currency, or billing,
-            create a new price after saving.
+            Prices in Stripe are immutable. To change amount, currency, or
+            billing, create a new price after saving.
           </p>
         </CardContent>
       </Card>

@@ -7,8 +7,8 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { useSession } from "@repo/auth/client";
 import { cn } from "@/lib/utils";
+import { useSession } from "@repo/auth/client";
 import { BlocksIcon } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";

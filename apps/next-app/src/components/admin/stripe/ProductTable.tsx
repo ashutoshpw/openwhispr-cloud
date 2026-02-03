@@ -1,12 +1,11 @@
 "use client";
 
+import { ActionsMenu } from "@/components/admin/stripe/ActionsMenu";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import type { Product } from "@/lib/stripe/types";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Product } from "@/lib/stripe/types";
-import { ActionsMenu } from "@/components/admin/stripe/ActionsMenu";
-
 
 interface ProductTableProps {
   products: Product[];
@@ -20,7 +19,7 @@ export function ProductTable({ products: initialProducts }: ProductTableProps) {
   const filteredProducts = products.filter(
     (product) =>
       product.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.description?.toLowerCase().includes(searchQuery.toLowerCase())
+      product.description?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const formatDate = (timestamp: number) => {
@@ -97,7 +96,9 @@ export function ProductTable({ products: initialProducts }: ProductTableProps) {
                 <td className="p-4 align-middle">
                   <Badge
                     variant={product.active ? "default" : "secondary"}
-                    className={product.active ? "bg-emerald-500 text-white" : ""}
+                    className={
+                      product.active ? "bg-emerald-500 text-white" : ""
+                    }
                   >
                     {product.active ? "Active" : "Archived"}
                   </Badge>

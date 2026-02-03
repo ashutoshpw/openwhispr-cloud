@@ -1,8 +1,8 @@
 import "server-only";
 
 import { db } from "@repo/database";
+import { and, eq } from "@repo/database";
 import * as schema from "@repo/database/schema";
-import { eq, and } from "@repo/database";
 import { nanoid } from "nanoid";
 
 export interface AuthKitUserData {
@@ -16,17 +16,18 @@ export interface AuthKitUserData {
 }
 
 export async function syncAuthKitUserToDb(
-  authKitUser: AuthKitUserData
+  authKitUser: AuthKitUserData,
 ): Promise<string> {
   try {
     if (!authKitUser.email) {
       throw new Error("No email address found for AuthKit user");
     }
 
-    const name = [authKitUser.firstName, authKitUser.lastName]
-      .filter(Boolean)
-      .join(" ")
-      .trim() || authKitUser.email.split("@")[0];
+    const name =
+      [authKitUser.firstName, authKitUser.lastName]
+        .filter(Boolean)
+        .join(" ")
+        .trim() || authKitUser.email.split("@")[0];
 
     const existingUsers = await db()
       .select()
@@ -72,7 +73,7 @@ export async function syncAuthKitUserToDb(
 }
 
 export async function syncAuthKitAccountToDb(
-  authKitUser: AuthKitUserData
+  authKitUser: AuthKitUserData,
 ): Promise<string> {
   try {
     const existingAccounts = await db()
@@ -81,8 +82,8 @@ export async function syncAuthKitAccountToDb(
       .where(
         and(
           eq(schema.account.userId, authKitUser.id),
-          eq(schema.account.providerId, "authkit")
-        )
+          eq(schema.account.providerId, "authkit"),
+        ),
       )
       .limit(1);
 
@@ -104,4 +105,3 @@ export async function syncAuthKitAccountToDb(
     throw error;
   }
 }
-

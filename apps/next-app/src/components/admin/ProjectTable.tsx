@@ -1,11 +1,11 @@
 "use client";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { useState } from "react";
+import type { Organization, Project } from "@repo/database/schema";
 import Link from "next/link";
-import type { Project, Organization } from "@repo/database/schema";
+import { useState } from "react";
 
 interface ProjectWithOrganization extends Project {
   organization?: Organization | null;

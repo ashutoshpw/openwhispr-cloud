@@ -1,25 +1,25 @@
 "use client";
 
-import { useAuth as useAuthKitAuth } from "@workos-inc/authkit-nextjs/components";
 import {
+  signOut as authKitSignOut,
   getSignInUrl,
   getSignUpUrl,
-  signOut as authKitSignOut,
 } from "@workos-inc/authkit-nextjs";
+import { useAuth as useAuthKitAuth } from "@workos-inc/authkit-nextjs/components";
 import { getAuthConfig } from "../../config";
-import { mapAuthKitSession } from "../../utils/schema-mapper";
 import type {
   AuthClientProvider,
-  SignInResult,
-  SignUpResult,
-  SignOutResult,
   GetSessionResult,
-  UseSessionResult,
   RequestPasswordResetParams,
   RequestPasswordResetResult,
   ResetPasswordParams,
   ResetPasswordResult,
+  SignInResult,
+  SignOutResult,
+  SignUpResult,
+  UseSessionResult,
 } from "../../types";
+import { mapAuthKitSession } from "../../utils/schema-mapper";
 
 export class AuthKitClient implements AuthClientProvider {
   private baseURL: string;

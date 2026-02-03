@@ -1,7 +1,7 @@
 import { ProjectTable } from "@/components/admin/ProjectTable";
 import { db } from "@repo/database";
-import { project, organization } from "@repo/database/schema";
 import { eq } from "@repo/database";
+import { organization, project } from "@repo/database/schema";
 
 async function getProjects() {
   try {

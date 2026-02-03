@@ -30,10 +30,12 @@ export function WorkspaceSwitcher() {
           return;
         }
         const result = await response.json();
-        
+
         // BetterAuth returns array directly, not wrapped in data property
-        const organizations = Array.isArray(result) ? result : result?.data || [];
-        
+        const organizations = Array.isArray(result)
+          ? result
+          : result?.data || [];
+
         if (organizations.length > 0) {
           setWorkspaces(organizations);
 
@@ -97,7 +99,7 @@ export function WorkspaceSwitcher() {
   if (!activeWorkspace) {
     return (
       <Button variant="ghost" className="w-full justify-start" asChild>
-        <a href="/onboarding">
+        <a href="/workspace/new">
           <Building2 className="mr-2 h-4 w-4" />
           Create Workspace
         </a>
@@ -133,7 +135,7 @@ export function WorkspaceSwitcher() {
         ))}
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <a href="/onboarding" className="cursor-pointer">
+          <a href="/workspace/new" className="cursor-pointer">
             <Building2 className="mr-2 h-4 w-4" />
             Create New Workspace
           </a>

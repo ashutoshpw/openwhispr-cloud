@@ -1,10 +1,10 @@
-import NextAuth from "next-auth";
-import Credentials from "next-auth/providers/credentials";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "@repo/database";
+import { and, eq } from "@repo/database";
 import * as schema from "@repo/database/schema";
+import NextAuth from "next-auth";
+import Credentials from "next-auth/providers/credentials";
 import { getAuthConfig } from "../../config";
-import { eq, and } from "@repo/database";
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   adapter: DrizzleAdapter(db(), {
@@ -44,8 +44,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
           .where(
             and(
               eq(schema.account.userId, users[0].id),
-              eq(schema.account.providerId, "credential")
-            )
+              eq(schema.account.providerId, "credential"),
+            ),
           )
           .limit(1);
 
@@ -56,7 +56,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         const bcrypt = await import("bcryptjs");
         const isValid = await bcrypt.compare(
           credentials.password as string,
-          accounts[0].password
+          accounts[0].password,
         );
 
         if (!isValid) {

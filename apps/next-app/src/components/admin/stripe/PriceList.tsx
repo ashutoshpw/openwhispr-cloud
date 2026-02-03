@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
-import { Badge } from "@/components/ui/badge";
 import { ActionsMenu } from "@/components/admin/stripe/ActionsMenu";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
 
 interface Price {
   id: string;
@@ -23,7 +23,11 @@ interface PriceListProps {
   defaultPriceId?: string | null;
 }
 
-export function PriceList({ prices, productId, defaultPriceId }: PriceListProps) {
+export function PriceList({
+  prices,
+  productId,
+  defaultPriceId,
+}: PriceListProps) {
   const formatAmount = (amount: number | null, currency: string) => {
     if (amount === null) return "Custom";
     const value = amount / 100;
@@ -70,7 +74,10 @@ export function PriceList({ prices, productId, defaultPriceId }: PriceListProps)
                 <Badge variant="secondary">Archived</Badge>
               )}
               {defaultPriceId === price.id && (
-                <Badge variant="outline" className="border-primary text-primary">
+                <Badge
+                  variant="outline"
+                  className="border-primary text-primary"
+                >
                   Default
                 </Badge>
               )}
@@ -87,7 +94,10 @@ export function PriceList({ prices, productId, defaultPriceId }: PriceListProps)
           <ActionsMenu
             itemType="price"
             itemId={price.id}
-            itemName={price.nickname || `${formatAmount(price.unit_amount, price.currency)} ${formatInterval(price.recurring)}`}
+            itemName={
+              price.nickname ||
+              `${formatAmount(price.unit_amount, price.currency)} ${formatInterval(price.recurring)}`
+            }
             viewUrl={`/adminx/stripe/prices/${price.id}/edit`}
             stripeUrl={`https://dashboard.stripe.com/prices/${price.id}`}
             isActive={price.active}

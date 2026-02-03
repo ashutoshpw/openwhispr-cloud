@@ -1,25 +1,25 @@
 import "server-only";
 
-import { db } from "@repo/database";
-import * as schema from "@repo/database/schema";
 import { sendPasswordResetEmail } from "@/lib/email";
 import { checkPasswordResetRateLimit } from "@/lib/rate-limit";
+import { db } from "@repo/database";
+import { eq } from "@repo/database";
+import * as schema from "@repo/database/schema";
+import bcrypt from "bcryptjs";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import { organization } from "better-auth/plugins";
 import { toNextJsHandler } from "better-auth/next-js";
+import { organization } from "better-auth/plugins";
 import { getAuthConfig } from "../../config";
-import { mapBetterAuthSession } from "../../utils/schema-mapper";
-import bcrypt from "bcryptjs";
-import { eq } from "@repo/database";
 import type {
   AuthServerProvider,
-  UnifiedSession,
   SignInResult,
-  SignUpResult,
   SignOutResult,
+  SignUpResult,
+  UnifiedSession,
 } from "../../types";
+import { mapBetterAuthSession } from "../../utils/schema-mapper";
 
 // Read admin domains from environment variable
 // Format: ADMIN_EMAIL_DOMAINS=domain1.com,domain2.io

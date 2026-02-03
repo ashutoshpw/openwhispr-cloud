@@ -18,9 +18,14 @@ export default async function NewPricePage({
     <div className="flex flex-col gap-4">
       <div>
         <h1 className="text-3xl font-bold">Add Price</h1>
-        <p className="text-muted-foreground">Create a new price for this product</p>
+        <p className="text-muted-foreground">
+          Create a new price for this product
+        </p>
       </div>
-      <PriceForm productId={product.id as string} productName={product.name as string} />
+      <PriceForm
+        productId={product.id as string}
+        productName={product.name as string}
+      />
     </div>
   );
 }

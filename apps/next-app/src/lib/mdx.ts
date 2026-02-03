@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
-import { MDXRemoteSerializeResult } from "next-mdx-remote";
+import type { MDXRemoteSerializeResult } from "next-mdx-remote";
 import { serialize } from "next-mdx-remote/serialize";
 
 const contentDirectory = path.join(process.cwd(), "content", "blog");
@@ -70,7 +70,7 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
 }
 
 export async function serializeMdx(
-  content: string
+  content: string,
 ): Promise<MDXRemoteSerializeResult> {
   try {
     return await serialize(content, {

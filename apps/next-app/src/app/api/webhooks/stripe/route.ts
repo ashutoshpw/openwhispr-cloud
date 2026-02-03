@@ -1,21 +1,21 @@
-import { NextRequest, NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
-import Stripe from "stripe";
-import { stripe } from "@/lib/stripe/client";
-import { stripeSync } from "@/lib/stripe/sync";
-import { db } from "@repo/database";
-import { organization } from "@repo/database/schema";
-import { eq } from "@repo/database";
 import {
+  AUDIT_ACTIONS,
+  ORG_STATUS,
   logBillingEvent,
   updateOrganizationStatus,
-  ORG_STATUS,
-  AUDIT_ACTIONS,
 } from "@/lib/billing";
 import {
   activatePendingOrganization,
   cancelPendingOrganization,
 } from "@/lib/stripe/checkout";
+import { stripe } from "@/lib/stripe/client";
+import { stripeSync } from "@/lib/stripe/sync";
+import { db } from "@repo/database";
+import { eq } from "@repo/database";
+import { organization } from "@repo/database/schema";
+import { revalidatePath } from "next/cache";
+import { type NextRequest, NextResponse } from "next/server";
+import type Stripe from "stripe";
 
 /**
  * Handle checkout.session.completed event

@@ -1,18 +1,18 @@
 "use server";
 
+import { canUserCreateFreeWorkspace } from "@/lib/billing";
 import { BetterAuthServer } from "@repo/auth/better-auth/server";
-import { db } from "@repo/database";
-import { organization, member, project } from "@repo/database/schema";
-import { eq, inArray } from "@repo/database";
 import type {
-  ListOrganizationsResult,
   CreateOrganizationParams,
   CreateOrganizationResult,
+  ListOrganizationsResult,
   SetActiveOrganizationParams,
   SetActiveOrganizationResult,
 } from "@repo/auth/types";
+import { db } from "@repo/database";
+import { eq, inArray } from "@repo/database";
+import { member, organization, project } from "@repo/database/schema";
 import { headers } from "next/headers";
-import { canUserCreateFreeWorkspace } from "@/lib/billing";
 
 let serverInstance: BetterAuthServer | null = null;
 

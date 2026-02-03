@@ -1,8 +1,8 @@
-import { getStripePromotionCodes } from "@/lib/stripe/queries";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Plus } from "lucide-react";
 import { PromoCodeTable } from "@/components/admin/stripe/PromoCodeTable";
+import { Button } from "@/components/ui/button";
+import { getStripePromotionCodes } from "@/lib/stripe/queries";
+import { Plus } from "lucide-react";
+import Link from "next/link";
 
 export default async function PromoCodesPage() {
   const promoCodes = await getStripePromotionCodes({ limit: 100 });

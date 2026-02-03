@@ -1,9 +1,9 @@
-import { revalidatePath } from "next/cache";
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@repo/auth/server";
 import { getSiteAdminStatus } from "@/lib/auth-utils";
-import { headers } from "next/headers";
 import { stripe } from "@/lib/stripe/client";
+import { auth } from "@repo/auth/server";
+import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
+import { type NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   req: NextRequest,

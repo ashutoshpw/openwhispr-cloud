@@ -1,6 +1,6 @@
 import "server-only";
 
-import { createClerkClient } from "@clerk/backend";
+import type { createClerkClient } from "@clerk/backend";
 
 export interface LocalUser {
   id: string;
@@ -11,7 +11,7 @@ export interface LocalUser {
 
 export async function checkUserExistsInClerk(
   email: string,
-  clerkClient: ReturnType<typeof createClerkClient>
+  clerkClient: ReturnType<typeof createClerkClient>,
 ): Promise<boolean> {
   try {
     const userList = await clerkClient.users.getUserList({
@@ -29,7 +29,7 @@ export async function checkUserExistsInClerk(
 export async function createUserInClerk(
   localUser: LocalUser,
   password: string,
-  clerkClient: ReturnType<typeof createClerkClient>
+  clerkClient: ReturnType<typeof createClerkClient>,
 ): Promise<string | null> {
   try {
     const nameParts = (localUser.name || "").trim().split(/\s+/);
@@ -61,4 +61,3 @@ export async function createUserInClerk(
     throw error;
   }
 }
-

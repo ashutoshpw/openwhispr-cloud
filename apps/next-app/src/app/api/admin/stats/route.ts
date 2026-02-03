@@ -1,10 +1,10 @@
-import { db } from "@repo/database";
-import { user, organization, payments, session } from "@repo/database/schema";
 import { getSiteAdminStatus } from "@/lib/auth-utils";
 import { auth } from "@repo/auth/server";
+import { db } from "@repo/database";
+import { gt, sql } from "@repo/database";
+import { organization, payments, session, user } from "@repo/database/schema";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { sql, gt } from "@repo/database";
 
 export async function GET() {
   try {
