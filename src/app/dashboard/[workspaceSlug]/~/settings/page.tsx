@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSession } from "@/lib/auth-client";
 
-export default function Settings() {
+export default function WorkspaceSettings() {
   const { data: session, isLoading } = useSession();
 
   if (isLoading) {
@@ -29,8 +29,15 @@ export default function Settings() {
     <div className="flex flex-wrap justify-start items-center gap-4 px-4 pt-5">
       <div className="flex flex-col gap-3 mb-[5rem] w-full max-w-[700px]">
         <h2 className="mt-10 first:mt-0 pb-2 border-b w-full font-semibold text-3xl tracking-tight transition-colors scroll-m-20">
-          My Profile
+          Workspace Settings
         </h2>
+        <p className="text-muted-foreground">
+          Manage your workspace settings, members, and billing.
+        </p>
+
+        <h3 className="mt-8 pb-2 border-b w-full font-semibold text-xl tracking-tight scroll-m-20">
+          My Profile
+        </h3>
         <div className="flex gap-3 mt-3 w-full">
           <div className="flex flex-col gap-3 w-full">
             <Label>Name</Label>

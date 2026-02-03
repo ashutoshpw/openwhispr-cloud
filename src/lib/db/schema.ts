@@ -4,6 +4,7 @@ import {
   serial,
   text,
   timestamp,
+  uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
 
@@ -130,6 +131,28 @@ export const invitation = pgTable("invitation", {
     .notNull(),
 });
 
+export const project = pgTable(
+  "project",
+  {
+    id: text("id").primaryKey(),
+    name: text("name").notNull(),
+    slug: text("slug").notNull(),
+    description: text("description"),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    isDefault: boolean("is_default").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("project_org_slug_unique").on(table.organizationId, table.slug),
+  ],
+);
+
 export type User = typeof user.$inferSelect;
 export type NewUser = typeof user.$inferInsert;
 export type Session = typeof session.$inferSelect;
@@ -143,3 +166,5 @@ export type Member = typeof member.$inferSelect;
 export type NewMember = typeof member.$inferInsert;
 export type Invitation = typeof invitation.$inferSelect;
 export type NewInvitation = typeof invitation.$inferInsert;
+export type Project = typeof project.$inferSelect;
+export type NewProject = typeof project.$inferInsert;

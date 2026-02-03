@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
-import DashboardSideBar from "./(components)/DashboardSideBar";
-import DashboardTopNav from "./(components)/DashboardTopNav";
+import DashboardSideBar from "../(components)/DashboardSideBar";
+import DashboardTopNav from "../(components)/DashboardTopNav";
 
-export default function DashboardLayout({ children }: { children: ReactNode }) {
+export default function WorkspaceLayout({ children }: { children: ReactNode }) {
   return (
     <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
       <DashboardSideBar />

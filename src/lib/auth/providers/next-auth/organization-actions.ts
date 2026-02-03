@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/lib/db";
-import { organization, member } from "@/lib/db/schema";
+import { organization, member, project } from "@/lib/db/schema";
 import { eq, inArray } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import type {
@@ -57,14 +57,17 @@ export async function listNextAuthOrganizations(): Promise<ListOrganizationsResu
   } catch (error) {
     return {
       error: {
-        message: error instanceof Error ? error.message : "Failed to list organizations",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to list organizations",
       },
     };
   }
 }
 
 export async function createNextAuthOrganization(
-  params: CreateOrganizationParams
+  params: CreateOrganizationParams,
 ): Promise<CreateOrganizationResult> {
   try {
     const { headers } = await import("next/headers");
@@ -99,6 +102,15 @@ export async function createNextAuthOrganization(
       role: "owner",
     });
 
+    // Create default project for the new organization
+    await db().insert(project).values({
+      id: nanoid(),
+      name: "Default Project",
+      slug: "default",
+      organizationId: orgId,
+      isDefault: true,
+    });
+
     return {
       data: {
         id: newOrg.id,
@@ -113,15 +125,17 @@ export async function createNextAuthOrganization(
   } catch (error) {
     return {
       error: {
-        message: error instanceof Error ? error.message : "Failed to create organization",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to create organization",
       },
     };
   }
 }
 
 export async function setActiveNextAuthOrganization(
-  params: SetActiveOrganizationParams
+  params: SetActiveOrganizationParams,
 ): Promise<SetActiveOrganizationResult> {
   return {};
 }
-

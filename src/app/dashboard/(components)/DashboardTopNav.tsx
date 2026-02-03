@@ -1,6 +1,7 @@
 "use client";
 
 import { CommandMenu } from "@/components/dashboard/command-menu";
+import { ProjectSwitcher } from "@/components/dashboard/project-switcher";
 import { ModeToggle } from "@/components/ModeToggle";
 import { Profile } from "@/components/Profile";
 import { Button } from "@/components/ui/button";
@@ -15,16 +16,34 @@ import {
 import { HamburgerMenuIcon } from "@radix-ui/react-icons";
 import { Folder, HomeIcon, Settings } from "lucide-react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import type { ReactNode } from "react";
 
 export default function DashboardTopNav({ children }: { children: ReactNode }) {
+  const params = useParams();
+  const workspaceSlug = params.workspaceSlug as string;
+  const projectSlug = params.projectSlug as string;
+
+  // Build dynamic URLs based on current workspace/project
+  const homeUrl =
+    workspaceSlug && projectSlug
+      ? `/dashboard/${workspaceSlug}/${projectSlug}`
+      : "/dashboard";
+  const financeUrl =
+    workspaceSlug && projectSlug
+      ? `/dashboard/${workspaceSlug}/${projectSlug}/finance`
+      : "/dashboard";
+  const settingsUrl = workspaceSlug
+    ? `/dashboard/${workspaceSlug}/~/settings`
+    : "/dashboard";
+
   return (
     <div className="flex flex-col">
       <header className="flex h-14 lg:h-[55px] items-center gap-4 border-b px-6">
         <Dialog>
           <SheetTrigger className="min-[1024px]:hidden p-2 transition">
             <HamburgerMenuIcon />
-            <span className="sr-only">Home</span>
+            <span className="sr-only">Menu</span>
           </SheetTrigger>
           <SheetContent side="left">
             <SheetHeader>
@@ -32,9 +51,15 @@ export default function DashboardTopNav({ children }: { children: ReactNode }) {
                 <SheetTitle>Nextjs Starter Kit</SheetTitle>
               </Link>
             </SheetHeader>
+
+            {/* Project Switcher for mobile */}
+            <div className="mt-4 mb-2">
+              <ProjectSwitcher />
+            </div>
+
             <div className="flex flex-col space-y-3 mt-[1rem]">
               <DialogClose asChild>
-                <Link href="/dashboard">
+                <Link href={homeUrl}>
                   <Button variant="outline" className="w-full">
                     <HomeIcon className="mr-2 h-4 w-4" />
                     Home
@@ -43,7 +68,7 @@ export default function DashboardTopNav({ children }: { children: ReactNode }) {
               </DialogClose>
 
               <DialogClose asChild>
-                <Link href="/dashboard/finance">
+                <Link href={financeUrl}>
                   <Button variant="outline" className="w-full">
                     <Folder className="mr-2 h-4 w-4" />
                     Finance
@@ -52,7 +77,7 @@ export default function DashboardTopNav({ children }: { children: ReactNode }) {
               </DialogClose>
               <Separator className="my-3" />
               <DialogClose asChild>
-                <Link href="/dashboard/settings">
+                <Link href={settingsUrl}>
                   <Button variant="outline" className="w-full">
                     <Settings className="mr-2 h-4 w-4" />
                     Settings
@@ -62,6 +87,12 @@ export default function DashboardTopNav({ children }: { children: ReactNode }) {
             </div>
           </SheetContent>
         </Dialog>
+
+        {/* Project Switcher - left side, desktop only */}
+        <div className="hidden lg:flex items-center">
+          <ProjectSwitcher />
+        </div>
+
         <div className="flex justify-center items-center gap-3 ml-auto">
           <CommandMenu />
           <Profile />

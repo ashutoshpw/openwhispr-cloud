@@ -2,7 +2,7 @@
 
 import { BetterAuthServer } from "./server";
 import { db } from "@/lib/db";
-import { organization, member } from "@/lib/db/schema";
+import { organization, member, project } from "@/lib/db/schema";
 import { eq, inArray } from "drizzle-orm";
 import type {
   ListOrganizationsResult,
@@ -101,6 +101,16 @@ export async function createBetterAuthOrganization(
     }
 
     const org = result.data || result;
+
+    // Create default project for the new organization
+    const { nanoid } = await import("nanoid");
+    await db().insert(project).values({
+      id: nanoid(),
+      name: "Default Project",
+      slug: "default",
+      organizationId: org.id,
+      isDefault: true,
+    });
 
     return {
       data: {

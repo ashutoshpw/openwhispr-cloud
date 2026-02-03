@@ -110,6 +110,50 @@ export interface OrganizationAdapter {
   ): Promise<SetActiveOrganizationResult>;
 }
 
+export interface Project {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string | null;
+  organizationId: string;
+  isDefault: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface CreateProjectParams {
+  name: string;
+  slug: string;
+  description?: string;
+  organizationId: string;
+}
+
+export interface CreateProjectResult {
+  data?: Project;
+  error?: AuthError;
+}
+
+export interface ListProjectsResult {
+  data?: Project[];
+  error?: AuthError;
+}
+
+export interface UpdateProjectParams {
+  name?: string;
+  slug?: string;
+  description?: string;
+}
+
+export interface UpdateProjectResult {
+  data?: Project;
+  error?: AuthError;
+}
+
+export interface DeleteProjectResult {
+  success?: boolean;
+  error?: AuthError;
+}
+
 export interface AuthClientProvider {
   signInEmail(params: {
     email: string;

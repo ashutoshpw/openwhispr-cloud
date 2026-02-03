@@ -2,6 +2,8 @@
 
 import { createClerkClient } from "@clerk/backend";
 import { getAuthConfig } from "../../config";
+import { db } from "@/lib/db";
+import { project } from "@/lib/db/schema";
 import type {
   ListOrganizationsResult,
   CreateOrganizationParams,
@@ -20,9 +22,9 @@ function getClerkClient() {
 export async function listClerkOrganizations(): Promise<ListOrganizationsResult> {
   try {
     const { auth } = await import("@clerk/nextjs/server");
-    
+
     const { userId } = await auth();
-    
+
     if (!userId) {
       return {
         error: {
@@ -32,7 +34,7 @@ export async function listClerkOrganizations(): Promise<ListOrganizationsResult>
     }
 
     const clerkClient = getClerkClient();
-    
+
     const response = await clerkClient.users.getOrganizationMembershipList({
       userId,
     });
@@ -54,20 +56,23 @@ export async function listClerkOrganizations(): Promise<ListOrganizationsResult>
     console.error("[listClerkOrganizations] Error:", error);
     return {
       error: {
-        message: error instanceof Error ? error.message : "Failed to list organizations",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to list organizations",
       },
     };
   }
 }
 
 export async function createClerkOrganization(
-  params: CreateOrganizationParams
+  params: CreateOrganizationParams,
 ): Promise<CreateOrganizationResult> {
   try {
     const { auth } = await import("@clerk/nextjs/server");
-    
+
     const { userId } = await auth();
-    
+
     if (!userId) {
       return {
         error: {
@@ -77,11 +82,21 @@ export async function createClerkOrganization(
     }
 
     const clerkClient = getClerkClient();
-    
+
     const organization = await clerkClient.organizations.createOrganization({
       name: params.name,
       slug: params.slug,
       createdBy: userId,
+    });
+
+    // Create default project for the new organization
+    const { nanoid } = await import("nanoid");
+    await db().insert(project).values({
+      id: nanoid(),
+      name: "Default Project",
+      slug: "default",
+      organizationId: organization.id,
+      isDefault: true,
     });
 
     return {
@@ -99,15 +114,17 @@ export async function createClerkOrganization(
     console.error("[createClerkOrganization] Error:", error);
     return {
       error: {
-        message: error instanceof Error ? error.message : "Failed to create organization",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to create organization",
       },
     };
   }
 }
 
 export async function setActiveClerkOrganization(
-  params: SetActiveOrganizationParams
+  params: SetActiveOrganizationParams,
 ): Promise<SetActiveOrganizationResult> {
   return {};
 }
-

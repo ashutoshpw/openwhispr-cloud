@@ -17,7 +17,7 @@ const FormSchema = z.object({
   category: z.string(),
 });
 
-export default function Category() {
+export default function FinancePage() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {

@@ -1,40 +1,41 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChartComponent } from "./(components)/BarChart";
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { member, organization } from "@/lib/db/schema";
+import { eq, inArray } from "drizzle-orm";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
-export default async function Dashboard() {
-  return (
-    <div className="flex justify-start items-center flex-wrap px-4 pt-4 gap-4">
-      <Card className="w-[20rem]">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Welcome</CardTitle>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            className="h-4 w-4 text-muted-foreground"
-          >
-            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-          </svg>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">100</div>
-          <p className="text-xs text-muted-foreground">
-            Enter your subtitle here
-          </p>
-        </CardContent>
-      </Card>
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>Overview</CardTitle>
-        </CardHeader>
-        <CardContent className="pl-2">
-          <BarChartComponent />
-        </CardContent>
-      </Card>
-    </div>
-  );
+export default async function DashboardPage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session?.user?.id) {
+    redirect("/sign-in");
+  }
+
+  // Get user's organizations
+  const userMembers = await db()
+    .select()
+    .from(member)
+    .where(eq(member.userId, session.user.id));
+
+  if (userMembers.length === 0) {
+    redirect("/onboarding");
+  }
+
+  const organizationIds = userMembers.map((m) => m.organizationId);
+
+  const organizations = await db()
+    .select()
+    .from(organization)
+    .where(inArray(organization.id, organizationIds))
+    .limit(1);
+
+  if (organizations.length === 0) {
+    redirect("/onboarding");
+  }
+
+  // Redirect to the first workspace
+  redirect(`/dashboard/${organizations[0].slug}`);
 }
