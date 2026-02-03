@@ -12,6 +12,7 @@ import type {
   SetActiveOrganizationResult,
 } from "@repo/auth/types";
 import { headers } from "next/headers";
+import { canUserCreateFreeWorkspace } from "@/lib/billing";
 
 let serverInstance: BetterAuthServer | null = null;
 
@@ -83,13 +84,47 @@ export async function createBetterAuthOrganization(
     const authInstance = server.getAuthInstance();
     const headersObject = await headers();
 
-    const result: any = await authInstance.api.createOrganization({
+    // Get current user session to check free workspace limit
+    const session = await server.getSession(headersObject);
+    if (!session?.user?.id) {
+      return {
+        error: {
+          message: "Unauthorized",
+        },
+      };
+    }
+
+    // Check if user can create a free workspace
+    // This is for free tier only - paid workspaces go through checkout flow
+    const canCreateFree = await canUserCreateFreeWorkspace(session.user.id);
+    if (!canCreateFree) {
+      return {
+        error: {
+          message:
+            "You already have a free workspace. Please upgrade your existing workspace or create a paid workspace.",
+          code: "FREE_WORKSPACE_LIMIT_REACHED",
+        },
+      };
+    }
+
+    const result = (await authInstance.api.createOrganization({
       headers: headersObject,
       body: {
         name: params.name,
         slug: params.slug,
       },
-    });
+    })) as {
+      error?: { message?: string; code?: string };
+      data?: {
+        id: string;
+        name: string;
+        slug: string;
+        logo?: string | null;
+        isActive?: boolean;
+        createdAt?: string | Date;
+        updatedAt?: string | Date;
+      };
+    };
 
     if (result?.error) {
       return {
@@ -100,7 +135,14 @@ export async function createBetterAuthOrganization(
       };
     }
 
-    const org = result.data || result;
+    const org = result.data;
+    if (!org) {
+      return {
+        error: {
+          message: "Failed to create organization - no data returned",
+        },
+      };
+    }
 
     // Create default project for the new organization
     const { nanoid } = await import("nanoid");
@@ -142,12 +184,12 @@ export async function setActiveBetterAuthOrganization(
     const server = getServerInstance();
     const authInstance = server.getAuthInstance();
     const headersObject = await headers();
-    const result: any = await authInstance.api.setActiveOrganization({
+    const result = (await authInstance.api.setActiveOrganization({
       headers: headersObject,
       body: {
         organizationId: params.organizationId,
       },
-    });
+    })) as { error?: { message?: string; code?: string } };
 
     if (result?.error) {
       return {

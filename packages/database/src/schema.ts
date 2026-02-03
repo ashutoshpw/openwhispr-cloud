@@ -92,6 +92,8 @@ export const organization = pgTable("organization", {
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
   logo: text("logo"),
+  stripeCustomerId: text("stripe_customer_id"),
+  status: text("status").notNull().default("active"), // pending | active | readonly | suspended
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
@@ -168,3 +170,89 @@ export type Invitation = typeof invitation.$inferSelect;
 export type NewInvitation = typeof invitation.$inferInsert;
 export type Project = typeof project.$inferSelect;
 export type NewProject = typeof project.$inferInsert;
+
+// Billing: Pricing tier features (admin-managed feature sets per Stripe product)
+export const pricingTierFeatures = pgTable(
+  "pricing_tier_features",
+  {
+    id: text("id").primaryKey(),
+    productId: text("product_id").notNull(), // Stripe product ID
+    featureKey: text("feature_key").notNull(), // e.g., "max_members", "api_access"
+    featureValue: text("feature_value").notNull(), // e.g., "5", "true", "unlimited"
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("pricing_tier_feature_unique").on(
+      table.productId,
+      table.featureKey,
+    ),
+  ],
+);
+
+// Billing: Per-organization feature overrides (not included in tier)
+export const orgFeatures = pgTable(
+  "org_features",
+  {
+    id: text("id").primaryKey(),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    featureKey: text("feature_key").notNull(),
+    featureValue: text("feature_value").notNull(),
+    reason: text("reason"), // e.g., "trial", "promotion", "manual_grant"
+    grantedBy: text("granted_by"), // User ID who granted this feature
+    expiresAt: timestamp("expires_at"), // Optional expiration
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("org_feature_unique").on(
+      table.organizationId,
+      table.featureKey,
+    ),
+  ],
+);
+
+// Billing: Organization audit logs for billing/subscription changes
+export const orgAuditLogs = pgTable("org_audit_logs", {
+  id: text("id").primaryKey(),
+  organizationId: text("organization_id")
+    .notNull()
+    .references(() => organization.id, { onDelete: "cascade" }),
+  action: text("action").notNull(), // e.g., "subscription_created", "plan_upgraded"
+  fromValue: text("from_value"), // Previous state
+  toValue: text("to_value"), // New state
+  metadata: text("metadata"), // JSON string for additional context
+  performedBy: text("performed_by").notNull(), // User ID or "system"
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+// App settings (for configurable values like enterprise contact link)
+export const appSettings = pgTable("app_settings", {
+  id: text("id").primaryKey(),
+  key: text("key").notNull().unique(),
+  value: text("value").notNull(),
+  description: text("description"),
+  updatedBy: text("updated_by"),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
+// Type exports for new tables
+export type PricingTierFeature = typeof pricingTierFeatures.$inferSelect;
+export type NewPricingTierFeature = typeof pricingTierFeatures.$inferInsert;
+export type OrgFeature = typeof orgFeatures.$inferSelect;
+export type NewOrgFeature = typeof orgFeatures.$inferInsert;
+export type OrgAuditLog = typeof orgAuditLogs.$inferSelect;
+export type NewOrgAuditLog = typeof orgAuditLogs.$inferInsert;
+export type AppSetting = typeof appSettings.$inferSelect;
+export type NewAppSetting = typeof appSettings.$inferInsert;

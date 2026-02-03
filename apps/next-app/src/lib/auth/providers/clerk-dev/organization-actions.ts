@@ -11,6 +11,7 @@ import type {
   SetActiveOrganizationParams,
   SetActiveOrganizationResult,
 } from "@repo/auth/types";
+import { canUserCreateFreeWorkspace } from "@/lib/billing";
 
 function getClerkClient() {
   const config = getAuthConfig("clerk-dev");
@@ -77,6 +78,19 @@ export async function createClerkOrganization(
       return {
         error: {
           message: "Unauthorized",
+        },
+      };
+    }
+
+    // Check if user can create a free workspace
+    // This is for free tier only - paid workspaces go through checkout flow
+    const canCreateFree = await canUserCreateFreeWorkspace(userId);
+    if (!canCreateFree) {
+      return {
+        error: {
+          message:
+            "You already have a free workspace. Please upgrade your existing workspace or create a paid workspace.",
+          code: "FREE_WORKSPACE_LIMIT_REACHED",
         },
       };
     }

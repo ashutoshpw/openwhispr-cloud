@@ -1,0 +1,101 @@
+import { auth } from "@repo/auth/server";
+import { headers } from "next/headers";
+import { NextResponse } from "next/server";
+import { db } from "@repo/database";
+import { member } from "@repo/database/schema";
+import { eq, and } from "@repo/database";
+import {
+  getOrganizationPlan,
+  isFreeTier,
+  isOrganizationInTrial,
+  getOrganizationTrialEndDate,
+  isReadOnly,
+  getOrganizationStatus,
+  BILLING_MANAGEMENT_ROLES,
+} from "@/lib/billing";
+import type { BillingSubscriptionResponse } from "@/lib/billing";
+
+/**
+ * GET /api/billing/subscription?orgId=xxx
+ * Get subscription information for an organization
+ *
+ * Returns:
+ * - plan: Current plan details (null if free tier)
+ * - status: Organization status (active, readonly, pending, suspended)
+ * - isFree: Whether on free tier
+ * - isTrialing: Whether in trial period
+ * - isReadOnly: Whether workspace is read-only
+ * - trialEndsAt: Trial end date if trialing
+ * - canManageBilling: Whether current user can manage billing
+ */
+export async function GET(request: Request) {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const orgId = searchParams.get("orgId");
+
+    if (!orgId) {
+      return NextResponse.json({ error: "orgId is required" }, { status: 400 });
+    }
+
+    // Verify user is a member of the organization
+    const membership = await db()
+      .select()
+      .from(member)
+      .where(
+        and(
+          eq(member.userId, session.user.id),
+          eq(member.organizationId, orgId),
+        ),
+      )
+      .limit(1);
+
+    if (!membership[0]) {
+      return NextResponse.json(
+        { error: "Not a member of this workspace" },
+        { status: 403 },
+      );
+    }
+
+    // Get subscription and plan info in parallel
+    const [plan, isFree, isTrialing, trialEndsAt, readOnly, status] =
+      await Promise.all([
+        getOrganizationPlan(orgId),
+        isFreeTier(orgId),
+        isOrganizationInTrial(orgId),
+        getOrganizationTrialEndDate(orgId),
+        isReadOnly(orgId),
+        getOrganizationStatus(orgId),
+      ]);
+
+    // Check if user can manage billing
+    const canManageBilling = BILLING_MANAGEMENT_ROLES.includes(
+      membership[0].role as (typeof BILLING_MANAGEMENT_ROLES)[number],
+    );
+
+    const response: BillingSubscriptionResponse = {
+      plan,
+      status: status ?? "active",
+      isFree,
+      isTrialing,
+      isReadOnly: readOnly,
+      trialEndsAt: trialEndsAt?.toISOString(),
+      canManageBilling,
+    };
+
+    return NextResponse.json(response);
+  } catch (error) {
+    console.error("Error fetching subscription:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch subscription information" },
+      { status: 500 },
+    );
+  }
+}
