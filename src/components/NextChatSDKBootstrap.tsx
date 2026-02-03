@@ -32,7 +32,7 @@ export function NextChatSDKBootstrap({ baseUrl }: { baseUrl: string }) {
     mutations.forEach((mutation) => {
       if (mutation.type === 'attributes' && mutation.target === htmlElement) {
         const attrName = mutation.attributeName;
-        if (attrName && attrName !== 'suppresshydrationwarning') {
+        if (attrName && attrName !== 'suppresshydrationwarning' && attrName !== 'class' && attrName !== 'style') {
           htmlElement.removeAttribute(attrName);
         }
       }
