@@ -1,5 +1,6 @@
 "use client";
 
+import { CommandMenu } from "@/components/dashboard/command-menu";
 import { ModeToggle } from "@/components/ModeToggle";
 import { Profile } from "@/components/Profile";
 import { Button } from "@/components/ui/button";
@@ -62,6 +63,7 @@ export default function DashboardTopNav({ children }: { children: ReactNode }) {
           </SheetContent>
         </Dialog>
         <div className="flex justify-center items-center gap-3 ml-auto">
+          <CommandMenu />
           <Profile />
           <ModeToggle />
         </div>

@@ -1,0 +1,258 @@
+"use client";
+
+import {
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+} from "@/components/ui/command";
+import { Button } from "@/components/ui/button";
+import { signOut } from "@/lib/auth-client";
+import {
+  Building2,
+  Home,
+  LogOut,
+  Moon,
+  Monitor,
+  Search,
+  Settings,
+  Sun,
+  User,
+  Wallet,
+} from "lucide-react";
+import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
+
+interface Workspace {
+  id: string;
+  name: string;
+  slug: string;
+  isActive?: boolean;
+}
+
+export function CommandMenu() {
+  const [open, setOpen] = useState(false);
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  const [activeWorkspace, setActiveWorkspace] = useState<Workspace | null>(
+    null,
+  );
+  const { setTheme } = useTheme();
+  const router = useRouter();
+
+  // Fetch workspaces on mount
+  useEffect(() => {
+    const fetchWorkspaces = async () => {
+      try {
+        const response = await fetch("/api/auth/organization/list");
+        if (!response.ok) return;
+
+        const result = await response.json();
+        const organizations = Array.isArray(result)
+          ? result
+          : result?.data || [];
+
+        if (organizations.length > 0) {
+          setWorkspaces(organizations);
+          const active =
+            organizations.find((org: Workspace) => org.isActive) ||
+            organizations[0];
+          setActiveWorkspace(active);
+        }
+      } catch (error) {
+        console.error("Failed to fetch workspaces:", error);
+      }
+    };
+
+    fetchWorkspaces();
+  }, []);
+
+  // Keyboard shortcut listener
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setOpen((open) => !open);
+      }
+    };
+
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
+
+  const runCommand = useCallback((command: () => void) => {
+    setOpen(false);
+    command();
+  }, []);
+
+  const handleNavigation = useCallback(
+    (path: string) => {
+      runCommand(() => router.push(path));
+    },
+    [router, runCommand],
+  );
+
+  const handleSwitchWorkspace = useCallback(
+    async (workspace: Workspace) => {
+      setOpen(false);
+
+      try {
+        const response = await fetch("/api/auth/organization/set-active", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ organizationId: workspace.id }),
+        });
+
+        if (!response.ok) {
+          const result = await response.json();
+          toast.error(result.error?.message || "Failed to switch workspace");
+          return;
+        }
+
+        const result = await response.json();
+        if (result.error) {
+          toast.error(result.error.message || "Failed to switch workspace");
+          return;
+        }
+
+        setActiveWorkspace(workspace);
+        toast.success(`Switched to ${workspace.name}`);
+        router.refresh();
+      } catch (error: unknown) {
+        const message =
+          error instanceof Error ? error.message : "Failed to switch workspace";
+        toast.error(message);
+      }
+    },
+    [router],
+  );
+
+  const handleSignOut = useCallback(async () => {
+    setOpen(false);
+
+    try {
+      const result = await signOut();
+
+      if (result?.error) {
+        console.error("Sign out error:", result.error);
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      router.push("/");
+      router.refresh();
+    } catch (error) {
+      console.error("Error during sign out:", error);
+      router.push("/");
+      router.refresh();
+    }
+  }, [router]);
+
+  const handleTheme = useCallback(
+    (theme: string) => {
+      runCommand(() => setTheme(theme));
+    },
+    [runCommand, setTheme],
+  );
+
+  return (
+    <>
+      <Button
+        variant="outline"
+        size="icon"
+        onClick={() => setOpen(true)}
+        className="relative"
+        title="Search (⌘K)"
+      >
+        <Search className="h-[1.2rem] w-[1.2rem]" />
+        <span className="sr-only">Open command menu</span>
+      </Button>
+
+      <CommandDialog open={open} onOpenChange={setOpen}>
+        <CommandInput placeholder="Type a command or search..." />
+        <CommandList>
+          <CommandEmpty>No results found.</CommandEmpty>
+
+          {/* Navigation */}
+          <CommandGroup heading="Navigation">
+            <CommandItem onSelect={() => handleNavigation("/dashboard")}>
+              <Home className="mr-2 h-4 w-4" />
+              <span>Home</span>
+            </CommandItem>
+            <CommandItem
+              onSelect={() => handleNavigation("/dashboard/finance")}
+            >
+              <Wallet className="mr-2 h-4 w-4" />
+              <span>Finance</span>
+            </CommandItem>
+            <CommandItem
+              onSelect={() => handleNavigation("/dashboard/settings")}
+            >
+              <Settings className="mr-2 h-4 w-4" />
+              <span>Settings</span>
+            </CommandItem>
+          </CommandGroup>
+
+          <CommandSeparator />
+
+          {/* Workspaces */}
+          <CommandGroup heading="Workspaces">
+            {workspaces.map((workspace) => (
+              <CommandItem
+                key={workspace.id}
+                onSelect={() => handleSwitchWorkspace(workspace)}
+              >
+                <Building2 className="mr-2 h-4 w-4" />
+                <span>{workspace.name}</span>
+                {activeWorkspace?.id === workspace.id && (
+                  <span className="ml-auto text-xs text-muted-foreground">
+                    Active
+                  </span>
+                )}
+              </CommandItem>
+            ))}
+            <CommandItem onSelect={() => handleNavigation("/onboarding")}>
+              <Building2 className="mr-2 h-4 w-4" />
+              <span>Create New Workspace</span>
+            </CommandItem>
+          </CommandGroup>
+
+          <CommandSeparator />
+
+          {/* Theme */}
+          <CommandGroup heading="Theme">
+            <CommandItem onSelect={() => handleTheme("light")}>
+              <Sun className="mr-2 h-4 w-4" />
+              <span>Light</span>
+            </CommandItem>
+            <CommandItem onSelect={() => handleTheme("dark")}>
+              <Moon className="mr-2 h-4 w-4" />
+              <span>Dark</span>
+            </CommandItem>
+            <CommandItem onSelect={() => handleTheme("system")}>
+              <Monitor className="mr-2 h-4 w-4" />
+              <span>System</span>
+            </CommandItem>
+          </CommandGroup>
+
+          <CommandSeparator />
+
+          {/* Account */}
+          <CommandGroup heading="Account">
+            <CommandItem onSelect={() => handleNavigation("/user-profile")}>
+              <User className="mr-2 h-4 w-4" />
+              <span>Profile</span>
+            </CommandItem>
+            <CommandItem onSelect={handleSignOut}>
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>Sign Out</span>
+            </CommandItem>
+          </CommandGroup>
+        </CommandList>
+      </CommandDialog>
+    </>
+  );
+}

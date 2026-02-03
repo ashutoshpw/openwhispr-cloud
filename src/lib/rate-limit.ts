@@ -55,7 +55,7 @@ function checkInMemoryRateLimit(identifier: string): RateLimitResult {
 
   // Clean up expired entries periodically
   if (inMemoryStore.size > 1000) {
-    for (const [k, v] of inMemoryStore.entries()) {
+    for (const [k, v] of Array.from(inMemoryStore.entries())) {
       if (v.resetAt < now) {
         inMemoryStore.delete(k);
       }
