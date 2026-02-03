@@ -15,6 +15,7 @@ import type {
   RequestPasswordResetResult,
   ResetPasswordParams,
   ResetPasswordResult,
+  SignInSocialParams,
 } from "../../types";
 
 export class BetterAuthClient implements AuthClientProvider {
@@ -202,6 +203,13 @@ export class BetterAuthClient implements AuthClientProvider {
         },
       };
     }
+  }
+
+  async signInSocial(params: SignInSocialParams): Promise<void> {
+    await this.client.signIn.social({
+      provider: params.provider as "google",
+      callbackURL: params.callbackURL,
+    });
   }
 }
 

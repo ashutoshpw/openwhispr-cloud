@@ -368,6 +368,86 @@ async function main() {
       value: existingUrl || appUrl,
       section: "BetterAuth",
     });
+
+    // Google OAuth (Optional for Better Auth)
+    console.log("");
+    const existingGoogleClientId = existingEnv.get(
+      "NEXT_PUBLIC_GOOGLE_CLIENT_ID",
+    );
+    const existingGoogleClientSecret = existingEnv.get("GOOGLE_CLIENT_SECRET");
+    const hasExistingGoogle = !!(
+      existingGoogleClientId && existingGoogleClientSecret
+    );
+
+    const configureGoogle = await confirm({
+      message: `Configure Google OAuth login?${hasExistingGoogle ? " (existing config found)" : ""}`,
+      default: hasExistingGoogle,
+    });
+
+    if (configureGoogle) {
+      console.log("");
+      console.log(
+        `${colors.dim}  Get credentials from: ${colors.cyan}https://console.cloud.google.com/apis/credentials${colors.reset}`,
+      );
+      console.log(
+        `${colors.dim}  Add this redirect URI: ${colors.cyan}${appUrl}/api/auth/callback/google${colors.reset}`,
+      );
+      console.log("");
+
+      if (existingGoogleClientId && isUpdating) {
+        printUpdateWarning(
+          "NEXT_PUBLIC_GOOGLE_CLIENT_ID",
+          existingGoogleClientId,
+        );
+      }
+      const googleClientId = await input({
+        message: "Google Client ID:",
+        default: existingGoogleClientId || "",
+      });
+
+      if (existingGoogleClientSecret && isUpdating) {
+        printUpdateWarning(
+          "GOOGLE_CLIENT_SECRET",
+          existingGoogleClientSecret,
+          true,
+        );
+      }
+      const googleClientSecret = await password({
+        message: "Google Client Secret:",
+        mask: "*",
+      });
+
+      if (googleClientId) {
+        newVariables.push({
+          key: "NEXT_PUBLIC_GOOGLE_CLIENT_ID",
+          value: googleClientId,
+          section: "BetterAuth",
+        });
+      }
+      if (googleClientSecret || existingGoogleClientSecret) {
+        newVariables.push({
+          key: "GOOGLE_CLIENT_SECRET",
+          value: googleClientSecret || existingGoogleClientSecret || "",
+          section: "BetterAuth",
+        });
+      }
+    } else if (hasExistingGoogle && isUpdating) {
+      // Preserve existing Google OAuth config
+      if (existingGoogleClientId) {
+        newVariables.push({
+          key: "NEXT_PUBLIC_GOOGLE_CLIENT_ID",
+          value: existingGoogleClientId,
+          section: "BetterAuth",
+        });
+      }
+      if (existingGoogleClientSecret) {
+        newVariables.push({
+          key: "GOOGLE_CLIENT_SECRET",
+          value: existingGoogleClientSecret,
+          section: "BetterAuth",
+        });
+      }
+    }
   } else if (authProvider === "next-auth") {
     printHeader("NEXTAUTH CONFIGURATION");
 
@@ -924,6 +1004,7 @@ async function main() {
   const secretKeys = [
     "BETTER_AUTH_SECRET",
     "NEXTAUTH_SECRET",
+    "GOOGLE_CLIENT_SECRET",
     "WORKOS_API_KEY",
     "WORKOS_COOKIE_PASSWORD",
     "CLERK_SECRET_KEY",

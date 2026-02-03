@@ -53,6 +53,11 @@ export interface ResetPasswordResult {
   error?: AuthError;
 }
 
+export interface SignInSocialParams {
+  provider: string;
+  callbackURL?: string;
+}
+
 export interface GetSessionResult {
   data?: UnifiedSession | null;
   error?: AuthError;

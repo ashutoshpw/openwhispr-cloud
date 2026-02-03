@@ -66,20 +66,25 @@ export async function listBetterAuthOrganizations(): Promise<ListOrganizationsRe
   } catch (error) {
     return {
       error: {
-        message: error instanceof Error ? error.message : "Failed to list organizations",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to list organizations",
       },
     };
   }
 }
 
 export async function createBetterAuthOrganization(
-  params: CreateOrganizationParams
+  params: CreateOrganizationParams,
 ): Promise<CreateOrganizationResult> {
   try {
     const server = getServerInstance();
     const authInstance = server.getAuthInstance();
+    const headersObject = await headers();
 
     const result: any = await authInstance.api.createOrganization({
+      headers: headersObject,
       body: {
         name: params.name,
         slug: params.slug,
@@ -111,14 +116,17 @@ export async function createBetterAuthOrganization(
   } catch (error) {
     return {
       error: {
-        message: error instanceof Error ? error.message : "Failed to create organization",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to create organization",
       },
     };
   }
 }
 
 export async function setActiveBetterAuthOrganization(
-  params: SetActiveOrganizationParams
+  params: SetActiveOrganizationParams,
 ): Promise<SetActiveOrganizationResult> {
   try {
     const server = getServerInstance();
@@ -144,9 +152,11 @@ export async function setActiveBetterAuthOrganization(
   } catch (error) {
     return {
       error: {
-        message: error instanceof Error ? error.message : "Failed to set active organization",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to set active organization",
       },
     };
   }
 }
-

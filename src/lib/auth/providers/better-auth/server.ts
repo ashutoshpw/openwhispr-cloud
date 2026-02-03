@@ -81,6 +81,16 @@ export class BetterAuthServer implements AuthServerProvider {
           },
         },
       },
+      // Google OAuth - only enabled if credentials are configured
+      ...(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID &&
+        process.env.GOOGLE_CLIENT_SECRET && {
+          socialProviders: {
+            google: {
+              clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+              clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+            },
+          },
+        }),
       session: {
         cookieCache: {
           enabled: true,

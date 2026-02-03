@@ -1,6 +1,24 @@
 import { getProviderName } from "@/lib/auth/config";
 import { NextResponse } from "next/server";
 
+// Cookie name must match middleware
+const HAS_WORKSPACE_COOKIE = "has_workspace";
+
+/**
+ * Create a JSON response that clears the workspace cookie.
+ * This forces the middleware to re-check workspace status on next request.
+ */
+function createSuccessResponse(data: unknown): NextResponse {
+  const response = NextResponse.json(data);
+  // Set cookie to "1" (has workspace) since we just created one
+  response.cookies.set(HAS_WORKSPACE_COOKIE, "1", {
+    path: "/",
+    maxAge: 5 * 60, // 5 minutes
+    sameSite: "lax",
+  });
+  return response;
+}
+
 export async function GET() {
   try {
     const providerName = getProviderName();
@@ -14,7 +32,7 @@ export async function GET() {
       if (result.error) {
         return NextResponse.json(
           { error: result.error.message },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -28,7 +46,7 @@ export async function GET() {
       if (result.error) {
         return NextResponse.json(
           { error: result.error.message },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -42,7 +60,7 @@ export async function GET() {
       if (result.error) {
         return NextResponse.json(
           { error: result.error.message },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -53,13 +71,13 @@ export async function GET() {
       {
         error: `Organization feature not supported by ${providerName}`,
       },
-      { status: 501 }
+      { status: 501 },
     );
   } catch (error) {
     console.error("Error listing organizations:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -73,7 +91,7 @@ export async function POST(request: Request) {
     if (!name || !slug) {
       return NextResponse.json(
         { error: "Name and slug are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -86,11 +104,11 @@ export async function POST(request: Request) {
       if (result.error) {
         return NextResponse.json(
           { error: result.error.message },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
-      return NextResponse.json(result.data);
+      return createSuccessResponse(result.data);
     } else if (providerName === "next-auth") {
       const { createNextAuthOrganization } = await import(
         "@/lib/auth/providers/next-auth/organization-actions"
@@ -100,11 +118,11 @@ export async function POST(request: Request) {
       if (result.error) {
         return NextResponse.json(
           { error: result.error.message },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
-      return NextResponse.json(result.data);
+      return createSuccessResponse(result.data);
     } else if (providerName === "clerk-dev") {
       const { createClerkOrganization } = await import(
         "@/lib/auth/providers/clerk-dev/organization-actions"
@@ -114,25 +132,24 @@ export async function POST(request: Request) {
       if (result.error) {
         return NextResponse.json(
           { error: result.error.message },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
-      return NextResponse.json(result.data);
+      return createSuccessResponse(result.data);
     }
 
     return NextResponse.json(
       {
         error: `Organization feature not supported by ${providerName}`,
       },
-      { status: 501 }
+      { status: 501 },
     );
   } catch (error) {
     console.error("Error creating organization:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-

@@ -11,6 +11,7 @@ import type {
   RequestPasswordResetResult,
   ResetPasswordParams,
   ResetPasswordResult,
+  SignInSocialParams,
 } from "./types";
 
 class BaseAuthClient {
@@ -174,6 +175,21 @@ class BaseAuthClient {
       },
     };
   }
+
+  async signInSocial(params: SignInSocialParams): Promise<void> {
+    const provider = await this.loadProvider();
+    if (
+      "signInSocial" in provider &&
+      typeof provider.signInSocial === "function"
+    ) {
+      return (
+        provider as {
+          signInSocial: (params: SignInSocialParams) => Promise<void>;
+        }
+      ).signInSocial(params);
+    }
+    throw new Error("Social sign-in not supported by this auth provider");
+  }
 }
 
 const baseClient = new BaseAuthClient();
@@ -181,6 +197,7 @@ const baseClient = new BaseAuthClient();
 export const signIn = {
   email: (params: { email: string; password: string }) =>
     baseClient.signInEmail(params),
+  social: (params: SignInSocialParams) => baseClient.signInSocial(params),
 };
 
 export const signUp = {
