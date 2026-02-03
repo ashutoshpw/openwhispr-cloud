@@ -2,18 +2,9 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useSession } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 
 export default function Settings() {
   const { data: session, isLoading } = useSession();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isLoading && !session?.user) {
-      router.push("/sign-in");
-    }
-  }, [session, isLoading, router]);
 
   if (isLoading) {
     return (
@@ -24,7 +15,12 @@ export default function Settings() {
   }
 
   if (!session?.user) {
-    return null;
+    // Middleware handles auth - this is just a fallback loading state
+    return (
+      <div className="flex flex-wrap justify-start items-center gap-4 px-4 pt-5">
+        <div>Loading...</div>
+      </div>
+    );
   }
 
   const user = session.user;
