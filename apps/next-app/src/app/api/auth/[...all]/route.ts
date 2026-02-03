@@ -1,12 +1,12 @@
-import { baseServer } from "@/lib/auth";
+import { baseServer } from "@repo/auth/server";
 import { NextResponse } from "next/server";
 
 async function syncClerkToDbAfterOperation(
   request: Request,
-  operation: "signup" | "signin" | "signout"
+  operation: "signup" | "signin" | "signout",
 ) {
   const authProvider = process.env.NEXT_PUBLIC_AUTH_PROVIDER || "better-auth";
-  
+
   if (authProvider !== "clerk-dev") {
     return;
   }
@@ -63,7 +63,13 @@ async function syncClerkToDbAfterOperation(
         const userAgent = request.headers.get("user-agent") || null;
         const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
-        await syncClerkSessionToDb(sessionId, userId, expiresAt, ipAddress, userAgent);
+        await syncClerkSessionToDb(
+          sessionId,
+          userId,
+          expiresAt,
+          ipAddress,
+          userAgent,
+        );
       }
     }
   } catch (error) {

@@ -1,13 +1,13 @@
 import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { auth } from "@repo/auth/server";
 import { getSiteAdminStatus } from "@/lib/auth-utils";
 import { headers } from "next/headers";
 import { stripe } from "@/lib/stripe/client";
 
 export async function GET(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await auth.api.getSession({
@@ -31,14 +31,14 @@ export async function GET(
     console.error("Error fetching coupon:", error);
     return NextResponse.json(
       { error: error.message || "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await auth.api.getSession({
@@ -59,15 +59,15 @@ export async function DELETE(
     await stripe.coupons.del(id);
     revalidatePath("/adminx/stripe/coupons");
 
-    return NextResponse.json({ 
-      success: true, 
-      message: "Coupon deleted successfully" 
+    return NextResponse.json({
+      success: true,
+      message: "Coupon deleted successfully",
     });
   } catch (error: any) {
     console.error("Error deleting coupon:", error);
     return NextResponse.json(
       { error: error.message || "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,7 +1,7 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useSession } from "@/lib/auth-client";
+import { useSession } from "@repo/auth/client";
 
 export default function WorkspaceSettings() {
   const { data: session, isLoading } = useSession();

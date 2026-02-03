@@ -1,4 +1,4 @@
-import { getProviderName } from "@/lib/auth/config";
+import { getProviderName } from "@repo/auth/config";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -14,7 +14,7 @@ export async function GET() {
       if (result.error) {
         return NextResponse.json(
           { error: result.error.message },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -28,7 +28,7 @@ export async function GET() {
       if (result.error) {
         return NextResponse.json(
           { error: result.error.message },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -42,7 +42,7 @@ export async function GET() {
       if (result.error) {
         return NextResponse.json(
           { error: result.error.message },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -53,14 +53,13 @@ export async function GET() {
       {
         error: `Organization feature not supported by ${providerName}`,
       },
-      { status: 501 }
+      { status: 501 },
     );
   } catch (error) {
     console.error("Error listing organizations:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-

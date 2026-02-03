@@ -3,7 +3,7 @@ import "server-only";
 import { db } from "@repo/database";
 import { member, organization } from "@repo/database/schema";
 import { eq, inArray } from "@repo/database";
-import { auth } from "@/lib/auth";
+import { auth } from "@repo/auth/server";
 
 // Cookie name for caching workspace status
 export const HAS_WORKSPACE_COOKIE = "has_workspace";

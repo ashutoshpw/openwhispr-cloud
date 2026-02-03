@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import { auth } from "@/lib/auth";
+import { auth } from "@repo/auth/server";
 import { getSiteAdminStatus } from "@/lib/auth-utils";
 import { headers } from "next/headers";
 import { stripe } from "@/lib/stripe/client";
@@ -62,7 +62,7 @@ async function deletePrice(priceId: string) {
 
 export async function POST(
   req: Request,
-  context: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await auth.api.getSession({
@@ -107,7 +107,7 @@ export async function POST(
             reason:
               "Product has prices with active subscriptions and cannot be deleted.",
           },
-          { status: 200 }
+          { status: 200 },
         );
       }
 
@@ -126,7 +126,7 @@ export async function POST(
               error?.message ||
               "Product cannot be deleted because it has been used in subscriptions or invoices.",
           },
-          { status: 200 }
+          { status: 200 },
         );
       }
 
@@ -136,7 +136,7 @@ export async function POST(
     console.error("Error deleting product:", error);
     return NextResponse.json(
       { error: error.message || "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

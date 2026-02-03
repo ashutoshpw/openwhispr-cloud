@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { auth } from "@repo/auth/server";
 import { getSiteAdminStatus } from "@/lib/auth-utils";
 import { headers } from "next/headers";
 import {
@@ -366,7 +366,7 @@ async function authkitWrappedMiddleware(request: NextRequest) {
     }
 
     // Check admin status using unified auth to get user ID
-    const { auth } = await import("@/lib/auth");
+    const { auth } = await import("@repo/auth/server");
     const { headers: nextHeaders } = await import("next/headers");
     const unifiedSession = await auth.api.getSession({
       headers: await nextHeaders(),

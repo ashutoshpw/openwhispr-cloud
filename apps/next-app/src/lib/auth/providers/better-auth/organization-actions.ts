@@ -1,6 +1,6 @@
 "use server";
 
-import { BetterAuthServer } from "./server";
+import { BetterAuthServer } from "@repo/auth/better-auth/server";
 import { db } from "@repo/database";
 import { organization, member, project } from "@repo/database/schema";
 import { eq, inArray } from "@repo/database";
@@ -10,7 +10,7 @@ import type {
   CreateOrganizationResult,
   SetActiveOrganizationParams,
   SetActiveOrganizationResult,
-} from "../../types";
+} from "@repo/auth/types";
 import { headers } from "next/headers";
 
 let serverInstance: BetterAuthServer | null = null;

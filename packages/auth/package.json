@@ -1,0 +1,50 @@
+{
+  "name": "@repo/auth",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./types": "./src/types/index.ts",
+    "./config": "./src/config/index.ts",
+    "./utils": "./src/utils/index.ts",
+    "./server": "./src/server.ts",
+    "./client": "./src/client.ts",
+    "./better-auth/server": "./src/providers/better-auth/server.ts",
+    "./better-auth/client": "./src/providers/better-auth/client.ts",
+    "./better-auth": "./src/providers/better-auth/index.ts",
+    "./next-auth/server": "./src/providers/next-auth/server.ts",
+    "./next-auth/client": "./src/providers/next-auth/client.ts",
+    "./next-auth": "./src/providers/next-auth/index.ts",
+    "./authkit/server": "./src/providers/authkit/server.ts",
+    "./authkit/client": "./src/providers/authkit/client.ts",
+    "./authkit": "./src/providers/authkit/index.ts",
+    "./clerk/server": "./src/providers/clerk/server.ts",
+    "./clerk/client": "./src/providers/clerk/client.ts",
+    "./clerk": "./src/providers/clerk/index.ts"
+  },
+  "dependencies": {
+    "@repo/database": "workspace:*",
+    "@auth/drizzle-adapter": "^1.11.1",
+    "@clerk/backend": "^2.24.0",
+    "@clerk/nextjs": "^6.35.5",
+    "@workos-inc/authkit-nextjs": "^2.11.1",
+    "@workos-inc/node": "^7.75.1",
+    "bcryptjs": "^2.4.3",
+    "better-auth": "^1.2.12",
+    "nanoid": "^5.0.7",
+    "next-auth": "^5.0.0-beta.25",
+    "server-only": "^0.0.1"
+  },
+  "peerDependencies": {
+    "next": ">=14.0.0",
+    "react": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^3.0.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "typescript": "latest"
+  }
+}

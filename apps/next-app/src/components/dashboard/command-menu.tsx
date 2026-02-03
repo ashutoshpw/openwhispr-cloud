@@ -10,7 +10,7 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
-import { signOut } from "@/lib/auth-client";
+import { signOut } from "@repo/auth/client";
 import {
   Building2,
   Home,

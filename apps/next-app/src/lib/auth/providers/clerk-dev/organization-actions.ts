@@ -1,7 +1,7 @@
 "use server";
 
 import { createClerkClient } from "@clerk/backend";
-import { getAuthConfig } from "../../config";
+import { getAuthConfig } from "@repo/auth/config";
 import { db } from "@repo/database";
 import { project } from "@repo/database/schema";
 import type {
@@ -10,7 +10,7 @@ import type {
   CreateOrganizationResult,
   SetActiveOrganizationParams,
   SetActiveOrganizationResult,
-} from "../../types";
+} from "@repo/auth/types";
 
 function getClerkClient() {
   const config = getAuthConfig("clerk-dev");

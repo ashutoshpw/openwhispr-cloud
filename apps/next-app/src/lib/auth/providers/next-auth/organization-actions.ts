@@ -3,14 +3,14 @@
 import { db } from "@repo/database";
 import { organization, member, project } from "@repo/database/schema";
 import { eq, inArray } from "@repo/database";
-import { auth } from "@/lib/auth";
+import { auth } from "@repo/auth/server";
 import type {
   ListOrganizationsResult,
   CreateOrganizationParams,
   CreateOrganizationResult,
   SetActiveOrganizationParams,
   SetActiveOrganizationResult,
-} from "../../types";
+} from "@repo/auth/types";
 
 export async function listNextAuthOrganizations(): Promise<ListOrganizationsResult> {
   try {

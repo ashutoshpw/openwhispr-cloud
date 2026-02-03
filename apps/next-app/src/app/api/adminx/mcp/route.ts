@@ -3,7 +3,7 @@ import { z } from "zod";
 import { db } from "@repo/database";
 import { user, organization, payments, session } from "@repo/database/schema";
 import { getSiteAdminStatus } from "@/lib/auth-utils";
-import { auth } from "@/lib/auth";
+import { auth } from "@repo/auth/server";
 import { headers } from "next/headers";
 import { sql, eq } from "@repo/database";
 
@@ -418,4 +418,3 @@ const handler = createMcpHandler(
 );
 
 export { handler as GET, handler as POST };
-

@@ -1,7 +1,7 @@
 import { db } from "@repo/database";
 import { user, organization, payments, session } from "@repo/database/schema";
 import { getSiteAdminStatus } from "@/lib/auth-utils";
-import { auth } from "@/lib/auth";
+import { auth } from "@repo/auth/server";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { sql, gt } from "@repo/database";
@@ -52,4 +52,3 @@ export async function GET() {
     );
   }
 }
-

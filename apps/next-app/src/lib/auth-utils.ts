@@ -1,6 +1,6 @@
 import { db } from "@repo/database";
 import { user } from "@repo/database/schema";
-import { auth } from "@/lib/auth";
+import { auth } from "@repo/auth/server";
 import { headers } from "next/headers";
 import { eq } from "@repo/database";
 
@@ -51,4 +51,3 @@ export async function getCurrentUserRole(): Promise<string | null> {
 
   return userRecord[0].role;
 }
-

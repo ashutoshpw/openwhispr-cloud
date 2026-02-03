@@ -10,7 +10,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { signOut, useSession } from "@/lib/auth-client";
+import { signOut, useSession } from "@repo/auth/client";
 import { CreditCard, LogOut, Settings, User } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -28,16 +28,16 @@ export function Profile() {
   const handleSignOut = async () => {
     try {
       const result = await signOut();
-      
+
       // Check if signOut had an error
       if (result?.error) {
         console.error("Sign out error:", result.error);
         // Still attempt to redirect even if there's an error
       }
-      
+
       // Wait a moment to ensure session is fully cleared
       await new Promise((resolve) => setTimeout(resolve, 100));
-      
+
       // Redirect to home page
       router.push("/");
       router.refresh();

@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { auth } from "@repo/auth/server";
 import { db } from "@repo/database";
 import { member, organization } from "@repo/database/schema";
 import { eq, inArray } from "@repo/database";

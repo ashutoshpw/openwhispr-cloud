@@ -1,4 +1,4 @@
-import { getProviderName } from "@/lib/auth/config";
+import { getProviderName } from "@repo/auth/config";
 import { NextResponse } from "next/server";
 
 // Cookie name must match middleware

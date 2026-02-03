@@ -1,7 +1,7 @@
 import { db } from "@repo/database";
 import { organization } from "@repo/database/schema";
 import { getSiteAdminStatus } from "@/lib/auth-utils";
-import { auth } from "@/lib/auth";
+import { auth } from "@repo/auth/server";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { eq } from "@repo/database";
@@ -97,4 +97,3 @@ export async function PATCH(
     );
   }
 }
-

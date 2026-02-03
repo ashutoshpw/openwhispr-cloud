@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { auth } from "@repo/auth/server";
 import { getSiteAdminStatus, getCurrentUserRole } from "@/lib/auth-utils";
 import { headers } from "next/headers";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

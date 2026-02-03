@@ -1,6 +1,6 @@
 import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/lib/auth";
+import { auth } from "@repo/auth/server";
 import { getSiteAdminStatus } from "@/lib/auth-utils";
 import { headers } from "next/headers";
 import { stripe } from "@/lib/stripe/client";
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
     console.error("Error creating promo code:", error);
     return NextResponse.json(
       { error: error.message || "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

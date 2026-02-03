@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+import { auth } from "@repo/auth/server";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -9,9 +9,13 @@ export async function GET() {
     return NextResponse.json({ data: session });
   } catch (error) {
     return NextResponse.json(
-      { error: { message: error instanceof Error ? error.message : "Internal server error" } },
-      { status: 500 }
+      {
+        error: {
+          message:
+            error instanceof Error ? error.message : "Internal server error",
+        },
+      },
+      { status: 500 },
     );
   }
 }
-

@@ -12,7 +12,9 @@
     "paths": {
       "@/*": ["./src/*"],
       "@repo/database": ["../../packages/database/src"],
-      "@repo/database/*": ["../../packages/database/src/*"]
+      "@repo/database/*": ["../../packages/database/src/*"],
+      "@repo/auth": ["../../packages/auth/src"],
+      "@repo/auth/*": ["../../packages/auth/src/*"]
     }
   },
   "include": [

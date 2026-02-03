@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "@/lib/auth-client";
+import { useSession } from "@repo/auth/client";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -20,4 +20,3 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
 
   return <>{children}</>;
 }
-

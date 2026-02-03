@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import { auth } from "@/lib/auth";
+import { auth } from "@repo/auth/server";
 import { getSiteAdminStatus } from "@/lib/auth-utils";
 import { headers } from "next/headers";
 import { stripe } from "@/lib/stripe/client";
@@ -52,13 +52,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validatedData = priceSchema.parse(body);
 
-    if (
-      validatedData.billing_type === "recurring" &&
-      !validatedData.interval
-    ) {
+    if (validatedData.billing_type === "recurring" && !validatedData.interval) {
       return NextResponse.json(
         { error: "Recurring prices must include an interval." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -68,7 +65,7 @@ export async function POST(req: NextRequest) {
     ) {
       return NextResponse.json(
         { error: "Usage-based pricing must be recurring." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -112,7 +109,7 @@ export async function POST(req: NextRequest) {
         if (!validatedData.unit_amount) {
           return NextResponse.json(
             { error: "Amount is required for this pricing model." },
-            { status: 400 }
+            { status: 400 },
           );
         }
         createParams.unit_amount = validatedData.unit_amount;
@@ -122,7 +119,7 @@ export async function POST(req: NextRequest) {
         if (!validatedData.tiers?.length || !validatedData.tiers_mode) {
           return NextResponse.json(
             { error: "Provide at least one tier and select a tier mode." },
-            { status: 400 }
+            { status: 400 },
           );
         }
         createParams.billing_scheme = "tiered";
@@ -146,13 +143,13 @@ export async function POST(req: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     return NextResponse.json(
       { error: error.message || "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

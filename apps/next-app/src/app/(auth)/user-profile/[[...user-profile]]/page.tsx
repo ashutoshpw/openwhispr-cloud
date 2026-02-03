@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { useSession } from "@/lib/auth-client";
+import { useSession } from "@repo/auth/client";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 

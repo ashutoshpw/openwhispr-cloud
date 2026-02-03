@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
-import { auth } from "@/lib/auth";
+import { auth } from "@repo/auth/server";
 import { getSiteAdminStatus } from "@/lib/auth-utils";
 import { headers } from "next/headers";
 import { stripe } from "@/lib/stripe/client";
@@ -24,7 +24,7 @@ const priceUpdateSchema = z.object({
 
 export async function GET(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await auth.api.getSession({
@@ -48,14 +48,14 @@ export async function GET(
     console.error("Error fetching price:", error);
     return NextResponse.json(
       { error: error.message || "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PUT(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await auth.api.getSession({
@@ -78,8 +78,7 @@ export async function PUT(
     const productId =
       typeof price.product === "string"
         ? price.product
-        : price.product?.id ||
-        validatedData.productId;
+        : price.product?.id || validatedData.productId;
     const existingPriceName =
       validatedData.name?.trim() ||
       (price.metadata?.price_name as string | undefined) ||
@@ -99,7 +98,7 @@ export async function PUT(
       ) {
         return NextResponse.json(
           { error: "Missing billing configuration for replacement." },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -112,9 +111,9 @@ export async function PUT(
         recurring:
           validatedData.billingType === "recurring"
             ? {
-              interval: validatedData.interval!,
-              interval_count: validatedData.intervalCount!,
-            }
+                interval: validatedData.interval!,
+                interval_count: validatedData.intervalCount!,
+              }
             : undefined,
         metadata: {
           created_by: session.user.email || session.user.id,
@@ -150,16 +149,16 @@ export async function PUT(
 
     const metadata =
       validatedData.nickname ||
-        validatedData.metadata ||
-        validatedData.active !== undefined ||
-        validatedData.name
+      validatedData.metadata ||
+      validatedData.active !== undefined ||
+      validatedData.name
         ? {
-          updated_by: session.user.email || session.user.id,
-          updated_at: new Date().toISOString(),
-          price_name: existingPriceName,
-          pricing_model: existingPricingModel,
-          ...validatedData.metadata,
-        }
+            updated_by: session.user.email || session.user.id,
+            updated_at: new Date().toISOString(),
+            price_name: existingPriceName,
+            pricing_model: existingPricingModel,
+            ...validatedData.metadata,
+          }
         : undefined;
 
     const updatedPrice = await stripe.prices.update(id, {
@@ -182,7 +181,7 @@ export async function PUT(
     console.error("Error updating price:", error);
     return NextResponse.json(
       { error: error.message || "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -213,7 +212,7 @@ async function deleteStripePrice(priceId: string) {
 
 export async function DELETE(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> },
 ) {
   try {
     const session = await auth.api.getSession({
@@ -249,7 +248,7 @@ export async function DELETE(
             reason:
               "This price has already been used in billing. Archive it instead of deleting.",
           },
-          { status: 200 }
+          { status: 200 },
         );
       }
 
@@ -266,7 +265,7 @@ export async function DELETE(
     console.error("Error deleting price:", error);
     return NextResponse.json(
       { error: error.message || "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

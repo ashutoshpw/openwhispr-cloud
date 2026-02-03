@@ -1,4 +1,4 @@
-import { getProviderName } from "@/lib/auth/config";
+import { getProviderName } from "@repo/auth/config";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     if (!organizationId) {
       return NextResponse.json(
         { error: "Organization ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       if (result.error) {
         return NextResponse.json(
           { error: result.error.message },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
       if (result.error) {
         return NextResponse.json(
           { error: result.error.message },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -48,14 +48,13 @@ export async function POST(request: Request) {
       {
         error: `Organization feature not supported by ${providerName}`,
       },
-      { status: 501 }
+      { status: 501 },
     );
   } catch (error) {
     console.error("Error setting active organization:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
-

@@ -1,6 +1,6 @@
-import { baseServer } from "@/lib/auth";
+import { baseServer } from "@repo/auth/server";
 import { NextResponse } from "next/server";
-import { getProviderName } from "@/lib/auth/config";
+import { getProviderName } from "@repo/auth/config";
 
 export async function POST(request: Request) {
   try {
@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       if (result?.error) {
         return NextResponse.json(
           { error: { message: result.error.message, code: result.error.code } },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -30,18 +30,20 @@ export async function POST(request: Request) {
     // For Next-Auth, delete session from DB before Next-Auth clears JWT cookie
     if (providerName === "next-auth") {
       const cookieHeader = request.headers.get("cookie") || "";
-      const { deleteNextAuthSessionFromDb } = await import("@/lib/auth/providers/next-auth/db-sync");
+      const { deleteNextAuthSessionFromDb } = await import(
+        "@/lib/auth/providers/next-auth/db-sync"
+      );
       await deleteNextAuthSessionFromDb(cookieHeader);
-      
+
       const result = await baseServer.signOut();
-      
+
       if (result?.error) {
         return NextResponse.json(
           { error: { message: result.error.message, code: result.error.code } },
-          { status: 400 }
+          { status: 400 },
         );
       }
-      
+
       // Next-Auth's client-side signOut will handle cookie clearing
       return NextResponse.json({});
     }
@@ -52,16 +54,20 @@ export async function POST(request: Request) {
     if (result?.error) {
       return NextResponse.json(
         { error: { message: result.error.message, code: result.error.code } },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     return NextResponse.json({});
   } catch (error) {
     return NextResponse.json(
-      { error: { message: error instanceof Error ? error.message : "Internal server error" } },
-      { status: 500 }
+      {
+        error: {
+          message:
+            error instanceof Error ? error.message : "Internal server error",
+        },
+      },
+      { status: 500 },
     );
   }
 }
-
