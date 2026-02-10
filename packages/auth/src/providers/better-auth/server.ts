@@ -188,9 +188,22 @@ export class BetterAuthServer implements AuthServerProvider {
     name: string;
   }): Promise<SignUpResult> {
     try {
+      console.log("[BetterAuthServer] signUpEmail called with:", {
+        email: params.email,
+        name: params.name,
+        hasPassword: !!params.password,
+      });
+
       const result = await this.authInstance.api.signUpEmail({
         body: params,
       });
+
+      console.log("[BetterAuthServer] signUpEmail result:", {
+        hasUser: result && "user" in result,
+        resultKeys: result ? Object.keys(result) : [],
+        result: JSON.stringify(result, null, 2),
+      });
+
       if (result && "user" in result) {
         const mappedSession = mapBetterAuthSession(
           result as {
@@ -212,14 +225,17 @@ export class BetterAuthServer implements AuthServerProvider {
             mappedSession,
           });
         }
+        console.log("[BetterAuthServer] Returning success with session");
         return {
           data: mappedSession || undefined,
         };
       }
+      console.log("[BetterAuthServer] No user in result, returning empty data");
       return {
         data: undefined,
       };
     } catch (error: unknown) {
+      console.error("[BetterAuthServer] Exception during sign-up:", error);
       const err = error as { message?: string; code?: string };
       return {
         error: {

@@ -111,10 +111,26 @@ export function getAuthConfig(provider: AuthProvider) {
     process.env.NEXT_PUBLIC_VERCEL_URL ||
     "http://localhost:3000";
 
+  console.log("[AuthConfig] getAuthConfig called:", {
+    provider,
+    isServer,
+    envVars: {
+      NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+      NEXT_PUBLIC_VERCEL_URL: process.env.NEXT_PUBLIC_VERCEL_URL,
+      BETTER_AUTH_URL: process.env.BETTER_AUTH_URL,
+    },
+    calculatedBaseURL: baseURL,
+  });
+
   if (provider === "better-auth") {
+    const finalBaseURL = process.env.BETTER_AUTH_URL || baseURL;
+    console.log("[AuthConfig] BetterAuth config:", {
+      finalBaseURL,
+      hasSecret: !!process.env.BETTER_AUTH_SECRET,
+    });
     return {
       secret: process.env.BETTER_AUTH_SECRET || "",
-      baseURL: process.env.BETTER_AUTH_URL || baseURL,
+      baseURL: finalBaseURL,
     };
   }
 

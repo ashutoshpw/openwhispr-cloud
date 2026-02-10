@@ -31,6 +31,14 @@ export class BetterAuthClient implements AuthClientProvider {
   constructor() {
     const config = getAuthConfig("better-auth");
 
+    console.log("[BetterAuthClient] Initializing with config:", {
+      baseURL: config.baseURL,
+      envVars: {
+        NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+        NEXT_PUBLIC_AUTH_PROVIDER: process.env.NEXT_PUBLIC_AUTH_PROVIDER,
+      },
+    });
+
     this.client = createAuthClient({
       baseURL: config.baseURL,
       plugins: [organizationClient()],
@@ -76,8 +84,28 @@ export class BetterAuthClient implements AuthClientProvider {
     name: string;
   }): Promise<SignUpResult> {
     try {
+      console.log("[BetterAuthClient] signUpEmail called with:", {
+        email: params.email,
+        name: params.name,
+        hasPassword: !!params.password,
+      });
+
       const result = await this.client.signUp.email(params);
+
+      console.log("[BetterAuthClient] signUp.email result:", {
+        hasData: !!result.data,
+        hasError: !!result.error,
+        errorMessage: result.error?.message,
+        errorCode: result.error?.code,
+        fullError: result.error,
+        dataKeys: result.data ? Object.keys(result.data) : [],
+      });
+
       if (result.error) {
+        console.error(
+          "[BetterAuthClient] Sign-up error details:",
+          result.error,
+        );
         return {
           error: {
             message: result.error.message || "Failed to sign up",
@@ -88,10 +116,17 @@ export class BetterAuthClient implements AuthClientProvider {
       const mappedSession = result.data
         ? mapBetterAuthSession(result.data)
         : null;
+
+      console.log("[BetterAuthClient] Mapped session:", {
+        hasMappedSession: !!mappedSession,
+        userId: mappedSession?.user?.id,
+      });
+
       return {
         data: mappedSession || undefined,
       };
     } catch (error) {
+      console.error("[BetterAuthClient] Exception during sign-up:", error);
       return {
         error: {
           message: error instanceof Error ? error.message : "Failed to sign up",
