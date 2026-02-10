@@ -1,6 +1,6 @@
 {
-  "buildCommand": "cd ../.. && bun run build --filter=@repo/next-app",
-  "installCommand": "cd ../.. && bun install",
+  "buildCommand": "bun run build --filter=@repo/next-app",
+  "installCommand": "bun install",
   "framework": "nextjs",
-  "outputDirectory": ".next"
+  "outputDirectory": "apps/next-app/.next"
 }
