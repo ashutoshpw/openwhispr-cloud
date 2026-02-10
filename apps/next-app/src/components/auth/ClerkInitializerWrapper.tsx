@@ -20,14 +20,12 @@ export function ClerkInitializerWrapper({
   // This ensures Clerk client is available when auth methods are called
   const ClerkInit = () => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { useClerk } = require("@clerk/nextjs") as typeof import(
-      "@clerk/nextjs",
-    );
+    const { useClerk } = require("@clerk/nextjs");
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { getClientInstance, setGlobalClerkClient } =
-      require("@/lib/auth/providers/clerk-dev/client") as typeof import(
-        "@/lib/auth/providers/clerk-dev/client",
-      );
+    const {
+      getClientInstance,
+      setGlobalClerkClient,
+    } = require("@/lib/auth/providers/clerk-dev/client");
 
     const clerk = useClerk();
     const client = getClientInstance();
@@ -37,7 +35,7 @@ export function ClerkInitializerWrapper({
         client.setClerkClient(clerk);
         setGlobalClerkClient(clerk);
       }
-    }, [clerk, client]);
+    }, [clerk, client, setGlobalClerkClient]);
 
     return null;
   };

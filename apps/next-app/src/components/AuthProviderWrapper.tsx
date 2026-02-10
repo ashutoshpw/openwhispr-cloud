@@ -6,9 +6,7 @@ export function AuthProviderWrapper({ children }: { children: ReactNode }) {
 
   if (authProvider === "next-auth") {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { SessionProvider } = require("next-auth/react") as typeof import(
-      "next-auth/react",
-    );
+    const { SessionProvider } = require("next-auth/react");
     const baseURL =
       process.env.NEXT_PUBLIC_APP_URL ||
       process.env.NEXT_PUBLIC_VERCEL_URL ||
@@ -19,14 +17,11 @@ export function AuthProviderWrapper({ children }: { children: ReactNode }) {
   if (authProvider === "clerk-dev") {
     // Dynamic require to avoid bundling Clerk for other providers
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { ClerkProvider } = require("@clerk/nextjs") as typeof import(
-      "@clerk/nextjs",
-    );
+    const { ClerkProvider } = require("@clerk/nextjs");
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { ClerkInitializerWrapper } =
-      require("@/components/auth/ClerkInitializerWrapper") as typeof import(
-        "@/components/auth/ClerkInitializerWrapper",
-      );
+    const {
+      ClerkInitializerWrapper,
+    } = require("@/components/auth/ClerkInitializerWrapper");
     const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
     if (!publishableKey) {
@@ -52,10 +47,9 @@ export function AuthProviderWrapper({ children }: { children: ReactNode }) {
     // Use wrapper component to handle AuthKit provider import
     // This isolates the ESM module import and allows Next.js to properly tree-shake
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { AuthKitProviderWrapper } =
-      require("@/components/auth/AuthKitProviderWrapper") as typeof import(
-        "@/components/auth/AuthKitProviderWrapper",
-      );
+    const {
+      AuthKitProviderWrapper,
+    } = require("@/components/auth/AuthKitProviderWrapper");
 
     return <AuthKitProviderWrapper>{children}</AuthKitProviderWrapper>;
   }
