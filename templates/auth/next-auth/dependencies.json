@@ -1,0 +1,29 @@
+{
+  "packages/auth": {
+    "add": {
+      "@repo/database": "workspace:*",
+      "@auth/drizzle-adapter": "^1.7.4",
+      "bcryptjs": "^2.4.3",
+      "nanoid": "^5.0.9",
+      "next-auth": "^5.0.0-beta.25",
+      "server-only": "^0.0.1"
+    },
+    "remove": [
+      "better-auth",
+      "@clerk/backend",
+      "@clerk/nextjs",
+      "@workos-inc/authkit-nextjs",
+      "@workos-inc/node"
+    ],
+    "devDependencies": {
+      "add": {
+        "@types/bcryptjs": "^3.0.0"
+      },
+      "remove": []
+    }
+  },
+  "apps/next-app": {
+    "add": {},
+    "remove": ["@clerk/backend", "@clerk/nextjs", "@workos-inc/authkit-nextjs"]
+  }
+}

@@ -11,7 +11,7 @@ A modern, production-ready Next.js 16 starter template built as a Turborepo mono
 
 - **Turborepo Monorepo** with bun workspaces for optimal DX
 - **Next.js 16** with App Router for optimal performance
-- **Unified Authentication** - Switchable auth layer supporting BetterAuth, NextAuth, AuthKit (WorkOS), and Clerk
+- **Single Auth Provider Architecture** - Choose your auth provider once at project init (BetterAuth, NextAuth, AuthKit, or Clerk)
 - **Shared Database Package** with PostgreSQL and Drizzle ORM for type-safe queries
 - **Beautiful UI** with Shadcn UI, TailwindCSS, and multiple component libraries
 - **Forms** with React Hook Form and Zod validation
@@ -46,9 +46,17 @@ nextjs16-starter-kit/
 │       └── drizzle.config.ts
 │
 ├── scripts/                      # Root-level scripts
+│   ├── init-auth.ts              # Auth provider initialization
 │   ├── setup.ts                  # Interactive setup
 │   ├── seed-admin.ts             # Seed admin user
 │   └── ...
+│
+├── templates/                    # Auth provider templates
+│   └── auth/                     # Provider-specific templates
+│       ├── better-auth/
+│       ├── next-auth/
+│       ├── authkit/
+│       └── clerk/
 │
 ├── turbo.json                    # Turborepo config
 ├── package.json                  # Root workspace
@@ -65,7 +73,7 @@ nextjs16-starter-kit/
 | Language | TypeScript (strict mode) |
 | Styling | TailwindCSS |
 | UI Components | Shadcn UI, Radix UI, Tremor, Magic UI |
-| Authentication | Unified Auth Layer (BetterAuth, NextAuth, AuthKit/WorkOS, Clerk) |
+| Authentication | Single Provider (BetterAuth, NextAuth, AuthKit/WorkOS, or Clerk) |
 | Database | PostgreSQL + Drizzle ORM (shared package) |
 | Forms | React Hook Form + Zod |
 | State Management | TanStack Query (React Query) |
@@ -94,31 +102,44 @@ nextjs16-starter-kit/
    bun install
    ```
 
-3. **Set up environment variables**
+3. **Initialize authentication provider (one-time, irreversible)**
    ```bash
-   cp .env.example .env.local
-   # Or use the interactive setup:
+   bun run init-auth
+   ```
+   
+   This prompts you to select your auth provider:
+   - `better-auth` (default) - Self-hosted, Organizations, Email/Password
+   - `next-auth` - Auth.js v5, JWT Sessions
+   - `authkit` - WorkOS, Enterprise SSO
+   - `clerk` - Managed, Pre-built UI
+   
+   > **Warning**: This choice is permanent. The script removes unused provider code and locks your selection. To change providers later, you must start fresh or use `--force` (which restores from backup if available).
+
+4. **Set up environment variables**
+   ```bash
    bun run setup
    ```
+   
+   The setup wizard will only show configuration for your chosen auth provider.
 
-4. **Push database schema**
+5. **Push database schema**
    ```bash
    bun run db:push
    ```
 
-5. **Seed admin user (optional)**
+6. **Seed admin user (optional)**
    ```bash
    bun run db:seed
    ```
 
-6. **Start development server with TUI**
+7. **Start development server with TUI**
    ```bash
    bun run dev
    ```
    
    This opens an interactive Terminal UI with a sidebar showing all running tasks.
 
-7. **Open your browser**
+8. **Open your browser**
    Navigate to http://localhost:8801
 
 ### Docker Setup (Alternative)
@@ -147,6 +168,7 @@ This starts PostgreSQL and the Next.js app with auto-schema push.
 | `bun run db:studio` | Open Drizzle Studio GUI |
 | `bun run db:seed` | Seed admin user |
 | `bun run setup` | Interactive environment setup |
+| `bun run init-auth` | Initialize auth provider (one-time) |
 
 ### Filtering to specific packages
 
@@ -189,41 +211,66 @@ bun run db:migrate
 
 ## Environment Variables
 
-Create `.env.local` at the root:
+Create `.env.local` at the root (or use `bun run setup`):
 
 ```env
 # Database (Required)
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/nextjs_starter
 
-# Auth Provider (Required)
-AUTH_PROVIDER=better-auth  # or: next-auth, authkit, clerk-dev
+# App URL (Required)
 NEXT_PUBLIC_APP_URL=http://localhost:8801
 
-# BetterAuth (if using better-auth)
-BETTER_AUTH_SECRET=<generate-with-openssl-rand>
-BETTER_AUTH_URL=http://localhost:8801
-
-# See .env.example for all options
+# Provider-specific variables are configured during `bun run setup`
+# based on your chosen auth provider from `bun run init-auth`
 ```
 
-Use `bun run setup` for an interactive configuration wizard.
+## Authentication
 
-## Authentication Providers
+This starter uses a **single auth provider architecture**. You choose your auth provider once during project initialization, and only that provider's code is included in your project.
 
-Switch providers by changing `AUTH_PROVIDER`:
+### Selecting Your Provider
 
-| Provider | Value | Features |
-|----------|-------|----------|
-| BetterAuth | `better-auth` | Self-hosted, Organizations, Email/Password |
-| NextAuth | `next-auth` | Auth.js v5, JWT Sessions |
-| AuthKit | `authkit` | WorkOS, Enterprise SSO |
-| Clerk | `clerk-dev` | Managed, Pre-built UI |
+Run `bun run init-auth` to select from:
 
-See provider documentation:
-- [BetterAuth README](./apps/next-app/src/lib/auth/providers/better-auth/README.md)
-- [NextAuth README](./apps/next-app/src/lib/auth/providers/next-auth/README.md)
-- [AuthKit README](./apps/next-app/src/lib/auth/providers/authkit/README.md)
-- [Clerk README](./apps/next-app/src/lib/auth/providers/clerk-dev/README.md)
+| Provider | Features | Best For |
+|----------|----------|----------|
+| **BetterAuth** (default) | Self-hosted, Organizations, Email/Password, Social OAuth | Full control, privacy-focused apps |
+| **NextAuth** | Auth.js v5, JWT Sessions, Multiple providers | Existing Auth.js experience |
+| **AuthKit** | WorkOS integration, Enterprise SSO, SAML | B2B/Enterprise applications |
+| **Clerk** | Managed service, Pre-built UI, User management | Rapid development, managed auth |
+
+### What Happens During Init
+
+1. You select a provider (or use `--provider=<name>` flag)
+2. Existing auth files are backed up to `.auth-backup/`
+3. Template files for your provider are copied to the project
+4. Package dependencies are updated
+5. Unused provider code is removed
+6. A `.auth-provider.lock` file is created (do not commit this)
+
+### Switching Providers
+
+The auth provider choice is **intentionally permanent** to keep the codebase clean. If you need to switch:
+
+```bash
+# Option 1: Start fresh
+rm -rf .auth-provider.lock .auth-backup
+bun run init-auth
+
+# Option 2: Force re-init (restores from backup first)
+bun run init-auth --force
+```
+
+### Direct Provider Selection
+
+Skip the interactive prompt:
+
+```bash
+bun run init-auth --provider=better-auth
+bun run init-auth --provider=next-auth
+bun run init-auth --provider=authkit
+bun run init-auth --provider=clerk
+```
 
 ## Development Guidelines
 
@@ -286,6 +333,20 @@ docker run -p 8801:8801 nextjs-starter
 ```
 
 ## Troubleshooting
+
+### Auth Provider Issues
+
+**"No auth provider lock file found"**
+```bash
+# Run init-auth first
+bun run init-auth
+```
+
+**"Auth provider already initialized"**
+```bash
+# Use --force to re-initialize (will restore backup first)
+bun run init-auth --force
+```
 
 ### Dependency Issues
 ```bash

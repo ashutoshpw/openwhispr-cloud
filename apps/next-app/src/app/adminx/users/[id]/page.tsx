@@ -7,8 +7,6 @@ import { user } from "@repo/database/schema";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-export const dynamic = "force-dynamic";
-
 async function getUser(id: string) {
   try {
     const [userRecord] = await db()

@@ -17,6 +17,7 @@
     "db:push": "turbo run db:push",
     "db:studio": "bun run --filter @repo/database db:studio",
     "db:seed": "bun run scripts/seed-admin.ts",
+    "init-auth": "bun run scripts/init-auth.ts",
     "setup": "bun run scripts/setup.ts",
     "setup:stripe": "bun run scripts/setup-stripe.ts",
     "setup:posthog": "bun run scripts/setup-posthog.ts",

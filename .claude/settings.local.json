@@ -9,16 +9,7 @@
       "Bash(bun run:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(bunx path-to-port:*)",
-      "Bash(git rm:*)",
-      "Bash(git checkout:*)",
-      "Bash(git rebase:*)",
-      "Bash(GIT_EDITOR=true git rebase:*)",
-      "Bash(git -c core.editor=true rebase --continue)",
-      "Bash(git diff-index:*)",
-      "Bash(git apply:*)",
-      "Bash(test:*)",
-      "Bash(git reset:*)"
+      "Bash(bunx path-to-port:*)"
     ]
   }
 }

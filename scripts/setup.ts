@@ -2,6 +2,9 @@
 /**
  * Interactive setup script for configuring .env.local
  * Run with: bun run setup
+ *
+ * NOTE: This script reads from .auth-provider.lock to determine which
+ * auth provider to configure. Run `bun run init-auth` first if not done.
  */
 
 import { confirm, input, password, select } from "@inquirer/prompts";
@@ -14,6 +17,7 @@ const colors = {
   reset: "\x1b[0m",
   bold: "\x1b[1m",
   dim: "\x1b[2m",
+  red: "\x1b[31m",
   green: "\x1b[32m",
   yellow: "\x1b[33m",
   blue: "\x1b[34m",
@@ -21,17 +25,38 @@ const colors = {
   cyan: "\x1b[36m",
 };
 
-const AUTH_PROVIDERS = [
-  {
-    value: "better-auth",
-    name: "better-auth (Recommended - simple, self-hosted)",
-  },
-  { value: "next-auth", name: "next-auth (Auth.js v5)" },
-  { value: "authkit", name: "authkit (WorkOS - enterprise SSO)" },
-  { value: "clerk-dev", name: "clerk-dev (Clerk - managed auth)" },
-] as const;
+// Auth provider types (mapped from lock file values)
+const AUTH_PROVIDER_NAMES: Record<string, string> = {
+  "better-auth": "Better Auth (self-hosted)",
+  "next-auth": "NextAuth (Auth.js v5)",
+  authkit: "AuthKit (WorkOS)",
+  clerk: "Clerk (managed auth)",
+};
 
-type AuthProvider = (typeof AUTH_PROVIDERS)[number]["value"];
+type AuthProvider = "better-auth" | "next-auth" | "authkit" | "clerk";
+
+interface LockFile {
+  version: string;
+  provider: AuthProvider;
+  initializedAt: string;
+  templateVersion: string;
+}
+
+// Read auth provider from lock file
+function getAuthProvider(): AuthProvider | null {
+  const lockPath = resolve(process.cwd(), ".auth-provider.lock");
+  if (!existsSync(lockPath)) {
+    return null;
+  }
+  try {
+    const content = readFileSync(lockPath, "utf-8");
+    const lock: LockFile = JSON.parse(content);
+    return lock.provider;
+  } catch (error) {
+    console.error("Error reading .auth-provider.lock:", error);
+    return null;
+  }
+}
 
 interface EnvVariable {
   key: string;
@@ -260,47 +285,34 @@ async function main() {
   });
 
   // ─────────────────────────────────────────────────────────────────
-  // AUTHENTICATION PROVIDER
+  // AUTHENTICATION PROVIDER (from lock file)
   // ─────────────────────────────────────────────────────────────────
   printHeader("AUTHENTICATION PROVIDER");
 
-  const existingAuthProvider = existingEnv.get("AUTH_PROVIDER") as
-    | AuthProvider
-    | undefined;
+  // Read auth provider from lock file
+  const authProvider = getAuthProvider();
 
-  if (existingAuthProvider && isUpdating) {
+  if (!authProvider) {
+    console.log(`${colors.red}  No auth provider initialized!${colors.reset}`);
+    console.log("");
     console.log(
-      `  ${colors.yellow}Current provider: ${existingAuthProvider}${colors.reset}`,
+      `${colors.yellow}  Please run: ${colors.bold}bun run init-auth${colors.reset}`,
+    );
+    console.log(
+      `${colors.dim}  This will initialize the project with your chosen auth provider.${colors.reset}`,
     );
     console.log("");
+    process.exit(1);
   }
 
-  const authProvider = await select({
-    message: "Select authentication provider:",
-    choices: AUTH_PROVIDERS.map((p) => ({
-      value: p.value,
-      name: p.name,
-    })),
-    default: existingAuthProvider || "better-auth",
-  });
-
-  if (
-    isUpdating &&
-    existingAuthProvider &&
-    existingAuthProvider !== authProvider
-  ) {
-    changes.push({
-      key: "AUTH_PROVIDER",
-      oldValue: existingAuthProvider,
-      newValue: authProvider,
-    });
-  }
-
-  newVariables.push({
-    key: "AUTH_PROVIDER",
-    value: authProvider,
-    section: "Authentication Provider",
-  });
+  const providerName = AUTH_PROVIDER_NAMES[authProvider] || authProvider;
+  console.log(
+    `${colors.green}  ✓ Using: ${colors.bold}${providerName}${colors.reset}`,
+  );
+  console.log(
+    `${colors.dim}  (Set by init-auth - this cannot be changed)${colors.reset}`,
+  );
+  console.log("");
 
   // App URL
   const existingAppUrl = existingEnv.get("NEXT_PUBLIC_APP_URL");
@@ -558,7 +570,7 @@ async function main() {
       value: redirectUri,
       section: "AuthKit",
     });
-  } else if (authProvider === "clerk-dev") {
+  } else if (authProvider === "clerk") {
     printHeader("CLERK CONFIGURATION");
 
     console.log(

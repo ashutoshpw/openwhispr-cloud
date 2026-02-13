@@ -3,10 +3,6 @@
     "next-devtools": {
       "command": "bunx",
       "args": ["-y", "next-devtools-mcp@latest"]
-    },
-    "devin": {
-      "type": "http",
-      "url": "https://automate-edge.w3api.dev/mcp/324f9f7f-a840-4edc-b261-03aaf01b10f2"
     }
   }
 }

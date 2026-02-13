@@ -2,8 +2,6 @@ import { OrganizationTable } from "@/components/admin/OrganizationTable";
 import { db } from "@repo/database";
 import { organization } from "@repo/database/schema";
 
-export const dynamic = "force-dynamic";
-
 async function getOrganizations() {
   try {
     const organizations = await db()
