@@ -21,6 +21,7 @@
     "setup": "bun run scripts/setup.ts",
     "setup:stripe": "bun run scripts/setup-stripe.ts",
     "setup:posthog": "bun run scripts/setup-posthog.ts",
+    "setup:referral": "bun run scripts/setup-referral.ts",
     "stripe:verify": "node scripts/verify-stripe-keys.js",
     "stripe:migrate": "bun run scripts/migrate-stripe-schema.ts",
     "stripe:backfill": "bun run scripts/backfill-stripe-data.ts",

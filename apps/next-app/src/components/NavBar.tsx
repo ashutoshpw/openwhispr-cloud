@@ -114,7 +114,7 @@ export function NavBar() {
             <NavigationMenuList>
               <Link
                 className="max-[825px]:hidden"
-                href="https://learn.rankboost.ai"
+                href="https://nextjs.org/docs"
                 target="_blank"
               >
                 <Button variant="ghost">Docs</Button>

@@ -1,5 +1,6 @@
 import {
   boolean,
+  integer,
   pgTable,
   serial,
   text,
@@ -256,3 +257,83 @@ export type OrgAuditLog = typeof orgAuditLogs.$inferSelect;
 export type NewOrgAuditLog = typeof orgAuditLogs.$inferInsert;
 export type AppSetting = typeof appSettings.$inferSelect;
 export type NewAppSetting = typeof appSettings.$inferInsert;
+
+// ============================================================================
+// Referral System
+// ============================================================================
+
+// Referral program configuration (single row for app-wide settings)
+export const referralConfig = pgTable("referral_config", {
+  id: text("id").primaryKey(),
+  enabled: boolean("enabled").default(false).notNull(),
+  referrerCreditAmount: integer("referrer_credit_amount").notNull(), // in cents
+  refereeCreditAmount: integer("referee_credit_amount").notNull(), // in cents
+  currency: varchar("currency", { length: 3 }).default("usd").notNull(),
+  minPlanTier: text("min_plan_tier").default("tier_1"), // minimum tier to get referral code
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
+// Referral codes - one per eligible user
+export const referralCodes = pgTable("referral_codes", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  code: varchar("code", { length: 20 }).notNull().unique(), // e.g., "REF7X9K2"
+  usageCount: integer("usage_count").default(0).notNull(),
+  totalCreditsEarned: integer("total_credits_earned").default(0).notNull(), // in cents
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
+// Referrals - tracks each referral relationship and conversion
+export const referrals = pgTable(
+  "referrals",
+  {
+    id: text("id").primaryKey(),
+    referralCodeId: text("referral_code_id")
+      .notNull()
+      .references(() => referralCodes.id),
+    referrerId: text("referrer_id")
+      .notNull()
+      .references(() => user.id),
+    refereeId: text("referee_id")
+      .notNull()
+      .references(() => user.id),
+    refereeOrganizationId: text("referee_organization_id").references(
+      () => organization.id,
+    ),
+    status: text("status").notNull().default("pending"), // pending | converted | expired | cancelled
+    referrerCreditAmount: integer("referrer_credit_amount"), // amount awarded to referrer (cents)
+    refereeCreditAmount: integer("referee_credit_amount"), // amount awarded to referee (cents)
+    referrerStripeTransactionId: text("referrer_stripe_transaction_id"), // Stripe balance transaction ID
+    refereeStripeTransactionId: text("referee_stripe_transaction_id"),
+    convertedAt: timestamp("converted_at"),
+    expiresAt: timestamp("expires_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    // Each user can only be referred once
+    uniqueIndex("referral_referee_unique").on(table.refereeId),
+  ],
+);
+
+// Type exports for referral tables
+export type ReferralConfig = typeof referralConfig.$inferSelect;
+export type NewReferralConfig = typeof referralConfig.$inferInsert;
+export type ReferralCode = typeof referralCodes.$inferSelect;
+export type NewReferralCode = typeof referralCodes.$inferInsert;
+export type Referral = typeof referrals.$inferSelect;
+export type NewReferral = typeof referrals.$inferInsert;

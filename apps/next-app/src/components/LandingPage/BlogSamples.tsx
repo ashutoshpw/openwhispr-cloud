@@ -36,7 +36,7 @@ export default function BlogSample() {
           </div>
           <div className="flex gap-3 justify-start items-center w-full border-b pb-4">
             <p className="text-gray-500">
-              All these articles were generated using RankBoost AI
+              All these articles were generated using our AI platform
             </p>
           </div>
         </div>
