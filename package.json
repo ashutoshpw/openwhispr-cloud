@@ -26,15 +26,21 @@
     "stripe:migrate": "bun run scripts/migrate-stripe-schema.ts",
     "stripe:backfill": "bun run scripts/backfill-stripe-data.ts",
     "posthog:test-event": "bun run scripts/test-posthog-event.ts",
-    "posthog:test-workflow": "bun run scripts/test-posthog-workflow.ts"
+    "posthog:test-workflow": "bun run scripts/test-posthog-workflow.ts",
+    "check:max-lines": "bun run scripts/check-max-lines.ts",
+    "prepare": "simple-git-hooks"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@inquirer/prompts": "^8.2.0",
     "dotenv": "^17.2.3",
     "posthog-node": "^5.24.15",
+    "simple-git-hooks": "^2.13.1",
     "tsx": "^4.21.0",
     "turbo": "^2.5.0",
     "typescript": "latest"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "bun run check:max-lines"
   }
 }
