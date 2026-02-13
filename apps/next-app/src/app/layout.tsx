@@ -4,6 +4,7 @@ import { NextChatSDKBootstrap } from "@/components/NextChatSDKBootstrap";
 import { ClerkCaptchaContainer } from "@/components/auth/ClerkCaptchaContainer";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { PostHogProvider } from "@/lib/analytics/posthog-provider";
 import { Analytics } from "@vercel/analytics/react";
 import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
@@ -26,17 +27,19 @@ export default function RootLayout({
       </head>
       <body className={GeistSans.className} suppressHydrationWarning>
         <ClerkCaptchaContainer />
-        <Provider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-            <Toaster />
-          </ThemeProvider>
-        </Provider>
+        <PostHogProvider>
+          <Provider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+              <Toaster />
+            </ThemeProvider>
+          </Provider>
+        </PostHogProvider>
         <Analytics />
       </body>
     </html>

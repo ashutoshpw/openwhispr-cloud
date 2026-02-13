@@ -19,14 +19,18 @@
     "db:seed": "bun run scripts/seed-admin.ts",
     "setup": "bun run scripts/setup.ts",
     "setup:stripe": "bun run scripts/setup-stripe.ts",
+    "setup:posthog": "bun run scripts/setup-posthog.ts",
     "stripe:verify": "node scripts/verify-stripe-keys.js",
     "stripe:migrate": "bun run scripts/migrate-stripe-schema.ts",
-    "stripe:backfill": "bun run scripts/backfill-stripe-data.ts"
+    "stripe:backfill": "bun run scripts/backfill-stripe-data.ts",
+    "posthog:test-event": "bun run scripts/test-posthog-event.ts",
+    "posthog:test-workflow": "bun run scripts/test-posthog-workflow.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@inquirer/prompts": "^8.2.0",
     "dotenv": "^17.2.3",
+    "posthog-node": "^5.24.15",
     "tsx": "^4.21.0",
     "turbo": "^2.5.0",
     "typescript": "latest"

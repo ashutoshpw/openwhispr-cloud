@@ -1,3 +1,5 @@
+import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
+import { trackServerEvent } from "@/lib/analytics/server";
 import { getProviderName } from "@repo/auth/config";
 import { baseServer } from "@repo/auth/server";
 import { NextResponse } from "next/server";
@@ -37,6 +39,15 @@ export async function POST(request: Request) {
         { error: { message: result.error.message, code: result.error.code } },
         { status: 400 },
       );
+    }
+
+    // Track user login in PostHog
+    const userId = (result?.data as { user?: { id?: string } })?.user?.id;
+    if (userId) {
+      await trackServerEvent(ANALYTICS_EVENTS.USER_LOGGED_IN, userId, {
+        email,
+        provider: "email",
+      });
     }
 
     const response = NextResponse.json({ data: result?.data });

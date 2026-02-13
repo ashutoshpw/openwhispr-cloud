@@ -1,5 +1,7 @@
 "use client";
 
+import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
+import { useTrackEvent } from "@/lib/analytics/hooks";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -28,7 +30,7 @@ import {
   Users,
 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 interface BillingSettingsProps {
@@ -56,9 +58,19 @@ export function BillingSettings({
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">(
     "monthly",
   );
+  const trackEvent = useTrackEvent();
 
   const checkoutSuccess = searchParams.get("checkout") === "success";
   const checkoutCancelled = searchParams.get("checkout") === "cancelled";
+
+  // Track when user views pricing page
+  useEffect(() => {
+    trackEvent(ANALYTICS_EVENTS.USER_CHECKED_PRICING, {
+      source_page: "billing_settings",
+      current_plan: subscription.plan?.productName || "free",
+      viewed_plans: pricingTiers.map((tier) => tier.name),
+    });
+  }, [trackEvent, subscription.plan?.productName, pricingTiers]);
 
   const handleManageBilling = async () => {
     startTransition(async () => {

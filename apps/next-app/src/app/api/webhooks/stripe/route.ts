@@ -4,6 +4,12 @@ import {
   logBillingEvent,
   updateOrganizationStatus,
 } from "@/lib/billing";
+import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
+import {
+  identifyServerUser,
+  setServerUserProperties,
+  trackServerEvent,
+} from "@/lib/analytics/server";
 import {
   activatePendingOrganization,
   cancelPendingOrganization,
@@ -12,7 +18,7 @@ import { stripe } from "@/lib/stripe/client";
 import { stripeSync } from "@/lib/stripe/sync";
 import { db } from "@repo/database";
 import { eq } from "@repo/database";
-import { organization } from "@repo/database/schema";
+import { organization, user } from "@repo/database/schema";
 import { revalidatePath } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 import type Stripe from "stripe";
@@ -54,6 +60,76 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     },
     performedBy: session.metadata?.userId || "system",
   });
+
+  // Track analytics event for trial or subscription
+  const userId = session.metadata?.userId;
+  if (userId && subscription) {
+    const priceId = subscription.items?.data[0]?.price?.id;
+    const productId = subscription.items?.data[0]?.price?.product as string;
+
+    // Get user email for tracking
+    const userData = await db()
+      .select()
+      .from(user)
+      .where(eq(user.id, userId))
+      .limit(1);
+
+    const userEmail = userData[0]?.email || session.customer_email || "";
+    const userName = userData[0]?.name || "";
+
+    if (isTrialing) {
+      // Track trial started
+      const trialEndDate = subscription.trial_end
+        ? new Date(subscription.trial_end * 1000)
+        : null;
+
+      await trackServerEvent(ANALYTICS_EVENTS.USER_TRIAL_STARTED, userId, {
+        email: userEmail,
+        name: userName,
+        plan_id: productId,
+        plan_name: productId, // Product name not available here
+        trial_duration_days: trialEndDate
+          ? Math.ceil(
+              (trialEndDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24),
+            )
+          : 14,
+        trial_end_date: trialEndDate?.toISOString() || "",
+      });
+
+      // Update user properties
+      await setServerUserProperties(userId, {
+        plan_type: "trial",
+        trial_end_date: trialEndDate?.toISOString(),
+        subscription_status: "trialing",
+      });
+    } else {
+      // Track subscription created
+      const price = subscription.items?.data[0]?.price;
+      const billingPeriod =
+        price?.recurring?.interval === "year" ? "yearly" : "monthly";
+      const amount = (price?.unit_amount || 0) / 100;
+
+      await trackServerEvent(
+        ANALYTICS_EVENTS.USER_SUBSCRIPTION_CREATED,
+        userId,
+        {
+          email: userEmail,
+          name: userName,
+          plan_id: productId,
+          plan_name: productId,
+          billing_period: billingPeriod,
+          amount,
+          currency: price?.currency || "usd",
+        },
+      );
+
+      // Update user properties
+      await setServerUserProperties(userId, {
+        plan_type: "tier_1", // Approximate, would need to map product to tier
+        subscription_status: "active",
+      });
+    }
+  }
 
   console.log(
     `[Webhook] Activated workspace ${orgId} with ${isTrialing ? "trial" : "subscription"}`,
@@ -204,6 +280,47 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     },
     performedBy: "system",
   });
+
+  // Track subscription cancelled in PostHog
+  // Find the owner of the organization
+  const { member } = await import("@repo/database/schema");
+  const ownerMember = await db()
+    .select()
+    .from(member)
+    .where(eq(member.organizationId, org[0].id))
+    .limit(1);
+
+  if (ownerMember[0]?.userId) {
+    const userData = await db()
+      .select()
+      .from(user)
+      .where(eq(user.id, ownerMember[0].userId))
+      .limit(1);
+
+    const productId = subscription.items.data[0]?.price?.product as string;
+    const cancellationReason = (
+      subscription as Stripe.Subscription & {
+        cancellation_details?: { reason?: string };
+      }
+    ).cancellation_details?.reason;
+
+    await trackServerEvent(
+      ANALYTICS_EVENTS.USER_SUBSCRIPTION_CANCELLED,
+      ownerMember[0].userId,
+      {
+        email: userData[0]?.email || "",
+        plan_id: productId,
+        plan_name: productId,
+        cancellation_reason: cancellationReason,
+      },
+    );
+
+    // Update user properties
+    await setServerUserProperties(ownerMember[0].userId, {
+      plan_type: "free",
+      subscription_status: "cancelled",
+    });
+  }
 
   // Note: We don't automatically downgrade to readonly here
   // The trial-expiration cron job handles setting readonly status
