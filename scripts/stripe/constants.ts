@@ -1,0 +1,77 @@
+import type Stripe from "stripe";
+
+export const WEBHOOK_EVENTS: Stripe.WebhookEndpointCreateParams.EnabledEvent[] =
+  [
+    "product.created",
+    "product.updated",
+    "product.deleted",
+    "price.created",
+    "price.updated",
+    "price.deleted",
+    "customer.created",
+    "customer.updated",
+    "customer.deleted",
+    "subscription_schedule.created",
+    "subscription_schedule.updated",
+    "customer.subscription.created",
+    "customer.subscription.updated",
+    "customer.subscription.deleted",
+    "invoice.created",
+    "invoice.updated",
+    "invoice.paid",
+    "invoice.payment_failed",
+    "invoice.finalized",
+    "charge.succeeded",
+    "charge.failed",
+    "charge.refunded",
+    "payment_intent.succeeded",
+    "payment_intent.payment_failed",
+    "payment_method.attached",
+    "payment_method.detached",
+    "checkout.session.completed",
+    "checkout.session.expired",
+    "coupon.created",
+    "coupon.updated",
+    "coupon.deleted",
+    "promotion_code.created",
+    "promotion_code.updated",
+    "charge.dispute.created",
+    "charge.dispute.updated",
+    "charge.dispute.closed",
+    "setup_intent.succeeded",
+    "setup_intent.setup_failed",
+  ];
+
+export const TIER_FEATURES: Record<number, string[]> = {
+  1: [
+    "Core features included",
+    "Email support",
+    "Basic analytics",
+    "Up to 1,000 requests/month",
+  ],
+  2: [
+    "Everything in Tier 1",
+    "Priority email support",
+    "Advanced analytics",
+    "Up to 10,000 requests/month",
+    "API access",
+  ],
+  3: [
+    "Everything in Tier 2",
+    "24/7 priority support",
+    "Custom analytics",
+    "Unlimited requests",
+    "API access",
+    "Custom integrations",
+  ],
+};
+
+export const ENTERPRISE_FEATURES = [
+  "Everything in lower tiers",
+  "Dedicated account manager",
+  "24/7 phone & email support",
+  "Unlimited usage",
+  "Custom integrations",
+  "SLA guarantee",
+  "On-premise deployment option",
+];

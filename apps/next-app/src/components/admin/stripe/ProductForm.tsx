@@ -1,39 +1,20 @@
 "use client";
 
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
   type BillingInterval,
   type PriceType,
   useCreateProduct,
   useUpdateProduct,
 } from "@/hooks/stripe/useProducts";
-import { cn } from "@/lib/utils";
-import { Loader2, Plus, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import type Stripe from "stripe";
+import { type MetadataEntry, ProductFormView } from "./ProductFormView";
 
 interface ProductFormProps {
   product?: Stripe.Product;
   mode: "create" | "edit";
-}
-
-interface MetadataEntry {
-  id: string;
-  key: string;
-  value: string;
-  isReserved?: boolean;
 }
 
 const RESERVED_METADATA_KEYS = new Set([
@@ -43,22 +24,26 @@ const RESERVED_METADATA_KEYS = new Set([
   "updated_at",
 ]);
 
-const currencyOptions = [
-  { label: "USD - US Dollar", value: "usd" },
-  { label: "EUR - Euro", value: "eur" },
-  { label: "GBP - British Pound", value: "gbp" },
-  { label: "CAD - Canadian Dollar", value: "cad" },
-  { label: "AUD - Australian Dollar", value: "aud" },
-];
-
-const billingIntervals: { label: string; value: BillingInterval }[] = [
-  { label: "Day", value: "day" },
-  { label: "Week", value: "week" },
-  { label: "Month", value: "month" },
-  { label: "Year", value: "year" },
-];
-
 const IMAGE_EXTENSION_REGEX = /\.(jpe?g|png|webp)(\?.*)?$/i;
+
+interface ProductPayload {
+  name: string;
+  description: string | null;
+  active: boolean;
+  images?: string[];
+  metadata?: Record<string, string>;
+  statementDescriptor?: string | null;
+  unitLabel?: string | null;
+  marketingFeatures?: string[];
+  initialPrice?: {
+    type: PriceType;
+    amount: number;
+    currency: string;
+    billingPeriod?: BillingInterval;
+    intervalCount?: number;
+    description?: string;
+  };
+}
 
 function createEntryId() {
   return Math.random().toString(36).slice(2, 10);
@@ -69,13 +54,30 @@ function sanitizeMetadata(
 ): Record<string, string> | undefined {
   const result: Record<string, string> = {};
 
-  entries.forEach(({ key, value, isReserved }) => {
-    if (isReserved) return;
-    if (!key.trim() || !value.trim()) return;
+  for (const { key, value, isReserved } of entries) {
+    if (isReserved) continue;
+    if (!key.trim() || !value.trim()) continue;
     result[key.trim()] = value.trim();
-  });
+  }
 
   return Object.keys(result).length ? result : undefined;
+}
+
+function validateImageUrl(url: string) {
+  try {
+    const parsed = new URL(url);
+    if (!["http:", "https:"].includes(parsed.protocol)) {
+      return "Only HTTP or HTTPS URLs are supported.";
+    }
+
+    if (!IMAGE_EXTENSION_REGEX.test(parsed.pathname)) {
+      return "Image must end with .jpg, .jpeg, .png, or .webp.";
+    }
+  } catch {
+    return "Enter a valid image URL.";
+  }
+
+  return null;
 }
 
 export function ProductForm({ product, mode }: ProductFormProps) {
@@ -175,23 +177,6 @@ export function ProductForm({ product, mode }: ProductFormProps) {
     setMarketingFeatures((prev) => prev.filter((item) => item !== feature));
   };
 
-  const validateImageUrl = (url: string) => {
-    try {
-      const parsed = new URL(url);
-      if (!["http:", "https:"].includes(parsed.protocol)) {
-        return "Only HTTP or HTTPS URLs are supported.";
-      }
-
-      if (!IMAGE_EXTENSION_REGEX.test(parsed.pathname)) {
-        return "Image must end with .jpg, .jpeg, .png, or .webp.";
-      }
-    } catch {
-      return "Enter a valid image URL.";
-    }
-
-    return null;
-  };
-
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -276,7 +261,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
           JSON.stringify(initialMarketingFeatures);
     const imageChanged = mode === "create" || trimmedImage !== initialImage;
 
-    const payload: any = {
+    const payload: ProductPayload = {
       name,
       description: description || null,
       active,
@@ -326,8 +311,9 @@ export function ProductForm({ product, mode }: ProductFormProps) {
     return payload;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     if (imageUrl.trim() && (imageError || !isImagePreviewReady)) {
       toast.error(imageError || "Please provide a valid product image URL.");
       return;
@@ -340,6 +326,7 @@ export function ProductForm({ product, mode }: ProductFormProps) {
       toast.error(priceError);
       return;
     }
+
     const payload = buildPayload();
 
     try {
@@ -353,442 +340,57 @@ export function ProductForm({ product, mode }: ProductFormProps) {
       router.push(`/adminx/stripe/products/${result.id}`);
       router.refresh();
     } catch (error) {
-      // errors are surfaced via the shared hooks/toasts
+      // Errors are surfaced via the shared hooks/toasts.
       console.error(error);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Basic Information</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Product Name *</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., Premium Plan"
-              required
-              maxLength={250}
-            />
-            <p className="text-xs text-muted-foreground">
-              Appears at checkout.
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe your product..."
-              rows={4}
-            />
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              id="active"
-              checked={active}
-              onChange={(e) => setActive(e.target.checked)}
-              className="h-4 w-4 rounded border-gray-300"
-            />
-            <Label htmlFor="active" className="cursor-pointer">
-              Active (product is available for purchase)
-            </Label>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="image">Product media</Label>
-            <div className="flex items-center gap-2">
-              <Input
-                id="image"
-                type="url"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://cdn.yourdomain.com/product.png"
-                className={cn(
-                  "flex-1",
-                  imageError &&
-                    "border-destructive focus-visible:ring-destructive",
-                )}
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                className="w-28 shrink-0"
-                onClick={() => setImageUrl("")}
-                disabled={!imageUrl.trim()}
-              >
-                Remove
-              </Button>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              JPEG, PNG or WEBP. Appears at checkout.
-            </p>
-            {imageError && (
-              <p className="text-xs text-destructive">{imageError}</p>
-            )}
-            {isImageLoading && (
-              <p className="text-xs text-muted-foreground">Validating image…</p>
-            )}
-            {isImagePreviewReady && !imageError && (
-              <div className="flex items-center gap-4 pt-2">
-                <img
-                  src={imageUrl}
-                  alt={name || "Product media"}
-                  className="h-20 w-20 rounded border object-cover"
-                />
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Advanced settings</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Open the sections you need and add details for checkout, metadata,
-            and pricing.
-          </p>
-        </CardHeader>
-        <CardContent>
-          <Accordion type="multiple" className="space-y-4">
-            <AccordionItem value="descriptor">
-              <AccordionTrigger>Statement descriptor</AccordionTrigger>
-              <AccordionContent>
-                <div className="space-y-2">
-                  <Label htmlFor="statementDescriptor">
-                    Statement descriptor
-                  </Label>
-                  <Input
-                    id="statementDescriptor"
-                    value={statementDescriptor}
-                    onChange={(e) => setStatementDescriptor(e.target.value)}
-                    maxLength={22}
-                    placeholder="YOUR BRAND*PLAN"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Overrides default descriptors. Only used for subscription
-                    payments. Choose something your customers will recognise on
-                    their bank statement.
-                  </p>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="unitLabel">
-              <AccordionTrigger>Unit label</AccordionTrigger>
-              <AccordionContent>
-                <div className="space-y-2">
-                  <Label htmlFor="unitLabel">Unit label</Label>
-                  <Input
-                    id="unitLabel"
-                    value={unitLabel}
-                    onChange={(e) => setUnitLabel(e.target.value)}
-                    maxLength={12}
-                    placeholder="seats"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Adding a unit label describes how you sell your product.
-                    Unit labels appear in receipts, invoices, Checkout, and the
-                    customer portal.
-                  </p>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="metadata">
-              <AccordionTrigger>Metadata</AccordionTrigger>
-              <AccordionContent>
-                <div className="space-y-3">
-                  <p className="text-sm text-muted-foreground">
-                    Store additional, structured information. Add more key/value
-                    pairs as needed.
-                  </p>
-                  <div className="space-y-2">
-                    {metadataEntries.map((entry) => (
-                      <div
-                        key={entry.id}
-                        className="grid grid-cols-[1fr_1fr_auto] gap-2"
-                      >
-                        <Input
-                          value={entry.key}
-                          onChange={(e) =>
-                            handleMetadataChange(
-                              entry.id,
-                              "key",
-                              e.target.value,
-                            )
-                          }
-                          placeholder="Key"
-                          disabled={entry.isReserved}
-                        />
-                        <Input
-                          value={entry.value}
-                          onChange={(e) =>
-                            handleMetadataChange(
-                              entry.id,
-                              "value",
-                              e.target.value,
-                            )
-                          }
-                          placeholder="Value"
-                          disabled={entry.isReserved}
-                        />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleRemoveMetadata(entry.id)}
-                          aria-label="Remove metadata row"
-                          disabled={entry.isReserved}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    size="sm"
-                    onClick={handleAddMetadata}
-                  >
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add metadata
-                  </Button>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="features">
-              <AccordionTrigger>Marketing feature list</AccordionTrigger>
-              <AccordionContent>
-                <div className="space-y-3">
-                  <p className="text-sm text-muted-foreground">
-                    A list of product features that will be visible to
-                    customers. Displayed in pricing tables.
-                  </p>
-                  <div className="flex gap-2">
-                    <Input
-                      value={newFeature}
-                      onChange={(e) => setNewFeature(e.target.value)}
-                      placeholder="e.g., Priority support"
-                      maxLength={80}
-                    />
-                    <Button
-                      type="button"
-                      onClick={handleAddFeature}
-                      disabled={
-                        !newFeature.trim() || marketingFeatures.length >= 8
-                      }
-                    >
-                      Add
-                    </Button>
-                  </div>
-                  <div className="space-y-2">
-                    {marketingFeatures.map((feature) => (
-                      <div
-                        key={feature}
-                        className="flex items-center justify-between rounded border px-3 py-2 text-sm"
-                      >
-                        <span>{feature}</span>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleRemoveFeature(feature)}
-                          aria-label={`Remove ${feature}`}
-                        >
-                          <X className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                    {!marketingFeatures.length && (
-                      <p className="text-xs text-muted-foreground">
-                        No features added yet.
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            {mode === "create" && (
-              <AccordionItem value="pricing">
-                <AccordionTrigger>Pricing (optional)</AccordionTrigger>
-                <AccordionContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-2">
-                      <input
-                        id="enablePrice"
-                        type="checkbox"
-                        checked={enableInitialPrice}
-                        onChange={(e) =>
-                          setEnableInitialPrice(e.target.checked)
-                        }
-                        className="h-4 w-4 rounded border-gray-300"
-                      />
-                      <Label htmlFor="enablePrice">
-                        Add an initial price for this product
-                      </Label>
-                    </div>
-
-                    {enableInitialPrice && (
-                      <div className="space-y-4 rounded border p-4">
-                        <div className="grid gap-4 md:grid-cols-2">
-                          <div className="space-y-2">
-                            <Label htmlFor="priceAmount">Amount *</Label>
-                            <Input
-                              id="priceAmount"
-                              type="number"
-                              step="0.01"
-                              min="0"
-                              value={priceAmount}
-                              onChange={(e) => setPriceAmount(e.target.value)}
-                              placeholder="9.99"
-                              className={cn(
-                                priceError &&
-                                  "border-destructive focus-visible:ring-destructive",
-                              )}
-                            />
-                            {priceError && (
-                              <p className="text-xs text-destructive">
-                                {priceError}
-                              </p>
-                            )}
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="priceCurrency">Currency *</Label>
-                            <select
-                              id="priceCurrency"
-                              value={priceCurrency}
-                              onChange={(e) => setPriceCurrency(e.target.value)}
-                              className="h-10 w-full rounded border px-3"
-                            >
-                              {currencyOptions.map((option) => (
-                                <option key={option.value} value={option.value}>
-                                  {option.label}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-
-                        <div className="space-y-2">
-                          <Label>Billing type *</Label>
-                          <div className="flex gap-4">
-                            <label className="flex items-center gap-2 text-sm">
-                              <input
-                                type="radio"
-                                value="one_time"
-                                checked={priceType === "one_time"}
-                                onChange={() => setPriceType("one_time")}
-                                className="h-4 w-4"
-                              />
-                              One-off
-                            </label>
-                            <label className="flex items-center gap-2 text-sm">
-                              <input
-                                type="radio"
-                                value="recurring"
-                                checked={priceType === "recurring"}
-                                onChange={() => setPriceType("recurring")}
-                                className="h-4 w-4"
-                              />
-                              Recurring
-                            </label>
-                          </div>
-                        </div>
-
-                        {priceType === "recurring" && (
-                          <div className="grid gap-4 md:grid-cols-2">
-                            <div className="space-y-2">
-                              <Label htmlFor="priceInterval">
-                                Billing period *
-                              </Label>
-                              <select
-                                id="priceInterval"
-                                value={priceInterval}
-                                onChange={(e) =>
-                                  setPriceInterval(
-                                    e.target.value as BillingInterval,
-                                  )
-                                }
-                                className="h-10 w-full rounded border px-3"
-                              >
-                                {billingIntervals.map((interval) => (
-                                  <option
-                                    key={interval.value}
-                                    value={interval.value}
-                                  >
-                                    {interval.label}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="priceIntervalCount">
-                                Interval count *
-                              </Label>
-                              <Input
-                                id="priceIntervalCount"
-                                type="number"
-                                min="1"
-                                value={priceIntervalCount}
-                                onChange={(e) =>
-                                  setPriceIntervalCount(e.target.value)
-                                }
-                              />
-                            </div>
-                          </div>
-                        )}
-
-                        <div className="space-y-2">
-                          <Label htmlFor="priceDescription">
-                            Price description
-                          </Label>
-                          <Input
-                            id="priceDescription"
-                            value={priceDescription}
-                            onChange={(e) =>
-                              setPriceDescription(e.target.value)
-                            }
-                            placeholder="e.g., Standard monthly price"
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            )}
-          </Accordion>
-        </CardContent>
-      </Card>
-
-      <div className="flex justify-end gap-2">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.back()}
-          disabled={isSubmitting}
-        >
-          Cancel
-        </Button>
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {mode === "create" ? "Create Product" : "Update Product"}
-        </Button>
-      </div>
-    </form>
+    <ProductFormView
+      mode={mode}
+      isSubmitting={isSubmitting}
+      onSubmit={handleSubmit}
+      onCancel={() => router.back()}
+      name={name}
+      onNameChange={setName}
+      description={description}
+      onDescriptionChange={setDescription}
+      active={active}
+      onActiveChange={setActive}
+      imageUrl={imageUrl}
+      onImageUrlChange={setImageUrl}
+      onClearImage={() => setImageUrl("")}
+      imageError={imageError}
+      isImageLoading={isImageLoading}
+      isImagePreviewReady={isImagePreviewReady}
+      statementDescriptor={statementDescriptor}
+      onStatementDescriptorChange={setStatementDescriptor}
+      unitLabel={unitLabel}
+      onUnitLabelChange={setUnitLabel}
+      metadataEntries={metadataEntries}
+      onAddMetadata={handleAddMetadata}
+      onMetadataChange={handleMetadataChange}
+      onRemoveMetadata={handleRemoveMetadata}
+      marketingFeatures={marketingFeatures}
+      newFeature={newFeature}
+      onNewFeatureChange={setNewFeature}
+      onAddFeature={handleAddFeature}
+      onRemoveFeature={handleRemoveFeature}
+      enableInitialPrice={enableInitialPrice}
+      onEnableInitialPriceChange={setEnableInitialPrice}
+      priceType={priceType}
+      onPriceTypeChange={setPriceType}
+      priceAmount={priceAmount}
+      onPriceAmountChange={setPriceAmount}
+      priceCurrency={priceCurrency}
+      onPriceCurrencyChange={setPriceCurrency}
+      priceInterval={priceInterval}
+      onPriceIntervalChange={setPriceInterval}
+      priceIntervalCount={priceIntervalCount}
+      onPriceIntervalCountChange={setPriceIntervalCount}
+      priceDescription={priceDescription}
+      onPriceDescriptionChange={setPriceDescription}
+      priceError={priceError}
+    />
   );
 }

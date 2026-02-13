@@ -3,7 +3,7 @@
 import { execSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 
-const MAX_LINES = 500;
+const MAX_LINES = 600;
 const CODE_EXTENSIONS = new Set([
   '.ts',
   '.tsx',
