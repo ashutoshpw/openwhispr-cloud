@@ -3,6 +3,8 @@ import { db } from "@repo/database";
 import { gt, sql } from "@repo/database";
 import { organization, payments, session, user } from "@repo/database/schema";
 
+export const dynamic = "force-dynamic";
+
 async function getStats() {
   try {
     const [totalUsers] = await db()

@@ -2,6 +2,8 @@ import { SessionTable } from "@/components/admin/SessionTable";
 import { db } from "@repo/database";
 import { session } from "@repo/database/schema";
 
+export const dynamic = "force-dynamic";
+
 async function getSessions() {
   try {
     const sessions = await db()

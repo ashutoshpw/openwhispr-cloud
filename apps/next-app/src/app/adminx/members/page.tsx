@@ -6,6 +6,8 @@ import { member, organization, user } from "@repo/database/schema";
 
 export const dynamic = "force-dynamic";
 
+export const dynamic = "force-dynamic";
+
 async function getMembers() {
   const members = await db()
     .select({

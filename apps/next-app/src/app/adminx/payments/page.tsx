@@ -2,6 +2,8 @@ import { PaymentTable } from "@/components/admin/PaymentTable";
 import { db } from "@repo/database";
 import { payments } from "@repo/database/schema";
 
+export const dynamic = "force-dynamic";
+
 async function getPayments() {
   try {
     const paymentRecords = await db()

@@ -2,6 +2,8 @@ import { UserTable } from "@/components/admin/UserTable";
 import { db } from "@repo/database";
 import { user } from "@repo/database/schema";
 
+export const dynamic = "force-dynamic";
+
 async function getUsers() {
   try {
     const users = await db().select().from(user).orderBy(user.createdAt);
