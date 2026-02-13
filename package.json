@@ -28,6 +28,7 @@
     "posthog:test-event": "bun run scripts/test-posthog-event.ts",
     "posthog:test-workflow": "bun run scripts/test-posthog-workflow.ts",
     "check:max-lines": "bun run scripts/check-max-lines.ts",
+    "check:staged-types": "bun run scripts/check-staged-types.ts",
     "prepare": "simple-git-hooks"
   },
   "devDependencies": {
@@ -41,6 +42,6 @@
     "typescript": "latest"
   },
   "simple-git-hooks": {
-    "pre-commit": "bun run check:max-lines"
+    "pre-commit": "bun run check:max-lines && bun run check:staged-types"
   }
 }
