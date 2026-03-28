@@ -84,7 +84,7 @@ export async function getUsageSummary(orgId: string): Promise<UsageSummary> {
 /**
  * Calculate percentage of usage
  */
-function calculatePercentage(
+export function calculatePercentage(
   current: number,
   limit: number | "unlimited" | null,
 ): number {

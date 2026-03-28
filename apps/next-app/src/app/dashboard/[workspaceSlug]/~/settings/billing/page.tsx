@@ -10,12 +10,12 @@ import {
   getUsageSummary,
   isFreeTier,
   isOrganizationInTrial,
-} from "@/lib/billing";
+} from "@repo/billing";
 import type {
   BillingSubscriptionResponse,
   BillingUsageResponse,
   MemberRole,
-} from "@/lib/billing/types";
+} from "@repo/billing/types";
 import { getPricingTiers } from "@/lib/stripe/queries";
 import { auth } from "@repo/auth/server";
 import { db } from "@repo/database";

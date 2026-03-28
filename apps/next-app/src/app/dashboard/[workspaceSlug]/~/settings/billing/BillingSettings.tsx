@@ -17,7 +17,7 @@ import { useTrackEvent } from "@/lib/analytics/hooks";
 import type {
   BillingSubscriptionResponse,
   BillingUsageResponse,
-} from "@/lib/billing/types";
+} from "@repo/billing/types";
 import type { PricingTier } from "@/lib/stripe/queries";
 import {
   AlertCircle,

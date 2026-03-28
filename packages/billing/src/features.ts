@@ -163,7 +163,7 @@ export async function checkFeatureLimitAccess(
 /**
  * Parse feature value from string to appropriate type
  */
-function parseFeatureValue(value: string): string | number | boolean {
+export function parseFeatureValue(value: string): string | number | boolean {
   // Boolean values
   if (value === "true") return true;
   if (value === "false") return false;

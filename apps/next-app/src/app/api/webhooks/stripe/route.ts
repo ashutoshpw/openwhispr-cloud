@@ -9,7 +9,7 @@ import {
   ORG_STATUS,
   logBillingEvent,
   updateOrganizationStatus,
-} from "@/lib/billing";
+} from "@repo/billing";
 import {
   activatePendingOrganization,
   cancelPendingOrganization,

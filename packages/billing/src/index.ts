@@ -46,6 +46,7 @@ export {
   removeTierFeature,
   getAppSetting,
   setAppSetting,
+  parseFeatureValue,
 } from "./features";
 
 // Re-export usage utilities
@@ -58,6 +59,7 @@ export {
   canDowngradeToPlan,
   canDowngradeToFree,
   getRemainingCapacity,
+  calculatePercentage,
 } from "./usage";
 
 // Re-export audit utilities
@@ -74,7 +76,6 @@ export {
   checkFeatureAccess,
   checkFeatureLimit,
   checkBillingPermission,
-  createErrorResponse,
   combineChecks,
 } from "./middleware";
 export type { BillingMiddlewareResult } from "./middleware";

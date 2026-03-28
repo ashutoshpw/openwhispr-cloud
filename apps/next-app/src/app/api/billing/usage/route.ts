@@ -1,5 +1,5 @@
-import { canDowngradeToFree, getUsageSummary } from "@/lib/billing";
-import type { BillingUsageResponse } from "@/lib/billing";
+import { canDowngradeToFree, getUsageSummary } from "@repo/billing";
+import type { BillingUsageResponse } from "@repo/billing";
 import { auth } from "@repo/auth/server";
 import { db } from "@repo/database";
 import { and, eq } from "@repo/database";

@@ -36,6 +36,9 @@
     "format:check": {},
     "db:generate": {},
     "db:migrate": {},
-    "db:push": {}
+    "db:push": {},
+    "test": {
+      "dependsOn": ["^build"]
+    }
   }
 }

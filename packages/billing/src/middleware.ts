@@ -1,7 +1,6 @@
 import { db } from "@repo/database";
 import { and, eq } from "@repo/database";
 import { member, organization } from "@repo/database/schema";
-import { NextResponse } from "next/server";
 import { BILLING_MANAGEMENT_ROLES, ORG_STATUS } from "./constants";
 import { checkFeatureLimitAccess, hasFeature } from "./features";
 import { isReadOnly as checkIsReadOnly } from "./organization";
@@ -189,25 +188,6 @@ export async function checkBillingPermission(
   }
 
   return { allowed: true };
-}
-
-/**
- * Create an error response from a middleware result
- */
-export function createErrorResponse(
-  result: BillingMiddlewareResult,
-): NextResponse {
-  if (result.allowed || !result.error) {
-    throw new Error("Cannot create error response from allowed result");
-  }
-
-  return NextResponse.json(
-    {
-      error: result.error.message,
-      code: result.error.code,
-    },
-    { status: result.error.status },
-  );
 }
 
 /**

@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FEATURE_DEFINITIONS } from "@/lib/billing/constants";
+import { FEATURE_DEFINITIONS } from "@repo/billing/constants";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";

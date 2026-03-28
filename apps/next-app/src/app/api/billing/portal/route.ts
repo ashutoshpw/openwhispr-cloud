@@ -1,8 +1,21 @@
-import { checkBillingPermission, createErrorResponse } from "@/lib/billing";
+import {
+  checkBillingPermission,
+  type BillingMiddlewareResult,
+} from "@repo/billing";
 import { createOrganizationPortalSession } from "@/lib/stripe/portal";
 import { auth } from "@repo/auth/server";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
+
+function createErrorResponse(result: BillingMiddlewareResult): NextResponse {
+  const error = result.error;
+  if (!error)
+    throw new Error("Cannot create error response from allowed result");
+  return NextResponse.json(
+    { error: error.message, code: error.code },
+    { status: error.status },
+  );
+}
 
 /**
  * POST /api/billing/portal

@@ -6,8 +6,8 @@ import {
   isFreeTier,
   isOrganizationInTrial,
   isReadOnly,
-} from "@/lib/billing";
-import type { BillingSubscriptionResponse } from "@/lib/billing";
+} from "@repo/billing";
+import type { BillingSubscriptionResponse } from "@repo/billing";
 import { auth } from "@repo/auth/server";
 import { db } from "@repo/database";
 import { and, eq } from "@repo/database";

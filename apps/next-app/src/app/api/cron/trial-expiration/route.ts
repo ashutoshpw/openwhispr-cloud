@@ -4,7 +4,7 @@ import {
   STRIPE_SCHEMA,
   logBillingEvent,
   updateOrganizationStatus,
-} from "@/lib/billing";
+} from "@repo/billing";
 import { db, sql } from "@repo/database";
 import { and, eq } from "@repo/database";
 import { organization } from "@repo/database/schema";

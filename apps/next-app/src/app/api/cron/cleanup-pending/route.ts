@@ -1,4 +1,4 @@
-import { ORG_STATUS, PENDING_WORKSPACE_TTL_HOURS } from "@/lib/billing";
+import { ORG_STATUS, PENDING_WORKSPACE_TTL_HOURS } from "@repo/billing";
 import { db, sql } from "@repo/database";
 import { and, eq, lt } from "@repo/database";
 import { member, organization, project } from "@repo/database/schema";
