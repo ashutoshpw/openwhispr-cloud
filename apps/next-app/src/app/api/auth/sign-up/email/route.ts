@@ -27,7 +27,6 @@ export async function POST(request: Request) {
     // Track user creation in PostHog
     const userId = (result?.data as { user?: { id?: string } })?.user?.id;
     if (userId) {
-      // Identify user with their properties
       await identifyServerUser(userId, {
         email,
         name,
@@ -35,7 +34,6 @@ export async function POST(request: Request) {
         signup_date: new Date().toISOString(),
       });
 
-      // Track the user.created event
       await trackServerEvent(ANALYTICS_EVENTS.USER_CREATED, userId, {
         email,
         name,
@@ -43,40 +41,7 @@ export async function POST(request: Request) {
       });
     }
 
-    const response = NextResponse.json({ data: result?.data });
-
-    if (result?.data && (result.data as any)._cookies) {
-      const cookies = (result.data as any)._cookies as string[];
-      cookies.forEach((cookie) => {
-        const [nameValue, ...attributes] = cookie.split(";");
-        const [name, value] = nameValue.split("=").map((s) => s.trim());
-
-        if (name && value) {
-          const options: any = {};
-          attributes.forEach((attr) => {
-            const [key, val] = attr.split("=").map((s) => s.trim());
-            const lowerKey = key.toLowerCase();
-            if (lowerKey === "path") {
-              options.path = val || "/";
-            } else if (lowerKey === "max-age") {
-              options.maxAge = Number.parseInt(val, 10);
-            } else if (lowerKey === "httponly") {
-              options.httpOnly = true;
-            } else if (lowerKey === "secure") {
-              options.secure = true;
-            } else if (lowerKey === "samesite") {
-              options.sameSite = (val || "lax").toLowerCase();
-            }
-          });
-
-          response.cookies.set(name, value, options);
-        }
-      });
-
-      delete (result.data as any)._cookies;
-    }
-
-    return response;
+    return NextResponse.json({ data: result?.data });
   } catch (error) {
     return NextResponse.json(
       {

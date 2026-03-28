@@ -11,4 +11,4 @@ export type {
   UnifiedSession,
   RequestPasswordResetParams,
   ResetPasswordParams,
-} from "./auth/types";
+} from "@repo/auth/types";

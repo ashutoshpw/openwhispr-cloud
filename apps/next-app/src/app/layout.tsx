@@ -1,7 +1,6 @@
 import { baseURL } from "@/../baseUrl";
 import Provider from "@/app/provider";
 import { NextChatSDKBootstrap } from "@/components/NextChatSDKBootstrap";
-import { ClerkCaptchaContainer } from "@/components/auth/ClerkCaptchaContainer";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { PostHogProvider } from "@/lib/analytics/posthog-provider";
@@ -26,7 +25,6 @@ export default function RootLayout({
         <NextChatSDKBootstrap baseUrl={baseURL} />
       </head>
       <body className={GeistSans.className} suppressHydrationWarning>
-        <ClerkCaptchaContainer />
         <PostHogProvider>
           <Provider>
             <ThemeProvider

@@ -1,9 +1,16 @@
-import { getProviderName } from "@repo/auth/config";
+import { getBetterAuthServer } from "@repo/auth/server";
+import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {
-    const providerName = getProviderName();
+    const server = getBetterAuthServer();
+    const session = await server.getSession(await headers());
+
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const { organizationId } = body;
 
@@ -14,42 +21,13 @@ export async function POST(request: Request) {
       );
     }
 
-    if (providerName === "better-auth") {
-      const { setActiveBetterAuthOrganization } = await import(
-        "@/lib/auth/providers/better-auth/organization-actions"
-      );
-      const result = await setActiveBetterAuthOrganization({ organizationId });
+    const instance = server.getAuthInstance();
+    await instance.api.setActiveOrganization({
+      body: { organizationId },
+      headers: await headers(),
+    });
 
-      if (result.error) {
-        return NextResponse.json(
-          { error: result.error.message },
-          { status: 400 },
-        );
-      }
-
-      return NextResponse.json({ success: true });
-    } else if (providerName === "next-auth") {
-      const { setActiveNextAuthOrganization } = await import(
-        "@/lib/auth/providers/next-auth/organization-actions"
-      );
-      const result = await setActiveNextAuthOrganization({ organizationId });
-
-      if (result.error) {
-        return NextResponse.json(
-          { error: result.error.message },
-          { status: 400 },
-        );
-      }
-
-      return NextResponse.json({ success: true });
-    }
-
-    return NextResponse.json(
-      {
-        error: `Organization feature not supported by ${providerName}`,
-      },
-      { status: 501 },
-    );
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error setting active organization:", error);
     return NextResponse.json(

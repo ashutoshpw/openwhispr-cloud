@@ -184,6 +184,58 @@ class BetterAuthServer {
     return this.authInstance;
   }
 
+  async signInEmail(params: { email: string; password: string }) {
+    try {
+      const ctx = await this.authInstance.api.signInEmail({
+        body: params,
+      });
+      return { data: ctx, error: null };
+    } catch (error) {
+      return {
+        data: null,
+        error: {
+          message: error instanceof Error ? error.message : "Failed to sign in",
+          code: "SIGN_IN_FAILED",
+        },
+      };
+    }
+  }
+
+  async signUpEmail(params: {
+    email: string;
+    password: string;
+    name: string;
+  }) {
+    try {
+      const ctx = await this.authInstance.api.signUpEmail({
+        body: params,
+      });
+      return { data: ctx, error: null };
+    } catch (error) {
+      return {
+        data: null,
+        error: {
+          message: error instanceof Error ? error.message : "Failed to sign up",
+          code: "SIGN_UP_FAILED",
+        },
+      };
+    }
+  }
+
+  async signOut() {
+    try {
+      return { error: null };
+    } catch (error) {
+      return {
+        error: {
+          message:
+            error instanceof Error ? error.message : "Failed to sign out",
+          code: "SIGN_OUT_FAILED",
+        },
+      };
+    }
+  }
+
   async assignSiteAdminRoleIfEligible(params: {
     email: string;
     userId?: string;
@@ -236,3 +288,31 @@ export async function getSession(
 
 // Export mapper for use in other modules
 export { mapBetterAuthSession };
+
+// Export baseServer singleton for API routes
+export const baseServer = {
+  getApiHandler: async () => {
+    const server = getBetterAuthServer();
+    return server.getApiHandler();
+  },
+  signInEmail: async (params: { email: string; password: string }) => {
+    const server = getBetterAuthServer();
+    return server.signInEmail(params);
+  },
+  signUpEmail: async (params: {
+    email: string;
+    password: string;
+    name: string;
+  }) => {
+    const server = getBetterAuthServer();
+    return server.signUpEmail(params);
+  },
+  signOut: async () => {
+    const server = getBetterAuthServer();
+    return server.signOut();
+  },
+  getSession: async (headers: Headers) => {
+    const server = getBetterAuthServer();
+    return server.getSession(headers);
+  },
+};

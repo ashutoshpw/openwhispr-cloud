@@ -53,7 +53,7 @@ export default function ContactUs() {
 
   const onSubmit = async (data: z.infer<typeof ContactUsForm>) => {
     try {
-      const response = await fetch(`/api/store-email`, {
+      const response = await fetch("/api/store-email", {
         method: "POST",
         body: JSON.stringify({
           firstName: data?.firstName,

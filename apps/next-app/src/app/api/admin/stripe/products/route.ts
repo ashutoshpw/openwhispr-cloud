@@ -122,10 +122,7 @@ export async function POST(req: NextRequest) {
       name: validatedData.name,
       description: validatedData.description || undefined,
       active: validatedData.active ?? true,
-      images:
-        validatedData.images && validatedData.images.length
-          ? validatedData.images
-          : undefined,
+      images: validatedData.images?.length ? validatedData.images : undefined,
       statement_descriptor: validatedData.statementDescriptor || undefined,
       unit_label: validatedData.unitLabel || undefined,
       features: validatedData.marketingFeatures

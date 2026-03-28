@@ -3,7 +3,7 @@
 import { WorkspaceSwitcher } from "@/components/dashboard/workspace-switcher";
 import { Separator } from "@/components/ui/separator";
 import clsx from "clsx";
-import { Folder, HomeIcon, Settings, CreditCard } from "lucide-react";
+import { CreditCard, Folder, HomeIcon, Settings } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 

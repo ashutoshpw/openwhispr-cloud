@@ -1,14 +1,14 @@
-import { redirect, notFound } from "next/navigation";
-import { auth } from "@repo/auth/server";
-import { headers } from "next/headers";
-import { db } from "@repo/database";
-import { organization, member } from "@repo/database/schema";
-import { eq, and } from "@repo/database";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { auth } from "@repo/auth/server";
+import { db } from "@repo/database";
+import { and, eq } from "@repo/database";
+import { member, organization } from "@repo/database/schema";
 import { CreditCard } from "lucide-react";
+import { headers } from "next/headers";
+import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
 
 interface PageProps {
   params: Promise<{ workspaceSlug: string }>;

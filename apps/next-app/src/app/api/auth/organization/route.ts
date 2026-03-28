@@ -1,19 +1,19 @@
-import { getProviderName } from "@repo/auth/config";
+import { getBetterAuthServer } from "@repo/auth/server";
+import { auth } from "@repo/auth/server";
+import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
 // Cookie name must match middleware
 const HAS_WORKSPACE_COOKIE = "has_workspace";
 
 /**
- * Create a JSON response that clears the workspace cookie.
- * This forces the middleware to re-check workspace status on next request.
+ * Create a JSON response that sets the workspace cookie.
  */
 function createSuccessResponse(data: unknown): NextResponse {
   const response = NextResponse.json(data);
-  // Set cookie to "1" (has workspace) since we just created one
   response.cookies.set(HAS_WORKSPACE_COOKIE, "1", {
     path: "/",
-    maxAge: 5 * 60, // 5 minutes
+    maxAge: 5 * 60,
     sameSite: "lax",
   });
   return response;
@@ -21,58 +21,19 @@ function createSuccessResponse(data: unknown): NextResponse {
 
 export async function GET() {
   try {
-    const providerName = getProviderName();
+    const server = getBetterAuthServer();
+    const session = await server.getSession(await headers());
 
-    if (providerName === "better-auth") {
-      const { listBetterAuthOrganizations } = await import(
-        "@/lib/auth/providers/better-auth/organization-actions"
-      );
-      const result = await listBetterAuthOrganizations();
-
-      if (result.error) {
-        return NextResponse.json(
-          { error: result.error.message },
-          { status: 400 },
-        );
-      }
-
-      return NextResponse.json(result.data || []);
-    } else if (providerName === "next-auth") {
-      const { listNextAuthOrganizations } = await import(
-        "@/lib/auth/providers/next-auth/organization-actions"
-      );
-      const result = await listNextAuthOrganizations();
-
-      if (result.error) {
-        return NextResponse.json(
-          { error: result.error.message },
-          { status: 400 },
-        );
-      }
-
-      return NextResponse.json(result.data || []);
-    } else if (providerName === "clerk-dev") {
-      const { listClerkOrganizations } = await import(
-        "@/lib/auth/providers/clerk-dev/organization-actions"
-      );
-      const result = await listClerkOrganizations();
-
-      if (result.error) {
-        return NextResponse.json(
-          { error: result.error.message },
-          { status: 400 },
-        );
-      }
-
-      return NextResponse.json(result.data || []);
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    return NextResponse.json(
-      {
-        error: `Organization feature not supported by ${providerName}`,
-      },
-      { status: 501 },
-    );
+    const instance = server.getAuthInstance();
+    const orgs = await instance.api.listOrganizations({
+      headers: await headers(),
+    });
+
+    return NextResponse.json(orgs || []);
   } catch (error) {
     console.error("Error listing organizations:", error);
     return NextResponse.json(
@@ -84,7 +45,13 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const providerName = getProviderName();
+    const server = getBetterAuthServer();
+    const session = await server.getSession(await headers());
+
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await request.json();
     const { name, slug } = body;
 
@@ -95,56 +62,13 @@ export async function POST(request: Request) {
       );
     }
 
-    if (providerName === "better-auth") {
-      const { createBetterAuthOrganization } = await import(
-        "@/lib/auth/providers/better-auth/organization-actions"
-      );
-      const result = await createBetterAuthOrganization({ name, slug });
+    const instance = server.getAuthInstance();
+    const result = await instance.api.createOrganization({
+      body: { name, slug },
+      headers: await headers(),
+    });
 
-      if (result.error) {
-        return NextResponse.json(
-          { error: result.error.message },
-          { status: 400 },
-        );
-      }
-
-      return createSuccessResponse(result.data);
-    } else if (providerName === "next-auth") {
-      const { createNextAuthOrganization } = await import(
-        "@/lib/auth/providers/next-auth/organization-actions"
-      );
-      const result = await createNextAuthOrganization({ name, slug });
-
-      if (result.error) {
-        return NextResponse.json(
-          { error: result.error.message },
-          { status: 400 },
-        );
-      }
-
-      return createSuccessResponse(result.data);
-    } else if (providerName === "clerk-dev") {
-      const { createClerkOrganization } = await import(
-        "@/lib/auth/providers/clerk-dev/organization-actions"
-      );
-      const result = await createClerkOrganization({ name, slug });
-
-      if (result.error) {
-        return NextResponse.json(
-          { error: result.error.message },
-          { status: 400 },
-        );
-      }
-
-      return createSuccessResponse(result.data);
-    }
-
-    return NextResponse.json(
-      {
-        error: `Organization feature not supported by ${providerName}`,
-      },
-      { status: 501 },
-    );
+    return createSuccessResponse(result);
   } catch (error) {
     console.error("Error creating organization:", error);
     return NextResponse.json(

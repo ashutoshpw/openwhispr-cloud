@@ -1,27 +1,11 @@
 import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
 import { trackServerEvent } from "@/lib/analytics/server";
-import { getProviderName } from "@repo/auth/config";
 import { baseServer } from "@repo/auth/server";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {
-    const providerName = getProviderName();
     const body = await request.text();
-
-    if (providerName === "next-auth") {
-      return NextResponse.json(
-        {
-          error: {
-            message:
-              "NextAuth sign-in must be handled client-side. Use signIn.email() from @/lib/auth-client instead. This API route is not used for NextAuth provider.",
-            code: "CLIENT_SIDE_REQUIRED",
-          },
-        },
-        { status: 405 },
-      );
-    }
-
     const bodyData = JSON.parse(body);
     const { email, password } = bodyData;
 
@@ -50,40 +34,7 @@ export async function POST(request: Request) {
       });
     }
 
-    const response = NextResponse.json({ data: result?.data });
-
-    if (result?.data && (result.data as any)._cookies) {
-      const cookies = (result.data as any)._cookies as string[];
-      cookies.forEach((cookie) => {
-        const [nameValue, ...attributes] = cookie.split(";");
-        const [name, value] = nameValue.split("=").map((s) => s.trim());
-
-        if (name && value) {
-          const options: any = {};
-          attributes.forEach((attr) => {
-            const [key, val] = attr.split("=").map((s) => s.trim());
-            const lowerKey = key.toLowerCase();
-            if (lowerKey === "path") {
-              options.path = val || "/";
-            } else if (lowerKey === "max-age") {
-              options.maxAge = Number.parseInt(val, 10);
-            } else if (lowerKey === "httponly") {
-              options.httpOnly = true;
-            } else if (lowerKey === "secure") {
-              options.secure = true;
-            } else if (lowerKey === "samesite") {
-              options.sameSite = (val || "lax").toLowerCase();
-            }
-          });
-
-          response.cookies.set(name, value, options);
-        }
-      });
-
-      delete (result.data as any)._cookies;
-    }
-
-    return response;
+    return NextResponse.json({ data: result?.data });
   } catch (error) {
     return NextResponse.json(
       {

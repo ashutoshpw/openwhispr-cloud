@@ -1,65 +1,13 @@
-import { getProviderName } from "@repo/auth/config";
 import { baseServer } from "@repo/auth/server";
-import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {
-    const providerName = getProviderName();
-
-    // For better-auth, delegate to its handler which properly handles sign-out
-    // Better-auth's handler knows how to clear cookies and invalidate sessions
-    if (providerName === "better-auth") {
-      const handler = await baseServer.getApiHandler();
-      return handler.POST(request);
-    }
-
-    // For Clerk, use server-side signOut which revokes session and syncs DB
-    if (providerName === "clerk-dev") {
-      const result = await baseServer.signOut();
-
-      if (result?.error) {
-        return NextResponse.json(
-          { error: { message: result.error.message, code: result.error.code } },
-          { status: 400 },
-        );
-      }
-
-      return NextResponse.json({});
-    }
-
-    // For Next-Auth, delete session from DB before Next-Auth clears JWT cookie
-    if (providerName === "next-auth") {
-      const cookieHeader = request.headers.get("cookie") || "";
-      const { deleteNextAuthSessionFromDb } = await import(
-        "@/lib/auth/providers/next-auth/db-sync"
-      );
-      await deleteNextAuthSessionFromDb(cookieHeader);
-
-      const result = await baseServer.signOut();
-
-      if (result?.error) {
-        return NextResponse.json(
-          { error: { message: result.error.message, code: result.error.code } },
-          { status: 400 },
-        );
-      }
-
-      // Next-Auth's client-side signOut will handle cookie clearing
-      return NextResponse.json({});
-    }
-
-    // For other providers, use the unified server signOut method
-    const result = await baseServer.signOut();
-
-    if (result?.error) {
-      return NextResponse.json(
-        { error: { message: result.error.message, code: result.error.code } },
-        { status: 400 },
-      );
-    }
-
-    return NextResponse.json({});
+    // For Better Auth, delegate to its handler which properly handles sign-out
+    // Better Auth's handler knows how to clear cookies and invalidate sessions
+    const handler = await baseServer.getApiHandler();
+    return handler.POST(request);
   } catch (error) {
+    const { NextResponse } = await import("next/server");
     return NextResponse.json(
       {
         error: {

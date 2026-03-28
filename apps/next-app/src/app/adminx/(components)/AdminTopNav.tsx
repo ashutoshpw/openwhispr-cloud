@@ -73,7 +73,7 @@ export default function AdminTopNav({ children }: { children: ReactNode }) {
                     <Button
                       variant={
                         pathname === item.href ||
-                        pathname.startsWith(item.href + "/")
+                        pathname.startsWith(`${item.href}/`)
                           ? "default"
                           : "outline"
                       }
@@ -99,7 +99,7 @@ export default function AdminTopNav({ children }: { children: ReactNode }) {
                     <Button
                       variant={
                         pathname === item.href ||
-                        pathname.startsWith(item.href + "/")
+                        pathname.startsWith(`${item.href}/`)
                           ? "default"
                           : "outline"
                       }

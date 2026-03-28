@@ -14,66 +14,8 @@ import { Label } from "@/components/ui/label";
 import { signIn, signUp } from "@repo/auth/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
-
-// Inner component that uses Clerk hooks - must call hooks unconditionally
-function ClerkAuthSetupInner() {
-  // Always call hooks unconditionally (React rules)
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const clerkModule = require("@clerk/nextjs");
-  const { useClerk } = clerkModule;
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const clerkClientModule = require("@/lib/auth/providers/clerk-dev/client");
-  const { getClientInstance, setGlobalClerkClient } = clerkClientModule;
-
-  const clerk = useClerk();
-  const client = getClientInstance();
-
-  useEffect(() => {
-    console.log(
-      "[SignUpPage] ClerkAuthSetupInner useEffect - clerk:",
-      !!clerk,
-      "client:",
-      !!client,
-    );
-    if (clerk && client) {
-      console.log(
-        "[SignUpPage] Setting Clerk client on instance and global ref",
-      );
-      client.setClerkClient(clerk);
-      setGlobalClerkClient(clerk);
-      console.log("[SignUpPage] Clerk client initialized successfully");
-    } else {
-      console.warn(
-        "[SignUpPage] Clerk client or client instance not available",
-        { clerk: !!clerk, client: !!client },
-      );
-    }
-  }, [clerk, client]);
-
-  return null;
-}
-
-// Wrapper that conditionally renders based on provider
-function ClerkAuthSetup() {
-  const provider = process.env.NEXT_PUBLIC_AUTH_PROVIDER || "better-auth";
-  console.log("[SignUpPage] ClerkAuthSetup - provider:", provider);
-
-  // Only render if Clerk is the provider
-  if (provider !== "clerk-dev") {
-    console.log("[SignUpPage] ClerkAuthSetup - not Clerk provider, skipping");
-    return null;
-  }
-
-  try {
-    console.log("[SignUpPage] ClerkAuthSetup - rendering ClerkAuthSetupInner");
-    return <ClerkAuthSetupInner />;
-  } catch (error) {
-    console.error("[SignUpPage] ClerkAuthSetup - error:", error);
-    return null;
-  }
-}
 
 export default function SignUpPage() {
   const [name, setName] = useState("");
@@ -100,72 +42,33 @@ export default function SignUpPage() {
     }
   };
 
-  useEffect(() => {
-    const provider = process.env.NEXT_PUBLIC_AUTH_PROVIDER || "better-auth";
-    console.log("[SignUpPage] Component mounted - AUTH_PROVIDER:", provider);
-  }, []);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    const provider = process.env.NEXT_PUBLIC_AUTH_PROVIDER || "better-auth";
-    console.log("[SignUpPage] Form submitted - AUTH_PROVIDER:", provider);
-    console.log("[SignUpPage] Form data:", {
-      email,
-      name: name.substring(0, 3) + "***",
-    });
-
     try {
-      console.log("[SignUpPage] Calling signUp.email()...");
       const { data, error } = await signUp.email({
         email,
         password,
         name,
       });
 
-      console.log("[SignUpPage] signUp.email() returned:", {
-        hasData: !!data,
-        hasError: !!error,
-        errorMessage: error?.message,
-      });
-
       if (error) {
-        console.error("[SignUpPage] Sign-up error:", error);
-
-        // Handle specific error cases with better messages
-        let errorMessage =
+        const errorMessage =
           error.message || "Failed to create account. Please try again.";
-
-        if (error.code === "MISSING_REQUIREMENTS") {
-          const details = (error as any).details;
-          if (details?.isCaptchaIssue) {
-            errorMessage =
-              "Security verification is processing. Please wait a moment and try again.";
-          } else if (details?.missingFields?.length > 0) {
-            errorMessage =
-              error.message ||
-              `Missing required information. Please check all fields and try again.`;
-          } else if (details?.unverifiedFields?.length > 0) {
-            errorMessage =
-              error.message ||
-              `Verification required. Please complete the verification process.`;
-          }
-        }
-
         toast.error(errorMessage);
         return;
       }
 
-      console.log("[SignUpPage] Sign-up successful!");
       toast.success("Account created successfully!");
       router.push("/onboarding");
       router.refresh();
-    } catch (error: any) {
-      console.error("[SignUpPage] Sign-up exception:", error);
-      toast.error(
-        error?.message || "Failed to create account. Please try again.",
-      );
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Failed to create account. Please try again.";
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -173,7 +76,6 @@ export default function SignUpPage() {
 
   return (
     <PageWrapper>
-      <ClerkAuthSetup />
       <div className="flex justify-center my-[5rem] min-w-screen">
         <Card className="w-[400px]">
           <CardHeader>
@@ -220,13 +122,6 @@ export default function SignUpPage() {
                   Password must be at least 8 characters
                 </p>
               </div>
-              {process.env.NEXT_PUBLIC_AUTH_PROVIDER === "clerk-dev" && (
-                <div
-                  id="cl-captcha"
-                  style={{ display: "none" }}
-                  aria-hidden="true"
-                />
-              )}
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Creating account..." : "Create Account"}
               </Button>

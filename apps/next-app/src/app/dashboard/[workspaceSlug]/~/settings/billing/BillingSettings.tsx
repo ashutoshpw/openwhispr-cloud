@@ -1,7 +1,5 @@
 "use client";
 
-import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
-import { useTrackEvent } from "@/lib/analytics/hooks";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,6 +12,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
+import { useTrackEvent } from "@/lib/analytics/hooks";
 import type {
   BillingSubscriptionResponse,
   BillingUsageResponse,

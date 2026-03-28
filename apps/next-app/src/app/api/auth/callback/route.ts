@@ -1,57 +1,14 @@
-import { getAuthConfig } from "@repo/auth/config";
-import { handleAuth } from "@workos-inc/authkit-nextjs";
-import type { NextRequest } from "next/server";
+import { getBetterAuthServer } from "@repo/auth/server";
+import { NextResponse } from "next/server";
 
-function getBaseURL(request: NextRequest): string {
-  const config = getAuthConfig("authkit");
-
-  if (config.baseURL) {
-    return config.baseURL;
-  }
-
-  if (process.env.NEXT_PUBLIC_APP_URL) {
-    return process.env.NEXT_PUBLIC_APP_URL;
-  }
-
-  if (process.env.NEXT_PUBLIC_VERCEL_URL) {
-    return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
-  }
-
-  const url = new URL(request.url);
-  return `${url.protocol}//${url.host}`;
-}
-
-export async function GET(request: NextRequest) {
-  const baseURL = getBaseURL(request);
-
-  const handler = handleAuth({
-    returnPathname: "/dashboard",
-    baseURL,
-    onSuccess: async ({ user }) => {
-      if (user) {
-        try {
-          const { syncAuthKitUserToDb, syncAuthKitAccountToDb } = await import(
-            "@/lib/auth/providers/authkit/db-sync"
-          );
-
-          const authKitUser = {
-            id: user.id,
-            email: user.email,
-            firstName: user.firstName || null,
-            lastName: user.lastName || null,
-            profilePictureUrl: user.profilePictureUrl || null,
-            createdAt: user.createdAt,
-            updatedAt: user.updatedAt,
-          };
-
-          await syncAuthKitUserToDb(authKitUser);
-          await syncAuthKitAccountToDb(authKitUser);
-        } catch (error) {
-          console.error("[AuthKit Callback] Error syncing user to DB:", error);
-        }
-      }
-    },
-  });
-
-  return handler(request);
+/**
+ * AuthKit callback route - only used when AuthKit provider is active.
+ * Since this project uses Better Auth, this route returns 404.
+ * Better Auth handles its own callbacks via the [...all] catch-all route.
+ */
+export async function GET() {
+  return NextResponse.json(
+    { error: "This callback route is not used with Better Auth" },
+    { status: 404 },
+  );
 }

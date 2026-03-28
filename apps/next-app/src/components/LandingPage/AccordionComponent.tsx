@@ -21,8 +21,8 @@ export function AccordionComponent() {
             latest in AI technology, including perplexity analysis,
             OpenAI&apos;s nuanced attribute creation, and Anthropic&apos;s
             Claude for in-depth prompting. This ensures our content is not only
-            highly relevant and engaging but also adheres to the highest
-            quality standards.
+            highly relevant and engaging but also adheres to the highest quality
+            standards.
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-2">
