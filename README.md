@@ -1,11 +1,20 @@
-# NextJS 16 Starter Kit - Turborepo Monorepo
+# Next.js 16 Starter Project for Turborepo Monorepos
 
-A modern, production-ready Next.js 16 starter template built as a Turborepo monorepo with bun workspaces. Features full-stack web applications with authentication, database integration, and a comprehensive UI component library.
+A production-ready starter for building full-stack Next.js apps with the App Router, TypeScript, authentication, PostgreSQL, and the shared `@repo/database` package.
+
+This repository gives you a solid starting point instead of starting from scratch. It is built as a Turborepo monorepo with bun workspaces, so you can start from a working foundation and customize it for your product, SaaS, admin dashboard, or internal tool.
 
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org/)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.x-38bdf8)](https://tailwindcss.com/)
 [![Turborepo](https://img.shields.io/badge/Turborepo-Monorepo-EF4444)](https://turbo.build/)
+
+## Why use this starter?
+
+- Start from a **working Next.js 16 starter** instead of scaffolding everything yourself
+- Ship with **authentication, database access, UI components, and developer tooling** already wired up
+- Use a **monorepo-friendly structure** with shared packages and room to grow
+- Customize the project for your own product without having to replace the core app architecture first
 
 ## Features
 
@@ -84,6 +93,8 @@ nextjs16-starter-kit/
 
 ## Getting Started
 
+Follow the steps below to configure the starter and begin building your app.
+
 ### Prerequisites
 
 - **Bun** (recommended) or Node.js 18+
@@ -93,7 +104,7 @@ nextjs16-starter-kit/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/W3DevStarter/nextjs16-starter-kit.git
+   git clone https://github.com/W3Mirror/nextjs16-starter-kit.git
    cd nextjs16-starter-kit
    ```
 
