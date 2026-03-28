@@ -2,8 +2,7 @@ name: Deploy to Vercel
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
     inputs:
       environment:
@@ -20,129 +19,30 @@ permissions:
   deployments: write
   pull-requests: write
   issues: write
+
 jobs:
   deploy:
     runs-on: self-hosted
-    
-    env:
-      VERCEL_ORG_ID: team_M1i3qUTW4i3A6mETy54E1Fy8
-      VERCEL_PROJECT_ID: prj_YLF5HawHAOzh4oKqS8wmxoBZ9hU5
-      VERCEL_PROJECT_SLUG: nexvio-ai
-      DEPLOY_ENVIRONMENT_NAME: ${{ ((github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')) && 'production - dashboard' || 'preview' }}
-    
+    environment:
+      name: ${{ (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')) && 'production' || 'preview' }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Create GitHub Deployment
-        id: create_deployment
-        uses: actions/github-script@v7
+      - name: Deploy to Vercel
+        uses: W3Dev/vercel-deploy@main
         with:
-          script: |
-            const environment = process.env.DEPLOY_ENVIRONMENT_NAME
-            const deployment = await github.rest.repos.createDeployment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: context.ref,
-              environment,
-              required_contexts: [],
-              auto_merge: false,
-              description: 'Deploying to Vercel'
-            });
-            return deployment.data.id;
-
-      - name: Set Deployment Status to In Progress
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.repos.createDeploymentStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              deployment_id: ${{ steps.create_deployment.outputs.result }},
-              state: 'in_progress',
-              description: 'Deployment in progress...',
-              log_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
-            });
-
-      - name: Setup Node.js 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.14.0
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
-
-      - name: Install Vercel CLI
-        run: bun install -g vercel
-
-      - name: Configure Git Author
-        run: |
-          git config --global user.email "ashutosh@w3dev.in"
-          git config --global user.name "Ashutosh"
-          git commit --amend --no-edit --author="Ashutosh <ashutosh@w3dev.in>"
-
-      - name: Setup Vercel Project Linking
-        run: |
-          rm -rf .vercel
-          mkdir -p .vercel
-          echo '{"orgId":"${{ secrets.VERCEL_ORG_ID }}","projectId":"${{ secrets.VERCEL_PROJECT_ID }}","projectName":"${{ secrets.VERCEL_PROJECT_SLUG }}"}' > .vercel/project.json
-
-      - name: Pull Vercel Environment Information
-        run: vercel pull --prod --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Build with Vercel
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Deploy to Production
-        id: vercel_deploy
-        run: |
-          DEPLOYMENT_URL=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
-          echo "url=$DEPLOYMENT_URL" >> $GITHUB_OUTPUT
-          echo "Deployed to: $DEPLOYMENT_URL"
-
-      - name: Set Deployment Status to Success
-        if: success()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.repos.createDeploymentStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              deployment_id: ${{ steps.create_deployment.outputs.result }},
-              state: 'success',
-              description: 'Deployment completed successfully',
-              environment_url: '${{ steps.vercel_deploy.outputs.url }}',
-              log_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
-            });
-
-      - name: Set Deployment Status to Failure
-        if: failure()
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.repos.createDeploymentStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              deployment_id: ${{ steps.create_deployment.outputs.result }},
-              state: 'failure',
-              description: 'Deployment failed',
-              log_url: `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
-            });
-
-      - name: Deployment Summary
-        if: success()
-        run: |
-          echo "✅ Deployment completed successfully!"
-          echo "Environment: $DEPLOY_ENVIRONMENT_NAME"
-          echo "Branch: ${{ github.ref_name }}"
-          echo "URL: ${{ steps.vercel_deploy.outputs.url }}"
-
+          vercel_token: ${{ secrets.VERCEL_TOKEN }}
+          vercel_org_id: 'team_XlKdoQLCLOaHFIGh0cZ5SJuv'
+          vercel_project_id: 'prj_YLF5HawHAOzh4oKqS8wmxoBZ9hU5'
+          vercel_project_name: 'nexvio-ai'
+          package_manager: 'bun'
+          node_version: '22'
+          deploy_args: '--archive=tgz'
+          environment: ${{ (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')) && 'production' || 'preview' }}
+          prebuild_script: |
+            git config --global user.email "ashutosh@w3dev.in"
+            git config --global user.name "Ashutosh"
