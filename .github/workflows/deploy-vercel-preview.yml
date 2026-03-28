@@ -26,7 +26,7 @@ permissions:
   issues: write
 jobs:
   deploy-preview:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}

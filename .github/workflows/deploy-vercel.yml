@@ -22,7 +22,7 @@ permissions:
   issues: write
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     
     env:
       VERCEL_ORG_ID: team_M1i3qUTW4i3A6mETy54E1Fy8
