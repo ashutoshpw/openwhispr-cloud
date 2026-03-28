@@ -1,8 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
+import { compile, run } from "@mdx-js/mdx";
 import matter from "gray-matter";
-import type { MDXRemoteSerializeResult } from "next-mdx-remote";
-import { serialize } from "next-mdx-remote/serialize";
+import type { ComponentType } from "react";
+import * as jsxRuntime from "react/jsx-runtime";
 
 const contentDirectory = path.join(process.cwd(), "content", "blog");
 
@@ -69,15 +70,18 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
   }
 }
 
-export async function serializeMdx(
-  content: string,
-): Promise<MDXRemoteSerializeResult> {
-  try {
-    return await serialize(content, {
-      parseFrontmatter: false,
-    });
-  } catch (error) {
-    console.error("MDX serialization error:", error);
-    throw error;
-  }
+export async function compileMdx(
+  source: string,
+  components?: Record<string, ComponentType>,
+): Promise<ComponentType> {
+  const compiled = await compile(source, {
+    outputFormat: "function-body",
+  });
+
+  const { default: MdxContent } = await run(String(compiled), {
+    ...jsxRuntime,
+    baseUrl: import.meta.url,
+  } as Parameters<typeof run>[1]);
+
+  return MdxContent as ComponentType;
 }

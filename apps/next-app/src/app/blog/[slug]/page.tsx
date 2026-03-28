@@ -1,6 +1,4 @@
-import { mdxComponents } from "@/components/mdx-components";
-import { getAllPosts, getPostBySlug, serializeMdx } from "@/lib/mdx";
-import { MDXRemote } from "next-mdx-remote/rsc";
+import { getPostBySlug, compileMdx } from "@/lib/mdx";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
@@ -18,10 +16,7 @@ export default async function BlogPostPage({
     notFound();
   }
 
-  const mdxSource = await serializeMdx(post.content);
-  if (!mdxSource) {
-    notFound();
-  }
+  const MdxContent = await compileMdx(post.content);
 
   return (
     <article className="container mx-auto px-4 py-8 max-w-3xl">
@@ -56,7 +51,7 @@ export default async function BlogPostPage({
         )}
       </header>
       <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-semibold prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:font-semibold">
-        <MDXRemote source={mdxSource} components={mdxComponents} />
+        <MdxContent />
       </div>
     </article>
   );
