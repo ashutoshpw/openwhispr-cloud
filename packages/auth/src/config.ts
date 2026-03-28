@@ -13,7 +13,9 @@ export function getAuthConfig(provider?: string) {
   const baseURL =
     process.env.BETTER_AUTH_URL ||
     process.env.NEXT_PUBLIC_APP_URL ||
-    "http://localhost:3000";
+    (typeof window !== "undefined"
+      ? window.location.origin
+      : "http://localhost:8801");
   const secret =
     process.env.BETTER_AUTH_SECRET || "development-secret-change-me";
 
