@@ -15,7 +15,7 @@ async function stripeTablesExist(): Promise<boolean> {
         WHERE table_schema = ${STRIPE_SCHEMA} AND table_name = 'subscriptions'
       )`,
     );
-    return (result[0]?.exists as boolean) || false;
+    return (result.rows[0]?.exists as boolean) || false;
   } catch {
     return false;
   }
@@ -44,9 +44,9 @@ export async function getActiveSubscription(
         ),
     );
 
-    if (!result[0]) return null;
+    if (!result.rows[0]) return null;
 
-    return result[0] as unknown as StripeSubscription;
+    return result.rows[0] as unknown as StripeSubscription;
   } catch (error) {
     console.error("Error fetching subscription:", error);
     return null;
@@ -76,7 +76,7 @@ export async function getSubscriptionWithProduct(
         .append(sql` WHERE id = ${priceId} LIMIT 1`),
     );
 
-    const price = priceResult[0] as {
+    const price = priceResult.rows[0] as {
       id: string;
       product: string;
       unit_amount: number;
@@ -93,7 +93,7 @@ export async function getSubscriptionWithProduct(
         .append(sql` WHERE id = ${price.product} LIMIT 1`),
     );
 
-    const product = productResult[0] as {
+    const product = productResult.rows[0] as {
       id: string;
       name: string;
     } | null;
@@ -182,7 +182,7 @@ export async function getAllSubscriptions(
         .append(sql` WHERE customer = ${customerId} ORDER BY created DESC`),
     );
 
-    return result as unknown as StripeSubscription[];
+    return result.rows as unknown as StripeSubscription[];
   } catch (error) {
     console.error("Error fetching all subscriptions:", error);
     return [];

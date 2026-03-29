@@ -9,9 +9,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronsUpDown, FolderKanban, Plus } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Check, ChevronsUpDown, FolderKanban, Plus, X } from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface Project {
@@ -30,8 +31,10 @@ interface Organization {
 
 export function ProjectSwitcher() {
   const params = useParams();
+  const router = useRouter();
   const workspaceSlug = params.workspaceSlug as string;
   const projectSlug = params.projectSlug as string;
+  const encodedWorkspaceSlug = encodeURIComponent(workspaceSlug);
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [organization, setOrganization] = useState<Organization | null>(null);
@@ -105,52 +108,88 @@ export function ProjectSwitcher() {
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="justify-between gap-2 px-3">
-          <div className="flex items-center gap-2">
-            <FolderKanban className="h-4 w-4" />
-            <span className="truncate max-w-[120px] hidden sm:inline">
-              {currentProject?.name || "Select Project"}
-            </span>
-          </div>
-          <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-[200px]">
-        <DropdownMenuLabel>Projects</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        {projects.map((project) => (
-          <DropdownMenuItem key={project.id} asChild>
+    <div className="flex items-center gap-1">
+      <Button
+        variant="ghost"
+        asChild
+        className="min-w-0 max-w-56 justify-start px-3"
+      >
+        <Link
+          href={
+            currentProject
+              ? `/dashboard/${encodedWorkspaceSlug}/${currentProject.slug}`
+              : `/dashboard/${encodedWorkspaceSlug}`
+          }
+        >
+          <FolderKanban className="mr-2 h-4 w-4 shrink-0" />
+          <span className="truncate">
+            {currentProject?.name || "Select Project"}
+          </span>
+        </Link>
+      </Button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 shrink-0 text-muted-foreground"
+            aria-label="Switch project"
+          >
+            <ChevronsUpDown className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="w-56">
+          <DropdownMenuLabel>Projects</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {projects.map((project) => (
+            <DropdownMenuItem key={project.id} asChild>
+              <Link
+                href={`/dashboard/${encodedWorkspaceSlug}/${project.slug}`}
+                className={cn(
+                  "cursor-pointer",
+                  project.slug === projectSlug && "bg-accent",
+                )}
+              >
+                <FolderKanban className="mr-2 h-4 w-4" />
+                <span className="truncate">{project.name}</span>
+                <div className="ml-auto flex items-center gap-2">
+                  {project.isDefault ? (
+                    <span className="text-xs text-muted-foreground">
+                      Default
+                    </span>
+                  ) : null}
+                  {project.slug === projectSlug ? (
+                    <Check className="h-4 w-4" />
+                  ) : null}
+                </div>
+              </Link>
+            </DropdownMenuItem>
+          ))}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem asChild>
             <Link
-              href={`/dashboard/${workspaceSlug}/${project.slug}`}
-              className={
-                project.slug === projectSlug
-                  ? "bg-accent cursor-pointer"
-                  : "cursor-pointer"
-              }
+              href={`/dashboard/${encodedWorkspaceSlug}/~/projects/new`}
+              className="cursor-pointer"
             >
-              <FolderKanban className="mr-2 h-4 w-4" />
-              <span className="truncate">{project.name}</span>
-              {project.isDefault && (
-                <span className="ml-auto text-xs text-muted-foreground">
-                  Default
-                </span>
-              )}
+              <Plus className="mr-2 h-4 w-4" />
+              New Project
             </Link>
           </DropdownMenuItem>
-        ))}
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link
-            href={`/dashboard/${workspaceSlug}/~/projects/new`}
-            className="cursor-pointer"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            New Project
-          </Link>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      {currentProject ? (
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 shrink-0 rounded-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+          aria-label="Return to workspace home"
+          title="Return to workspace home"
+          onClick={() => router.push(`/dashboard/${encodedWorkspaceSlug}`)}
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      ) : null}
+    </div>
   );
 }

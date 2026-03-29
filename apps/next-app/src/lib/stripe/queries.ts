@@ -15,7 +15,7 @@ async function tableExists(
         WHERE table_schema = ${schema} AND table_name = ${tableName}
       )`,
     );
-    return (result[0]?.exists as boolean) || false;
+    return (result.rows[0]?.exists as boolean) || false;
   } catch (error) {
     return false;
   }
@@ -69,7 +69,7 @@ export async function getStripeProducts(filters?: {
 
   try {
     const result = await db().execute(query);
-    return result;
+    return result.rows;
   } catch (error) {
     console.error("Error querying stripe.products:", error);
     const products = await stripe.products.list({
@@ -99,7 +99,7 @@ export async function getStripeProduct(productId: string) {
         .append(sql.raw(`${STRIPE_SCHEMA}.products`))
         .append(sql` WHERE id = ${productId} LIMIT 1`),
     );
-    return result[0] || null;
+    return result.rows[0] || null;
   } catch (error) {
     console.error("Error querying stripe.products:", error);
     try {
@@ -157,7 +157,7 @@ export async function getStripePrices(filters?: {
 
   try {
     const result = await db().execute(query);
-    return result;
+    return result.rows;
   } catch (error) {
     console.error("Error querying stripe.prices:", error);
     const prices = await stripe.prices.list({
@@ -191,7 +191,7 @@ export async function getStripePricesForProduct(productId: string) {
         .append(sql.raw(`${STRIPE_SCHEMA}.prices`))
         .append(sql` WHERE product = ${productId} ORDER BY created DESC`),
     );
-    return result;
+    return result.rows;
   } catch (error) {
     console.error("Error querying stripe.prices:", error);
     const prices = await stripe.prices.list({
@@ -220,7 +220,7 @@ export async function getStripePrice(priceId: string) {
         .append(sql.raw(`${STRIPE_SCHEMA}.prices`))
         .append(sql` WHERE id = ${priceId} LIMIT 1`),
     );
-    return result[0] || null;
+    return result.rows[0] || null;
   } catch (error) {
     try {
       const price = await stripe.prices.retrieve(priceId);

@@ -61,7 +61,7 @@ export async function GET(request: Request) {
           ),
       );
 
-      const subscription = subscriptionCheck[0] as
+      const subscription = subscriptionCheck.rows[0] as
         | {
             id?: string;
             status?: string;
@@ -81,7 +81,7 @@ export async function GET(request: Request) {
             ),
         );
 
-        if (anySubscription.length > 0) {
+        if (anySubscription.rows.length > 0) {
           // They had a subscription that is now inactive
           await updateOrganizationStatus(org.id, ORG_STATUS.READONLY);
           await logBillingEvent({

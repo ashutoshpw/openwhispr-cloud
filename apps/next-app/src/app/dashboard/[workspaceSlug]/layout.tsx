@@ -4,10 +4,10 @@ import DashboardTopNav from "../(components)/DashboardTopNav";
 
 export default function WorkspaceLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
+    <div className="h-screen overflow-hidden lg:grid lg:grid-cols-[280px_minmax(0,1fr)]">
       <DashboardSideBar />
       <DashboardTopNav>
-        <main className="flex flex-col gap-4 p-4 lg:gap-6">{children}</main>
+        <main className="flex-1 overflow-y-auto p-4 lg:p-6">{children}</main>
       </DashboardTopNav>
     </div>
   );

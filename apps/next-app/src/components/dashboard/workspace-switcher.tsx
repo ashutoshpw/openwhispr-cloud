@@ -9,14 +9,32 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Building2, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Building2, Check, ChevronsUpDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
+interface Workspace {
+  id: string;
+  name: string;
+  slug: string;
+  isActive?: boolean;
+}
+
+interface WorkspaceListResponse {
+  data?: Workspace[];
+}
+
+interface ApiErrorResponse {
+  error?: { message?: string };
+}
+
 export function WorkspaceSwitcher() {
-  const [workspaces, setWorkspaces] = useState<any[]>([]);
-  const [activeWorkspace, setActiveWorkspace] = useState<any>(null);
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  const [activeWorkspace, setActiveWorkspace] = useState<Workspace | null>(
+    null,
+  );
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
@@ -29,19 +47,22 @@ export function WorkspaceSwitcher() {
           setIsLoading(false);
           return;
         }
-        const result = await response.json();
+        const result: Workspace[] | WorkspaceListResponse =
+          await response.json();
 
         // BetterAuth returns array directly, not wrapped in data property
         const organizations = Array.isArray(result)
           ? result
-          : result?.data || [];
+          : Array.isArray(result.data)
+            ? result.data
+            : [];
 
         if (organizations.length > 0) {
           setWorkspaces(organizations);
 
           // Set first organization as active if none marked as active
           const active =
-            organizations.find((org: any) => org.isActive) || organizations[0];
+            organizations.find((org) => org.isActive) || organizations[0];
           setActiveWorkspace(active);
         }
       } catch (error) {
@@ -54,7 +75,7 @@ export function WorkspaceSwitcher() {
     fetchWorkspaces();
   }, []);
 
-  const handleSwitchWorkspace = async (workspaceId: string) => {
+  const handleSwitchWorkspace = async (workspace: Workspace) => {
     try {
       const response = await fetch("/api/auth/organization/set-active", {
         method: "POST",
@@ -62,28 +83,29 @@ export function WorkspaceSwitcher() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          organizationId: workspaceId,
+          organizationId: workspace.id,
         }),
       });
 
       if (!response.ok) {
-        const result = await response.json();
+        const result: ApiErrorResponse = await response.json();
         toast.error(result.error?.message || "Failed to switch workspace");
         return;
       }
 
-      const result = await response.json();
-      if (result.error) {
-        toast.error(result.error.message || "Failed to switch workspace");
+      const switchResult: ApiErrorResponse = await response.json();
+      if (switchResult.error) {
+        toast.error(switchResult.error.message || "Failed to switch workspace");
         return;
       }
 
-      const workspace = workspaces.find((w) => w.id === workspaceId);
       setActiveWorkspace(workspace);
       toast.success("Workspace switched successfully");
-      router.refresh();
-    } catch (error: any) {
-      toast.error(error?.message || "Failed to switch workspace");
+      router.push(`/dashboard/${encodeURIComponent(workspace.slug)}`);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to switch workspace";
+      toast.error(message);
     }
   };
 
@@ -107,40 +129,57 @@ export function WorkspaceSwitcher() {
     );
   }
 
+  const currentWorkspace = activeWorkspace ?? workspaces[0];
+
+  if (!currentWorkspace) {
+    return null;
+  }
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="w-full justify-between px-3">
-          <div className="flex items-center gap-2">
-            <Building2 className="h-4 w-4" />
-            <span className="truncate max-w-[150px]">
-              {activeWorkspace.name}
-            </span>
-          </div>
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-[200px]">
-        <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        {workspaces.map((workspace) => (
-          <DropdownMenuItem
-            key={workspace.id}
-            onClick={() => handleSwitchWorkspace(workspace.id)}
-            className={workspace.id === activeWorkspace.id ? "bg-accent" : ""}
+    <div className="flex items-center gap-1 px-1 py-1">
+      <div className="flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-2 text-sm font-medium">
+        <Building2 className="h-4 w-4 shrink-0" />
+        <span className="truncate">{currentWorkspace.name}</span>
+      </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 shrink-0 text-muted-foreground"
+            aria-label="Switch workspace"
           >
-            <Building2 className="mr-2 h-4 w-4" />
-            <span className="truncate">{workspace.name}</span>
+            <ChevronsUpDown className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="w-[220px]">
+          <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {workspaces.map((workspace) => (
+            <DropdownMenuItem
+              key={workspace.id}
+              onClick={() => handleSwitchWorkspace(workspace)}
+              className={cn(
+                "cursor-pointer",
+                workspace.id === currentWorkspace.id && "bg-accent",
+              )}
+            >
+              <Building2 className="mr-2 h-4 w-4" />
+              <span className="truncate">{workspace.name}</span>
+              {workspace.id === currentWorkspace.id ? (
+                <Check className="ml-auto h-4 w-4" />
+              ) : null}
+            </DropdownMenuItem>
+          ))}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem asChild>
+            <a href="/workspace/new" className="cursor-pointer">
+              <Building2 className="mr-2 h-4 w-4" />
+              Create New Workspace
+            </a>
           </DropdownMenuItem>
-        ))}
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <a href="/workspace/new" className="cursor-pointer">
-            <Building2 className="mr-2 h-4 w-4" />
-            Create New Workspace
-          </a>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 }

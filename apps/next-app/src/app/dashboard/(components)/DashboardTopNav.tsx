@@ -5,9 +5,10 @@ import { Profile } from "@/components/Profile";
 import { CommandMenu } from "@/components/dashboard/command-menu";
 import { ProjectSwitcher } from "@/components/dashboard/project-switcher";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogClose } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import {
+  Sheet,
+  SheetClose,
   SheetContent,
   SheetHeader,
   SheetTitle,
@@ -38,12 +39,18 @@ export default function DashboardTopNav({ children }: { children: ReactNode }) {
     : "/dashboard";
 
   return (
-    <div className="flex flex-col">
-      <header className="flex h-14 lg:h-[55px] items-center gap-4 border-b px-6">
-        <Dialog>
-          <SheetTrigger className="min-[1024px]:hidden p-2 transition">
-            <HamburgerMenuIcon />
-            <span className="sr-only">Menu</span>
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-4 border-b bg-background px-6 lg:h-[55px]">
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden"
+              aria-label="Open navigation menu"
+            >
+              <HamburgerMenuIcon />
+            </Button>
           </SheetTrigger>
           <SheetContent side="left">
             <SheetHeader>
@@ -58,35 +65,35 @@ export default function DashboardTopNav({ children }: { children: ReactNode }) {
             </div>
 
             <div className="flex flex-col space-y-3 mt-[1rem]">
-              <DialogClose asChild>
+              <SheetClose asChild>
                 <Link href={homeUrl}>
                   <Button variant="outline" className="w-full">
                     <HomeIcon className="mr-2 h-4 w-4" />
                     Home
                   </Button>
                 </Link>
-              </DialogClose>
+              </SheetClose>
 
-              <DialogClose asChild>
+              <SheetClose asChild>
                 <Link href={financeUrl}>
                   <Button variant="outline" className="w-full">
                     <Folder className="mr-2 h-4 w-4" />
                     Finance
                   </Button>
                 </Link>
-              </DialogClose>
+              </SheetClose>
               <Separator className="my-3" />
-              <DialogClose asChild>
+              <SheetClose asChild>
                 <Link href={settingsUrl}>
                   <Button variant="outline" className="w-full">
                     <Settings className="mr-2 h-4 w-4" />
                     Settings
                   </Button>
                 </Link>
-              </DialogClose>
+              </SheetClose>
             </div>
           </SheetContent>
-        </Dialog>
+        </Sheet>
 
         {/* Project Switcher - left side, desktop only */}
         <div className="hidden lg:flex items-center">
