@@ -63,7 +63,7 @@ export function NavBar() {
               <SheetHeader>
                 <SheetTitle>Next Starter</SheetTitle>
               </SheetHeader>
-              <div className="flex flex-col space-y-3 mt-[1rem]">
+              <div className="flex flex-col space-y-3 mt-4">
                 <SheetClose asChild>
                   <Link href="/">
                     <Button variant="outline" className="w-full">
@@ -89,7 +89,7 @@ export function NavBar() {
       </div>
       {mounted ? (
         <NavigationMenu>
-          <NavigationMenuList className="max-[825px]:hidden flex justify-between gap-3 w-[100%]">
+          <NavigationMenuList className="max-[825px]:hidden flex justify-between gap-3 w-full">
             <Link href="/" className="pl-2">
               <BlocksIcon />
             </Link>
@@ -150,7 +150,7 @@ const ListItem = React.forwardRef<
         <a
           ref={ref}
           className={cn(
-            "block space-y-1 hover:bg-accent focus:bg-accent p-3 rounded-md outline-none no-underline leading-none transition-colors hover:text-accent-foreground focus:text-accent-foreground select-none",
+            "block space-y-1 hover:bg-accent focus:bg-accent p-3 rounded-md outline-hidden no-underline leading-none transition-colors hover:text-accent-foreground focus:text-accent-foreground select-none",
             className,
           )}
           {...props}

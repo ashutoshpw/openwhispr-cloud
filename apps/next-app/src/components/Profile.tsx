@@ -62,7 +62,7 @@ export function Profile() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild className="w-[2.25rem] h-[2.25rem]">
+      <DropdownMenuTrigger asChild className="w-9 h-9">
         <Avatar>
           <AvatarImage src={session?.user?.image || ""} alt="User Profile" />
           <AvatarFallback>

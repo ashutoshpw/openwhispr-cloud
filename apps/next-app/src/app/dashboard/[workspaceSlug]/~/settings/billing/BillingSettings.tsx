@@ -305,7 +305,7 @@ export function BillingSettings({
                 type="button"
                 className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                   billingCycle === "monthly"
-                    ? "bg-background shadow-sm"
+                    ? "bg-background shadow-xs"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
                 onClick={() => setBillingCycle("monthly")}
@@ -316,7 +316,7 @@ export function BillingSettings({
                 type="button"
                 className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                   billingCycle === "yearly"
-                    ? "bg-background shadow-sm"
+                    ? "bg-background shadow-xs"
                     : "text-muted-foreground hover:text-foreground"
                 }`}
                 onClick={() => setBillingCycle("yearly")}

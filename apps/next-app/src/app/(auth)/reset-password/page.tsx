@@ -73,7 +73,7 @@ function ResetPasswordForm() {
   if (!token) {
     return (
       <PageWrapper>
-        <div className="flex min-w-screen justify-center my-[5rem]">
+        <div className="flex min-w-screen justify-center my-20">
           <Card className="w-[400px]">
             <CardHeader>
               <CardTitle>Invalid reset link</CardTitle>
@@ -104,7 +104,7 @@ function ResetPasswordForm() {
 
   return (
     <PageWrapper>
-      <div className="flex min-w-screen justify-center my-[5rem]">
+      <div className="flex min-w-screen justify-center my-20">
         <Card className="w-[400px]">
           <CardHeader>
             <CardTitle>Reset password</CardTitle>
@@ -161,7 +161,7 @@ export default function ResetPasswordPage() {
     <Suspense
       fallback={
         <PageWrapper>
-          <div className="flex min-w-screen justify-center my-[5rem]">
+          <div className="flex min-w-screen justify-center my-20">
             <Card className="w-[400px]">
               <CardHeader>
                 <CardTitle>Loading...</CardTitle>

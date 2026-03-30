@@ -56,7 +56,7 @@ export default async function WorkspaceSettings({ params }: PageProps) {
 
   return (
     <div className="flex flex-wrap justify-start items-center gap-4 px-4 pt-5">
-      <div className="flex flex-col gap-3 mb-[5rem] w-full max-w-[700px]">
+      <div className="flex flex-col gap-3 mb-20 w-full max-w-[700px]">
         <h2 className="mt-10 first:mt-0 pb-2 border-b w-full font-semibold text-3xl tracking-tight transition-colors scroll-m-20">
           Workspace Settings
         </h2>

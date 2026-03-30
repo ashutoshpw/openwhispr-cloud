@@ -3,20 +3,25 @@ import { useForm } from "react-hook-form";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 
+type FooterFormValues = {
+  email: string;
+};
+
 export default function Footer() {
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm();
+  } = useForm<FooterFormValues>();
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: FooterFormValues) => {
     console.log(data);
+    reset();
   };
   return (
     <footer className="border-t dark:bg-black">
-      <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[var(--breakpoint-xl)] px-4 sm:px-6 lg:px-8">
         <div className="lg:grid lg:grid-cols-2">
           <div className="border-b   py-8 lg:order-last lg:border-b-0 lg:border-s lg:py-16 lg:ps-16">
             <div className="mt-8 space-y-4 lg:mt-0">

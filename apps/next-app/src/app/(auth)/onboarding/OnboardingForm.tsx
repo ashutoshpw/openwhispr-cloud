@@ -130,7 +130,7 @@ export default function OnboardingForm() {
 
   return (
     <PageWrapper>
-      <div className="flex min-w-screen justify-center my-[5rem]">
+      <div className="flex min-w-screen justify-center my-20">
         <Card className="w-[400px]">
           <CardHeader>
             <CardTitle>Create Your Workspace</CardTitle>

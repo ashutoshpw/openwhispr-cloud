@@ -77,7 +77,7 @@ const PricingCard = ({ tier, isYearly }: PricingCardProps) => {
       className={cn(
         `w-72 flex flex-col justify-between py-1 ${popular ? "border-rose-400" : "border-zinc-700"} mx-auto sm:mx-0`,
         {
-          "animate-background-shine bg-white dark:bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] transition-colors":
+          "animate-background-shine bg-white dark:bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] [background-size:200%_100%] transition-colors":
             exclusive,
         },
       )}
@@ -93,7 +93,7 @@ const PricingCard = ({ tier, isYearly }: PricingCardProps) => {
                 className={cn(
                   "px-2.5 rounded-xl h-fit text-sm py-1 bg-zinc-200 text-black dark:bg-zinc-800 dark:text-white",
                   {
-                    "bg-gradient-to-r from-orange-400 to-rose-400 dark:text-black":
+                    "bg-linear-to-r from-orange-400 to-rose-400 dark:text-black":
                       popular,
                   },
                 )}
@@ -141,8 +141,8 @@ const PricingCard = ({ tier, isYearly }: PricingCardProps) => {
         </CardContent>
       </div>
       <CardFooter className="mt-2">
-        <Button className="relative inline-flex w-full items-center justify-center rounded-md bg-black text-white dark:bg-white px-6 font-medium dark:text-black transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50">
-          <div className="absolute -inset-0.5 -z-10 rounded-lg bg-gradient-to-b from-[#c7d2fe] to-[#8678f9] opacity-75 blur" />
+        <Button className="relative inline-flex w-full items-center justify-center rounded-md bg-black text-white dark:bg-white px-6 font-medium dark:text-black transition-colors focus:outline-hidden focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 focus:ring-offset-slate-50">
+          <div className="absolute -inset-0.5 -z-10 rounded-lg bg-linear-to-b from-[#c7d2fe] to-[#8678f9] opacity-75 blur-sm" />
           {actionLabel}
         </Button>
       </CardFooter>

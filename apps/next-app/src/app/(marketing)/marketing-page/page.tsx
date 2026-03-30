@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 export default async function MarketingPage() {
   return (
     <PageWrapper>
-      <div className="flex flex-col min-h-screen items-center mt-[4rem] p-3 w-full">
+      <div className="flex flex-col min-h-screen items-center mt-16 p-3 w-full">
         <h1 className="scroll-m-20 text-5xl font-bold tracking-tight lg:text-6xl text-center">
           Example Marketing Page
         </h1>
@@ -45,7 +45,7 @@ export default async function MarketingPage() {
             />
           </video>
         </div>
-        <div className="flex flex-col min-h-screen max-w-[900px] items-center my-[2rem]">
+        <div className="flex flex-col min-h-screen max-w-[900px] items-center my-8">
           <article className="max-w-4xl mx-auto pb-8">
             <h1 className="text-3xl lg:text-4xl font-bold mb-6">
               Lorem ipsum dolor sit amet

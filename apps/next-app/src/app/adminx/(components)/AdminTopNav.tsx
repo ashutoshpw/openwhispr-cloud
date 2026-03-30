@@ -65,7 +65,7 @@ export default function AdminTopNav({ children }: { children: ReactNode }) {
                 <SheetTitle>Admin Portal</SheetTitle>
               </Link>
             </SheetHeader>
-            <div className="flex flex-col space-y-3 mt-[1rem]">
+            <div className="flex flex-col space-y-3 mt-4">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 return (

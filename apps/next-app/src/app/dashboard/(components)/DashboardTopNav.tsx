@@ -64,7 +64,7 @@ export default function DashboardTopNav({ children }: { children: ReactNode }) {
               <ProjectSwitcher />
             </div>
 
-            <div className="flex flex-col space-y-3 mt-[1rem]">
+            <div className="flex flex-col space-y-3 mt-4">
               <SheetClose asChild>
                 <Link href={homeUrl}>
                   <Button variant="outline" className="w-full">

@@ -76,7 +76,7 @@ export default function SignUpPage() {
 
   return (
     <PageWrapper>
-      <div className="flex justify-center my-[5rem] min-w-screen">
+      <div className="flex justify-center my-20 min-w-screen">
         <Card className="w-[400px]">
           <CardHeader>
             <CardTitle>Create Account</CardTitle>

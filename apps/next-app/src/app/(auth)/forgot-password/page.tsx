@@ -52,7 +52,7 @@ export default function ForgotPasswordPage() {
   if (isSubmitted) {
     return (
       <PageWrapper>
-        <div className="flex min-w-screen justify-center my-[5rem]">
+        <div className="flex min-w-screen justify-center my-20">
           <Card className="w-[400px]">
             <CardHeader>
               <CardTitle>Check your email</CardTitle>
@@ -96,7 +96,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <PageWrapper>
-      <div className="flex min-w-screen justify-center my-[5rem]">
+      <div className="flex min-w-screen justify-center my-20">
         <Card className="w-[400px]">
           <CardHeader>
             <CardTitle>Forgot password</CardTitle>
