@@ -73,12 +73,14 @@ export function NavBar() {
                 </SheetClose>
                 <SheetClose asChild>
                   <Link
-                    href="/dashboard"
+                    href={session?.user ? "/dashboard" : "/sign-in"}
                     legacyBehavior
                     passHref
                     className="cursor-pointer"
                   >
-                    <Button variant="outline">Dashboard</Button>
+                    <Button variant="outline">
+                      {session?.user ? "Dashboard" : "Get Started"}
+                    </Button>
                   </Link>
                 </SheetClose>
               </div>
@@ -130,8 +132,13 @@ export function NavBar() {
         </div>
       )}
       <div className="max-[825px]:hidden flex items-center gap-3">
-        <Link href="/dashboard" className="max-[825px]:hidden">
-          <Button size="sm">Dashboard</Button>
+        <Link
+          href={session?.user ? "/dashboard" : "/sign-in"}
+          className="max-[825px]:hidden"
+        >
+          <Button size="sm">
+            {session?.user ? "Dashboard" : "Get Started"}
+          </Button>
         </Link>
         {session?.user && <Profile />}
         <ModeToggle />
