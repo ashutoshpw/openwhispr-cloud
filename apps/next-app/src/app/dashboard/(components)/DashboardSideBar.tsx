@@ -56,7 +56,7 @@ export default function DashboardSideBar() {
               )}
               href={homeUrl}
             >
-              <div className="border rounded-lg dark:bg-black dark:border-gray-800 border-gray-400 p-1 bg-white">
+              <div className="rounded-lg p-1 bg-white dark:bg-black">
                 <HomeIcon className="h-3 w-3" />
               </div>
               Home
@@ -72,7 +72,7 @@ export default function DashboardSideBar() {
               )}
               href={financeUrl}
             >
-              <div className="border rounded-lg dark:bg-black dark:border-gray-800 border-gray-400 p-1 bg-white">
+              <div className="rounded-lg p-1 bg-white dark:bg-black">
                 <Folder className="h-3 w-3" />
               </div>
               Finance
@@ -89,7 +89,7 @@ export default function DashboardSideBar() {
               href={settingsUrl}
               id="onboarding"
             >
-              <div className="border rounded-lg dark:bg-black dark:border-gray-800 border-gray-400 p-1 bg-white">
+              <div className="rounded-lg p-1 bg-white dark:bg-black">
                 <Settings className="h-3 w-3" />
               </div>
               Settings
@@ -104,7 +104,7 @@ export default function DashboardSideBar() {
               )}
               href={billingUrl}
             >
-              <div className="border rounded-lg dark:bg-black dark:border-gray-800 border-gray-400 p-1 bg-white">
+              <div className="rounded-lg p-1 bg-white dark:bg-black">
                 <CreditCard className="h-3 w-3" />
               </div>
               Billing

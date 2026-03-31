@@ -77,7 +77,7 @@ export default function AdminSidebar() {
         )}
         href={item.href}
       >
-        <div className="border rounded-lg dark:bg-black dark:border-gray-800 border-gray-400 p-1 bg-white">
+        <div className="rounded-lg p-1 bg-white dark:bg-black">
           <Icon className="h-3 w-3" />
         </div>
         {item.label}
