@@ -72,6 +72,20 @@ export function NavBar() {
                   </Link>
                 </SheetClose>
                 <SheetClose asChild>
+                  <Link href="/docs">
+                    <Button variant="outline" className="w-full">
+                      Docs
+                    </Button>
+                  </Link>
+                </SheetClose>
+                <SheetClose asChild>
+                  <Link href="/blog">
+                    <Button variant="outline" className="w-full">
+                      Blog
+                    </Button>
+                  </Link>
+                </SheetClose>
+                <SheetClose asChild>
                   <Link
                     href={session?.user ? "/dashboard" : "/sign-in"}
                     legacyBehavior
@@ -114,12 +128,11 @@ export function NavBar() {
               </NavigationMenuContent>
             </NavigationMenuItem>
             <NavigationMenuList>
-              <Link
-                className="max-[825px]:hidden"
-                href="https://nextjs.org/docs"
-                target="_blank"
-              >
+              <Link className="max-[825px]:hidden" href="/docs">
                 <Button variant="ghost">Docs</Button>
+              </Link>
+              <Link className="max-[825px]:hidden" href="/blog">
+                <Button variant="ghost">Blog</Button>
               </Link>
             </NavigationMenuList>
           </NavigationMenuList>
