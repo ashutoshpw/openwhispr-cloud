@@ -19,7 +19,7 @@ const UserProfilePage = () => {
 
   useEffect(() => {
     if (!isLoading && !session?.user) {
-      router.push("/sign-in");
+      router.push("/auth/sign-in");
     }
   }, [session, isLoading, router]);
 

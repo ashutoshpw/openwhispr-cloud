@@ -11,7 +11,7 @@ export default async function DashboardPage() {
   });
 
   if (!session?.user?.id) {
-    redirect("/sign-in");
+    redirect("/auth/sign-in");
   }
 
   // Get user's organizations
@@ -21,7 +21,7 @@ export default async function DashboardPage() {
     .where(eq(member.userId, session.user.id));
 
   if (userMembers.length === 0) {
-    redirect("/onboarding");
+    redirect("/auth/onboarding");
   }
 
   const organizationIds = userMembers.map((m) => m.organizationId);
@@ -33,7 +33,7 @@ export default async function DashboardPage() {
     .limit(1);
 
   if (organizations.length === 0) {
-    redirect("/onboarding");
+    redirect("/auth/onboarding");
   }
 
   // Redirect to the first workspace

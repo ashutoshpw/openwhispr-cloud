@@ -30,7 +30,7 @@ export default function SignUpPage() {
     try {
       await signIn.social({
         provider: "google",
-        callbackURL: "/onboarding",
+        callbackURL: "/auth/onboarding",
       });
     } catch (error: unknown) {
       const message =
@@ -61,7 +61,7 @@ export default function SignUpPage() {
       }
 
       toast.success("Account created successfully!");
-      router.push("/onboarding");
+      router.push("/auth/onboarding");
       router.refresh();
     } catch (error: unknown) {
       const message =
@@ -156,7 +156,7 @@ export default function SignUpPage() {
             )}
             <div className="mt-4 text-sm text-center">
               Already have an account?{" "}
-              <Link href="/sign-in" className="underline">
+              <Link href="/auth/sign-in" className="underline">
                 Sign in
               </Link>
             </div>

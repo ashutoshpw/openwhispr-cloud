@@ -94,8 +94,8 @@ export async function proxy(request: NextRequest) {
   // Protected routes: dashboard, user-profile, onboarding
   if (
     pathname.startsWith("/dashboard") ||
-    pathname.startsWith("/user-profile") ||
-    pathname.startsWith("/onboarding")
+    pathname.startsWith("/auth/user-profile") ||
+    pathname.startsWith("/auth/onboarding")
   ) {
     let session: Awaited<ReturnType<typeof auth.api.getSession>> | null = null;
     try {
@@ -108,7 +108,9 @@ export async function proxy(request: NextRequest) {
     }
 
     if (!session) {
-      const response = NextResponse.redirect(new URL("/sign-in", request.url));
+      const response = NextResponse.redirect(
+        new URL("/auth/sign-in", request.url),
+      );
       response.cookies.delete(HAS_WORKSPACE_COOKIE);
       addCorsHeaders(response);
       return response;
@@ -123,7 +125,7 @@ export async function proxy(request: NextRequest) {
 
       if (!hasWorkspace) {
         const response = NextResponse.redirect(
-          new URL("/onboarding", request.url),
+          new URL("/auth/onboarding", request.url),
         );
         if (shouldSetCookie) {
           setWorkspaceCookie(response, false);
@@ -148,7 +150,7 @@ export async function proxy(request: NextRequest) {
     });
 
     if (!session) {
-      return NextResponse.redirect(new URL("/sign-in", request.url));
+      return NextResponse.redirect(new URL("/auth/sign-in", request.url));
     }
 
     const isAdmin = await getSiteAdminStatus(session.user.id);

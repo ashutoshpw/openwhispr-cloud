@@ -16,7 +16,7 @@ export default async function NewWorkspacePage() {
   });
 
   if (!session?.user?.id) {
-    redirect("/sign-in?redirect=/workspace/new");
+    redirect("/auth/sign-in?redirect=/workspace/new");
   }
 
   // Fetch pricing tiers and check if user can create free workspace

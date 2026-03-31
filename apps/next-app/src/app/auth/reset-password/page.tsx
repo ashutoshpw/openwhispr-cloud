@@ -60,7 +60,7 @@ function ResetPasswordForm() {
       toast.success(
         "Password reset successfully! Please sign in with your new password.",
       );
-      router.push("/sign-in");
+      router.push("/auth/sign-in");
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to reset password",
@@ -86,10 +86,10 @@ function ResetPasswordForm() {
                 Please request a new password reset link.
               </p>
               <div className="flex flex-col gap-2">
-                <Link href="/forgot-password" className="w-full">
+                <Link href="/auth/forgot-password" className="w-full">
                   <Button className="w-full">Request new link</Button>
                 </Link>
-                <Link href="/sign-in" className="w-full">
+                <Link href="/auth/sign-in" className="w-full">
                   <Button variant="ghost" className="w-full">
                     Back to sign in
                   </Button>
@@ -145,7 +145,7 @@ function ResetPasswordForm() {
               </Button>
             </form>
             <div className="mt-4 text-center text-sm">
-              <Link href="/sign-in" className="underline">
+              <Link href="/auth/sign-in" className="underline">
                 Back to sign in
               </Link>
             </div>

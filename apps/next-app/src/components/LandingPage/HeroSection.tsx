@@ -22,11 +22,7 @@ export default function HeroSection() {
             Get Started
           </Button>
         </Link>
-        <Link
-          href="https://discord.gg/HUcHdrrDgY"
-          target="_blank"
-          className="mt-5"
-        >
+        <Link href="#" target="_blank" className="mt-5">
           <Button
             variant="outline"
             className="flex gap-1 text-blue-600 hover:text-blue-600 hover:bg-blue-100"

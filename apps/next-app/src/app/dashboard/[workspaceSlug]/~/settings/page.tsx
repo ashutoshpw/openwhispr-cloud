@@ -22,7 +22,7 @@ export default async function WorkspaceSettings({ params }: PageProps) {
   });
 
   if (!session?.user?.id) {
-    redirect(`/sign-in?redirect=/dashboard/${workspaceSlug}/~/settings`);
+    redirect(`/auth/sign-in?redirect=/dashboard/${workspaceSlug}/~/settings`);
   }
 
   // Get organization by slug

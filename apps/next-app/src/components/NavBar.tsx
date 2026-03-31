@@ -87,7 +87,7 @@ export function NavBar() {
                 </SheetClose>
                 <SheetClose asChild>
                   <Link
-                    href={session?.user ? "/dashboard" : "/sign-in"}
+                    href={session?.user ? "/dashboard" : "/auth/sign-in"}
                     legacyBehavior
                     passHref
                     className="cursor-pointer"
@@ -146,7 +146,7 @@ export function NavBar() {
       )}
       <div className="max-[825px]:hidden flex items-center gap-3">
         <Link
-          href={session?.user ? "/dashboard" : "/sign-in"}
+          href={session?.user ? "/dashboard" : "/auth/sign-in"}
           className="max-[825px]:hidden"
         >
           <Button size="sm" className="cursor-pointer">

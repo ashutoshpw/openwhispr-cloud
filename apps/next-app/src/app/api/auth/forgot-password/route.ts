@@ -57,7 +57,7 @@ export async function POST(request: Request) {
 
     // Build reset URL
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:8801";
-    const resetUrl = `${baseUrl}/reset-password?token=${token}`;
+    const resetUrl = `${baseUrl}/auth/reset-password?token=${token}`;
 
     // Send email (or log to console if not configured)
     void sendPasswordResetEmail({

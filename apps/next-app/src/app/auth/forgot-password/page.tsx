@@ -81,7 +81,7 @@ export default function ForgotPasswordPage() {
                 >
                   Try another email
                 </Button>
-                <Link href="/sign-in" className="w-full">
+                <Link href="/auth/sign-in" className="w-full">
                   <Button variant="ghost" className="w-full">
                     Back to sign in
                   </Button>
@@ -125,7 +125,7 @@ export default function ForgotPasswordPage() {
             </form>
             <div className="mt-4 text-center text-sm">
               Remember your password?{" "}
-              <Link href="/sign-in" className="underline">
+              <Link href="/auth/sign-in" className="underline">
                 Sign in
               </Link>
             </div>

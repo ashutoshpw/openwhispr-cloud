@@ -38,7 +38,7 @@ export default async function BillingSettingsPage({ params }: PageProps) {
 
   if (!session?.user?.id) {
     redirect(
-      `/sign-in?redirect=/dashboard/${workspaceSlug}/~/settings/billing`,
+      `/auth/sign-in?redirect=/dashboard/${workspaceSlug}/~/settings/billing`,
     );
   }
 

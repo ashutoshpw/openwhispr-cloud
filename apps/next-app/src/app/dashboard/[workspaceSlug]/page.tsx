@@ -26,7 +26,7 @@ export default async function WorkspacePage({ params }: PageProps) {
   });
 
   if (!session?.user?.id) {
-    redirect("/sign-in");
+    redirect("/auth/sign-in");
   }
 
   const [org] = await db()

@@ -244,7 +244,9 @@ export function AdminCommandMenu() {
 
           {/* Account */}
           <CommandGroup heading="Account">
-            <CommandItem onSelect={() => handleNavigation("/user-profile")}>
+            <CommandItem
+              onSelect={() => handleNavigation("/auth/user-profile")}
+            >
               <User className="mr-2 h-4 w-4" />
               <span>Profile</span>
             </CommandItem>

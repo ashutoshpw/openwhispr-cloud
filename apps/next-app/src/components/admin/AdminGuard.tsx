@@ -10,7 +10,7 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!session?.user) {
-      router.push("/sign-in");
+      router.push("/auth/sign-in");
     }
   }, [session, router]);
 

@@ -10,7 +10,7 @@ export default async function OnboardingPage() {
   });
 
   if (!session?.user) {
-    redirect("/sign-in");
+    redirect("/auth/sign-in");
   }
 
   // Check if user already has workspaces

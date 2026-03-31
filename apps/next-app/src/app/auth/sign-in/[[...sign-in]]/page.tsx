@@ -99,7 +99,7 @@ export default function SignInPage() {
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Password</Label>
                   <Link
-                    href="/forgot-password"
+                    href="/auth/forgot-password"
                     className="text-sm underline text-muted-foreground hover:text-foreground"
                   >
                     Forgot password?
@@ -147,7 +147,7 @@ export default function SignInPage() {
             )}
             <div className="mt-4 text-center text-sm">
               Don&apos;t have an account?{" "}
-              <Link href="/sign-up" className="underline">
+              <Link href="/auth/sign-up" className="underline">
                 Sign up
               </Link>
             </div>

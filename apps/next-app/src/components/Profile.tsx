@@ -74,7 +74,7 @@ export function Profile() {
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <Link href="/user-profile">
+          <Link href="/auth/user-profile">
             <DropdownMenuItem>
               <User className="mr-2 w-4 h-4" />
               <span>Profile</span>
