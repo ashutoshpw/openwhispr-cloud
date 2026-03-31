@@ -3,6 +3,7 @@
 import { ModeToggle } from "@/components/ModeToggle";
 import { Profile } from "@/components/Profile";
 import { CommandMenu } from "@/components/dashboard/command-menu";
+import { InvitationBell } from "@/components/dashboard/invitation-bell";
 import { ProjectSwitcher } from "@/components/dashboard/project-switcher";
 import { useSidebar } from "@/components/dashboard/sidebar-context";
 import { Button } from "@/components/ui/button";
@@ -16,7 +17,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { HamburgerMenuIcon } from "@radix-ui/react-icons";
-import { Folder, HomeIcon, PanelLeft, Settings } from "lucide-react";
+import { Folder, HomeIcon, PanelLeft, Settings, Users } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import type { ReactNode } from "react";
@@ -38,6 +39,9 @@ export default function DashboardTopNav({ children }: { children: ReactNode }) {
       : "/dashboard";
   const settingsUrl = workspaceSlug
     ? `/dashboard/${workspaceSlug}/~/settings`
+    : "/dashboard";
+  const membersUrl = workspaceSlug
+    ? `/dashboard/${workspaceSlug}/~/settings/members`
     : "/dashboard";
 
   return (
@@ -93,6 +97,14 @@ export default function DashboardTopNav({ children }: { children: ReactNode }) {
                   </Button>
                 </Link>
               </SheetClose>
+              <SheetClose asChild>
+                <Link href={membersUrl}>
+                  <Button variant="outline" className="w-full">
+                    <Users className="mr-2 h-4 w-4" />
+                    Members
+                  </Button>
+                </Link>
+              </SheetClose>
             </div>
           </SheetContent>
         </Sheet>
@@ -113,6 +125,7 @@ export default function DashboardTopNav({ children }: { children: ReactNode }) {
 
         <div className="flex justify-center items-center gap-3 ml-auto">
           <CommandMenu />
+          <InvitationBell />
           <Profile />
           <ModeToggle />
         </div>

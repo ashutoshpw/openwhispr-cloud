@@ -310,3 +310,91 @@ export const forgotPassword = {
   reset: (params: ResetPasswordParams) =>
     getClientInstance().resetPassword(params),
 };
+
+// Organization convenience exports
+// These proxy to the BetterAuth organization plugin methods on the client.
+export const organizationMethods = {
+  createInvitation: (params: {
+    email: string;
+    role: "member" | "admin";
+    organizationId: string;
+  }) =>
+    getClientInstance().getBaseClient().organization.inviteMember({
+      email: params.email,
+      role: params.role,
+      organizationId: params.organizationId,
+    }),
+
+  cancelInvitation: (params: { invitationId: string }) =>
+    getClientInstance().getBaseClient().organization.cancelInvitation({
+      invitationId: params.invitationId,
+    }),
+
+  acceptInvitation: (params: { invitationId: string }) =>
+    getClientInstance().getBaseClient().organization.acceptInvitation({
+      invitationId: params.invitationId,
+    }),
+
+  rejectInvitation: (params: { invitationId: string }) =>
+    getClientInstance().getBaseClient().organization.rejectInvitation({
+      invitationId: params.invitationId,
+    }),
+
+  getInvitation: (params: { id: string }) =>
+    getClientInstance()
+      .getBaseClient()
+      .organization.getInvitation({
+        query: { id: params.id },
+      }),
+
+  removeMember: (params: {
+    memberIdOrEmail: string;
+    organizationId: string;
+  }) =>
+    getClientInstance().getBaseClient().organization.removeMember({
+      memberIdOrEmail: params.memberIdOrEmail,
+      organizationId: params.organizationId,
+    }),
+
+  updateMemberRole: (params: {
+    memberId: string;
+    role: "member" | "admin" | "owner";
+    organizationId: string;
+  }) =>
+    getClientInstance().getBaseClient().organization.updateMemberRole({
+      memberId: params.memberId,
+      role: params.role,
+      organizationId: params.organizationId,
+    }),
+
+  setActiveOrganization: (params: { organizationId: string }) =>
+    getClientInstance().getBaseClient().organization.setActive({
+      organizationId: params.organizationId,
+    }),
+
+  getFullOrganization: (params: { query?: { organizationId?: string } } = {}) =>
+    getClientInstance()
+      .getBaseClient()
+      .organization.getFullOrganization(params),
+
+  listInvitations: (params: { query: { organizationId: string } }) =>
+    getClientInstance()
+      .getBaseClient()
+      .organization.getFullOrganization(params),
+
+  /** Returns pending invitations for the current user across all orgs */
+  listUserInvitations: () =>
+    getClientInstance().getBaseClient().organization.listInvitations(),
+
+  leaveOrganization: (params: { organizationId: string }) =>
+    getClientInstance()
+      .getBaseClient()
+      .organization.leave({ organizationId: params.organizationId }),
+};
+
+// Re-export the reactive hook for active organization
+export const useActiveOrganization = () =>
+  getClientInstance().getBaseClient().useActiveOrganization();
+
+export const useListOrganizations = () =>
+  getClientInstance().getBaseClient().useListOrganizations();

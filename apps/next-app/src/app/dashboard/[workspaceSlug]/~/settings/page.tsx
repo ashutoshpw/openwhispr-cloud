@@ -5,7 +5,7 @@ import { auth } from "@repo/auth/server";
 import { db } from "@repo/database";
 import { and, eq } from "@repo/database";
 import { member, organization } from "@repo/database/schema";
-import { CreditCard } from "lucide-react";
+import { CreditCard, Users } from "lucide-react";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -66,6 +66,12 @@ export default async function WorkspaceSettings({ params }: PageProps) {
 
         {/* Quick links */}
         <div className="flex gap-2 mt-2">
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/dashboard/${workspaceSlug}/~/settings/members`}>
+              <Users className="h-4 w-4 mr-2" />
+              Members
+            </Link>
+          </Button>
           <Button asChild variant="outline" size="sm">
             <Link href={`/dashboard/${workspaceSlug}/~/settings/billing`}>
               <CreditCard className="h-4 w-4 mr-2" />

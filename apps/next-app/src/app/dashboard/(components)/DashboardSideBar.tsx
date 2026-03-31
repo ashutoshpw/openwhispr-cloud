@@ -3,7 +3,7 @@
 import { WorkspaceSwitcher } from "@/components/dashboard/workspace-switcher";
 import { Separator } from "@/components/ui/separator";
 import clsx from "clsx";
-import { CreditCard, Folder, HomeIcon, Settings } from "lucide-react";
+import { CreditCard, Folder, HomeIcon, Settings, Users } from "lucide-react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 
@@ -25,6 +25,9 @@ export default function DashboardSideBar() {
   const settingsUrl = workspaceSlug
     ? `/dashboard/${workspaceSlug}/~/settings`
     : "/dashboard";
+  const membersUrl = workspaceSlug
+    ? `/dashboard/${workspaceSlug}/~/settings/members`
+    : "/dashboard";
   const billingUrl = workspaceSlug
     ? `/dashboard/${workspaceSlug}/~/settings/billing`
     : "/dashboard";
@@ -35,7 +38,12 @@ export default function DashboardSideBar() {
     pathname === `/dashboard/${workspaceSlug}/${projectSlug}`;
   const isFinanceActive = pathname === financeUrl;
   const isSettingsActive =
-    pathname === settingsUrl || pathname.startsWith(`${settingsUrl}/`);
+    pathname === settingsUrl ||
+    (pathname.startsWith(`${settingsUrl}/`) &&
+      !pathname.startsWith(membersUrl) &&
+      !pathname.startsWith(billingUrl));
+  const isMembersActive =
+    pathname === membersUrl || pathname.startsWith(`${membersUrl}/`);
   const isBillingActive = pathname === billingUrl;
 
   return (
@@ -83,7 +91,7 @@ export default function DashboardSideBar() {
                 "flex items-center gap-2 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50",
                 {
                   "flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-2 text-gray-900  transition-all hover:text-gray-900 dark:bg-gray-800 dark:text-gray-50 dark:hover:text-gray-50":
-                    isSettingsActive && !isBillingActive,
+                    isSettingsActive && !isBillingActive && !isMembersActive,
                 },
               )}
               href={settingsUrl}
@@ -93,6 +101,21 @@ export default function DashboardSideBar() {
                 <Settings className="h-3.5 w-3.5" />
               </div>
               Settings
+            </Link>
+            <Link
+              className={clsx(
+                "flex items-center gap-2 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50",
+                {
+                  "flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-2 text-gray-900  transition-all hover:text-gray-900 dark:bg-gray-800 dark:text-gray-50 dark:hover:text-gray-50":
+                    isMembersActive,
+                },
+              )}
+              href={membersUrl}
+            >
+              <div className="rounded-lg p-1 bg-white dark:bg-black">
+                <Users className="h-3.5 w-3.5" />
+              </div>
+              Members
             </Link>
             <Link
               className={clsx(
