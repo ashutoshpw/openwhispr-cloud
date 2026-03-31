@@ -1,48 +1,47 @@
-import { getPostBySlug, compileMdx } from "@/lib/mdx";
+import { blog } from "@/lib/source";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import defaultMdxComponents from "fumadocs-ui/mdx";
 
-export const dynamic = "force-dynamic";
-
-export default async function BlogPostPage({
-  params,
-}: {
-  params: { slug: string };
+export default async function BlogPostPage(props: {
+  params: Promise<{ slug: string }>;
 }) {
-  const { slug } = params;
-  const post = await getPostBySlug(slug);
+  const params = await props.params;
+  const post = blog.find(
+    (p) => p.info.path.replace(/\.mdx$/, "") === params.slug,
+  );
 
   if (!post) {
     notFound();
   }
 
-  const MdxContent = await compileMdx(post.content);
+  const MDX = post.body;
 
   return (
     <article className="container mx-auto px-4 py-8 max-w-3xl">
       <header className="mb-8">
         <h1 className="scroll-m-20 text-4xl font-bold tracking-tight mb-4">
-          {post.frontMatter.title}
+          {post.title}
         </h1>
         <div className="flex items-center gap-4 text-muted-foreground mb-6">
-          <time dateTime={post.frontMatter.date}>
-            {new Date(post.frontMatter.date).toLocaleDateString("en-US", {
+          <time dateTime={post.date}>
+            {new Date(post.date).toLocaleDateString("en-US", {
               year: "numeric",
               month: "long",
               day: "numeric",
             })}
           </time>
-          {post.frontMatter.author && (
+          {post.author && (
             <>
-              <span>•</span>
-              <span>{post.frontMatter.author}</span>
+              <span>&bull;</span>
+              <span>{post.author}</span>
             </>
           )}
         </div>
-        {post.frontMatter.image && (
+        {post.image && (
           <Image
-            src={post.frontMatter.image}
-            alt={post.frontMatter.title}
+            src={post.image}
+            alt={post.title}
             width={1200}
             height={675}
             className="rounded-lg mb-8 w-full h-auto"
@@ -51,8 +50,29 @@ export default async function BlogPostPage({
         )}
       </header>
       <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-semibold prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:font-semibold">
-        <MdxContent />
+        <MDX components={{ ...defaultMdxComponents }} />
       </div>
     </article>
   );
+}
+
+export function generateStaticParams() {
+  return blog.map((post) => ({
+    slug: post.info.path.replace(/\.mdx$/, ""),
+  }));
+}
+
+export async function generateMetadata(props: {
+  params: Promise<{ slug: string }>;
+}) {
+  const params = await props.params;
+  const post = blog.find(
+    (p) => p.info.path.replace(/\.mdx$/, "") === params.slug,
+  );
+  if (!post) return {};
+
+  return {
+    title: post.title,
+    description: post.excerpt,
+  };
 }
