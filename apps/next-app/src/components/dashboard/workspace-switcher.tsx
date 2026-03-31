@@ -1,16 +1,16 @@
 "use client";
 
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
-import { Building2, Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, Plus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -31,12 +31,47 @@ interface ApiErrorResponse {
   error?: { message?: string };
 }
 
+const AVATAR_COLORS = [
+  "bg-violet-500",
+  "bg-blue-500",
+  "bg-emerald-500",
+  "bg-rose-500",
+  "bg-amber-500",
+  "bg-cyan-500",
+];
+
+function getAvatarColor(name: string): string {
+  const idx = name
+    .split("")
+    .reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  return AVATAR_COLORS[idx % AVATAR_COLORS.length];
+}
+
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  return parts.length >= 2
+    ? (parts[0][0] + parts[1][0]).toUpperCase()
+    : name.slice(0, 2).toUpperCase();
+}
+
+function WorkspaceAvatar({ name, className }: { name: string; className?: string }) {
+  return (
+    <Avatar className={cn("h-5 w-5 shrink-0", className)}>
+      <AvatarFallback
+        className={cn(getAvatarColor(name), "text-white text-[10px] font-medium")}
+      >
+        {getInitials(name)}
+      </AvatarFallback>
+    </Avatar>
+  );
+}
+
 export function WorkspaceSwitcher() {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [activeWorkspace, setActiveWorkspace] = useState<Workspace | null>(
-    null,
-  );
+  const [activeWorkspace, setActiveWorkspace] = useState<Workspace | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [open, setOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -48,10 +83,8 @@ export function WorkspaceSwitcher() {
           setIsLoading(false);
           return;
         }
-        const result: Workspace[] | WorkspaceListResponse =
-          await response.json();
+        const result: Workspace[] | WorkspaceListResponse = await response.json();
 
-        // BetterAuth returns array directly, not wrapped in data property
         const organizations = Array.isArray(result)
           ? result
           : Array.isArray(result.data)
@@ -60,8 +93,6 @@ export function WorkspaceSwitcher() {
 
         if (organizations.length > 0) {
           setWorkspaces(organizations);
-
-          // Set first organization as active if none marked as active
           const active =
             organizations.find((org) => org.isActive) || organizations[0];
           setActiveWorkspace(active);
@@ -80,12 +111,8 @@ export function WorkspaceSwitcher() {
     try {
       const response = await fetch("/api/auth/organization/set-active", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          organizationId: workspace.id,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ organizationId: workspace.id }),
       });
 
       if (!response.ok) {
@@ -101,6 +128,7 @@ export function WorkspaceSwitcher() {
       }
 
       setActiveWorkspace(workspace);
+      setOpen(false);
       toast.success("Workspace switched successfully");
       router.push(`/dashboard/${encodeURIComponent(workspace.slug)}`);
     } catch (error) {
@@ -113,7 +141,7 @@ export function WorkspaceSwitcher() {
   if (isLoading) {
     return (
       <Button variant="ghost" className="w-full justify-start" disabled>
-        <Building2 className="mr-2 h-4 w-4" />
+        <div className="mr-2 h-5 w-5 rounded-full bg-muted" />
         Loading...
       </Button>
     );
@@ -123,7 +151,7 @@ export function WorkspaceSwitcher() {
     return (
       <Button variant="ghost" className="w-full justify-start" asChild>
         <a href="/workspace/new">
-          <Building2 className="mr-2 h-4 w-4" />
+          <Plus className="mr-2 h-4 w-4" />
           Create Workspace
         </a>
       </Button>
@@ -136,6 +164,10 @@ export function WorkspaceSwitcher() {
     return null;
   }
 
+  const filtered = workspaces.filter((w) =>
+    w.name.toLowerCase().includes(search.toLowerCase()),
+  );
+
   return (
     <div className="flex h-[55px] w-full items-center">
       <Button
@@ -144,47 +176,83 @@ export function WorkspaceSwitcher() {
         className="min-w-0 flex-1 justify-start px-3 h-full rounded-none font-medium"
       >
         <Link href={`/dashboard/${encodeURIComponent(currentWorkspace.slug)}`}>
-          <Building2 className="mr-2 h-4 w-4 shrink-0" />
+          <WorkspaceAvatar name={currentWorkspace.name} className="mr-2" />
           <span className="truncate">{currentWorkspace.name}</span>
         </Link>
       </Button>
-      <DropdownMenu>
+      <DropdownMenu
+        open={open}
+        onOpenChange={(o) => {
+          setOpen(o);
+          if (!o) setSearch("");
+        }}
+      >
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
             size="icon"
-            className="h-full w-10 shrink-0 rounded-none text-muted-foreground"
+            className="h-full w-10 shrink-0 rounded-none text-muted-foreground focus-visible:ring-0 focus-visible:outline-none"
             aria-label="Switch workspace"
           >
             <ChevronsUpDown className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-[220px]">
-          <DropdownMenuLabel>Workspaces</DropdownMenuLabel>
+        <DropdownMenuContent align="end" alignOffset={-10} className="w-[260px] p-0">
+          {/* Search */}
+          <div className="flex items-center px-3 py-2 border-b">
+            <input
+              autoFocus
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Find Team..."
+              className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+            />
+            <span className="text-xs text-muted-foreground">Esc</span>
+          </div>
+
+          {/* Workspace list */}
+          <div className="p-1">
+            {filtered.length === 0 && (
+              <p className="py-4 text-center text-sm text-muted-foreground">
+                No teams found
+              </p>
+            )}
+            {filtered.map((workspace) => (
+              <DropdownMenuItem
+                key={workspace.id}
+                onClick={() => handleSwitchWorkspace(workspace)}
+                className={cn(
+                  "cursor-pointer gap-2",
+                  workspace.id === currentWorkspace.id && "bg-accent",
+                )}
+              >
+                <WorkspaceAvatar name={workspace.name} />
+                <span className="truncate flex-1">{workspace.name}</span>
+                {workspace.id === currentWorkspace.id && (
+                  <Check className="h-4 w-4 shrink-0" />
+                )}
+              </DropdownMenuItem>
+            ))}
+          </div>
+
           <DropdownMenuSeparator />
-          {workspaces.map((workspace) => (
-            <DropdownMenuItem
-              key={workspace.id}
-              onClick={() => handleSwitchWorkspace(workspace)}
-              className={cn(
-                "cursor-pointer",
-                workspace.id === currentWorkspace.id && "bg-accent",
-              )}
-            >
-              <Building2 className="mr-2 h-4 w-4" />
-              <span className="truncate">{workspace.name}</span>
-              {workspace.id === currentWorkspace.id ? (
-                <Check className="ml-auto h-4 w-4" />
-              ) : null}
+
+          {/* Create Team */}
+          <div className="p-1">
+            <DropdownMenuItem asChild>
+              <a href="/workspace/new" className="cursor-pointer flex items-start gap-3 py-2">
+                <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border mt-0.5">
+                  <Plus className="h-3 w-3" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium">Create Team</span>
+                  <span className="text-xs text-muted-foreground">
+                    Collaborate with others in a shared workspace
+                  </span>
+                </div>
+              </a>
             </DropdownMenuItem>
-          ))}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem asChild>
-            <a href="/workspace/new" className="cursor-pointer">
-              <Building2 className="mr-2 h-4 w-4" />
-              Create New Workspace
-            </a>
-          </DropdownMenuItem>
+          </div>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

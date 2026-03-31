@@ -45,7 +45,7 @@ export default function DashboardSideBar() {
           <WorkspaceSwitcher />
         </div>
         <div className="flex-1 overflow-y-auto py-2">
-          <nav className="grid items-start px-4 text-sm font-medium">
+          <nav className="grid items-start px-2 text-sm font-medium">
             <Link
               className={clsx(
                 "flex items-center gap-2 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50",
@@ -57,7 +57,7 @@ export default function DashboardSideBar() {
               href={homeUrl}
             >
               <div className="rounded-lg p-1 bg-white dark:bg-black">
-                <HomeIcon className="h-3 w-3" />
+                <HomeIcon className="h-3.5 w-3.5" />
               </div>
               Home
             </Link>
@@ -73,7 +73,7 @@ export default function DashboardSideBar() {
               href={financeUrl}
             >
               <div className="rounded-lg p-1 bg-white dark:bg-black">
-                <Folder className="h-3 w-3" />
+                <Folder className="h-3.5 w-3.5" />
               </div>
               Finance
             </Link>
@@ -90,7 +90,7 @@ export default function DashboardSideBar() {
               id="onboarding"
             >
               <div className="rounded-lg p-1 bg-white dark:bg-black">
-                <Settings className="h-3 w-3" />
+                <Settings className="h-3.5 w-3.5" />
               </div>
               Settings
             </Link>
@@ -105,7 +105,7 @@ export default function DashboardSideBar() {
               href={billingUrl}
             >
               <div className="rounded-lg p-1 bg-white dark:bg-black">
-                <CreditCard className="h-3 w-3" />
+                <CreditCard className="h-3.5 w-3.5" />
               </div>
               Billing
             </Link>

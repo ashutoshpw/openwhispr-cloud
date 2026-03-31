@@ -61,7 +61,7 @@ export default async function WorkspacePage({ params }: PageProps) {
     .orderBy(project.createdAt);
 
   return (
-    <div className="p-6">
+    <div>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-semibold">{org.name}</h1>
