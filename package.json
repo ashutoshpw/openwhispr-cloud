@@ -31,6 +31,7 @@
     "posthog:test-workflow": "bun run scripts/test-posthog-workflow.ts",
     "check:max-lines": "bun run scripts/check-max-lines.ts",
     "check:staged-types": "bun run scripts/check-staged-types.ts",
+    "check:no-middleware": "bun run scripts/check-no-middleware.ts",
     "prepare": "simple-git-hooks"
   },
   "devDependencies": {
@@ -44,6 +45,6 @@
     "typescript": "latest"
   },
   "simple-git-hooks": {
-    "pre-commit": "bun run check:max-lines && bun run check:staged-types"
+    "pre-commit": "bun run check:max-lines && bun run check:staged-types && bun run check:no-middleware"
   }
 }

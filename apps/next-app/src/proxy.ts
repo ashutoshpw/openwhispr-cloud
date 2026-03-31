@@ -1,7 +1,7 @@
 /**
- * Middleware for Better Auth
+ * Proxy for Better Auth
  *
- * Simplified middleware with no provider switching.
+ * Simplified proxy with no provider switching.
  * ~120 lines vs 471 lines in the multi-provider version.
  */
 import { getSiteAdminStatus } from "@/lib/auth-utils";
@@ -44,7 +44,7 @@ async function checkUserWorkspaces(
     const hasWorkspace = userMembers.length > 0;
     return { hasWorkspace, shouldSetCookie: true };
   } catch (error) {
-    console.error("[Middleware] Error checking workspaces:", error);
+    console.error("[Proxy] Error checking workspaces:", error);
     return { hasWorkspace: true, shouldSetCookie: false };
   }
 }
@@ -76,7 +76,7 @@ function addCorsHeaders(response: NextResponse): void {
   response.headers.set("Access-Control-Allow-Headers", "*");
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // Handle CORS preflight
@@ -103,7 +103,7 @@ export async function middleware(request: NextRequest) {
         headers: await headers(),
       });
     } catch (error) {
-      console.error("[Middleware] Error getting session:", error);
+      console.error("[Proxy] Error getting session:", error);
       session = null;
     }
 
@@ -164,6 +164,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  runtime: "nodejs",
   matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
 };
