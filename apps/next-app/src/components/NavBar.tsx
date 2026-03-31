@@ -78,7 +78,7 @@ export function NavBar() {
                     passHref
                     className="cursor-pointer"
                   >
-                    <Button variant="outline">
+                    <Button variant="outline" className="cursor-pointer">
                       {session?.user ? "Dashboard" : "Get Started"}
                     </Button>
                   </Link>
@@ -136,7 +136,7 @@ export function NavBar() {
           href={session?.user ? "/dashboard" : "/sign-in"}
           className="max-[825px]:hidden"
         >
-          <Button size="sm">
+          <Button size="sm" className="cursor-pointer">
             {session?.user ? "Dashboard" : "Get Started"}
           </Button>
         </Link>
