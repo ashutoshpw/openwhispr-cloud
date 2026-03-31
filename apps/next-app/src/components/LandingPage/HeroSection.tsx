@@ -40,12 +40,12 @@ export default function HeroSection() {
         <div className="relative flex max-w-6xl justify-center overflow-hidden mt-7">
           <div className="relative rounded-xl">
             <img
-              src="/dash-light.png"
+              src="/dash-light.jpg"
               alt="Hero Image"
               className="block w-[1200px] rounded-[inherit] border object-contain shadow-lg dark:hidden"
             />
             <img
-              src="/dash.png"
+              src="/dash.jpg"
               alt="Hero Image"
               className="dark:block w-[1200px] rounded-[inherit] border object-contain shadow-lg hidden"
             />
