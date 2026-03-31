@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { Building2, Check, ChevronsUpDown } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -137,10 +138,16 @@ export function WorkspaceSwitcher() {
 
   return (
     <div className="flex items-center gap-1 px-1 py-1">
-      <div className="flex min-w-0 flex-1 items-center gap-2 rounded-md px-2 py-2 text-sm font-medium">
-        <Building2 className="h-4 w-4 shrink-0" />
-        <span className="truncate">{currentWorkspace.name}</span>
-      </div>
+      <Button
+        variant="ghost"
+        asChild
+        className="min-w-0 flex-1 justify-start px-2"
+      >
+        <Link href={`/dashboard/${encodeURIComponent(currentWorkspace.slug)}`}>
+          <Building2 className="mr-2 h-4 w-4 shrink-0" />
+          <span className="truncate">{currentWorkspace.name}</span>
+        </Link>
+      </Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button

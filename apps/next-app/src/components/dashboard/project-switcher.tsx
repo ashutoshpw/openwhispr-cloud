@@ -121,9 +121,11 @@ export function ProjectSwitcher() {
               : `/dashboard/${encodedWorkspaceSlug}`
           }
         >
-          <FolderKanban className="mr-2 h-4 w-4 shrink-0" />
+          {currentProject && (
+            <FolderKanban className="mr-2 h-4 w-4 shrink-0" />
+          )}
           <span className="truncate">
-            {currentProject?.name || "Select Project"}
+            {currentProject?.name || "All Projects"}
           </span>
         </Link>
       </Button>

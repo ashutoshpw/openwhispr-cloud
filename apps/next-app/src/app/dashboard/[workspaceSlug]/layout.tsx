@@ -4,7 +4,7 @@ import DashboardTopNav from "../(components)/DashboardTopNav";
 
 export default function WorkspaceLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="h-screen overflow-hidden lg:grid lg:grid-cols-[280px_minmax(0,1fr)]">
+    <div className="h-screen overflow-hidden lg:grid lg:grid-cols-[224px_minmax(0,1fr)]">
       <DashboardSideBar />
       <DashboardTopNav>
         <main className="flex-1 overflow-y-auto p-4 lg:p-6">{children}</main>
