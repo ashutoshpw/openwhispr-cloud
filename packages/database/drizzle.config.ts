@@ -7,6 +7,7 @@ config({ path: resolve(__dirname, "../../.env.local") });
 
 export default defineConfig({
   schema: "./src/schema.ts",
+  schemaFilter: ["public", "archived"],
   out: "./drizzle",
   dialect: "postgresql",
   dbCredentials: {
