@@ -5,7 +5,7 @@ import Image from "next/image";
 const ProjectsData = [
   {
     id: 1,
-    name: "Nextjs 14",
+    name: "Nextjs 16",
     description:
       "A framework for React that enables server-side rendering and effortless deployment.",
     image: "/nextjs.svg",
@@ -31,12 +31,6 @@ const ProjectsData = [
     description: "Beautifully designed components by Shadcn.",
     image: "/shadcn.png",
     imageDark: "/shadcn-dark.png",
-  },
-  {
-    id: 5,
-    name: "Syntax UI",
-    description: "Beautifully designed components by Syntax UI.",
-    image: "/syntaxUI.svg",
   },
   {
     id: 6,
