@@ -4,6 +4,7 @@ import { ModeToggle } from "@/components/ModeToggle";
 import { Profile } from "@/components/Profile";
 import { CommandMenu } from "@/components/dashboard/command-menu";
 import { ProjectSwitcher } from "@/components/dashboard/project-switcher";
+import { useSidebar } from "@/components/dashboard/sidebar-context";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -15,12 +16,13 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { HamburgerMenuIcon } from "@radix-ui/react-icons";
-import { Folder, HomeIcon, Settings } from "lucide-react";
+import { Folder, HomeIcon, PanelLeft, Settings } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import type { ReactNode } from "react";
 
 export default function DashboardTopNav({ children }: { children: ReactNode }) {
+  const { toggle } = useSidebar();
   const params = useParams();
   const workspaceSlug = params.workspaceSlug as string;
   const projectSlug = params.projectSlug as string;
@@ -95,8 +97,17 @@ export default function DashboardTopNav({ children }: { children: ReactNode }) {
           </SheetContent>
         </Sheet>
 
-        {/* Project Switcher - left side, desktop only */}
-        <div className="hidden lg:flex items-center">
+        {/* Sidebar toggle + Project Switcher - left side, desktop only */}
+        <div className="hidden lg:flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 shrink-0"
+            onClick={toggle}
+            aria-label="Toggle sidebar"
+          >
+            <PanelLeft className="h-4 w-4" />
+          </Button>
           <ProjectSwitcher />
         </div>
 

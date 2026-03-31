@@ -16,7 +16,9 @@
       "@repo/auth": ["../../packages/auth/src"],
       "@repo/auth/*": ["../../packages/auth/src/*"],
       "@repo/billing": ["../../packages/billing/src"],
-      "@repo/billing/*": ["../../packages/billing/src/*"]
+      "@repo/billing/*": ["../../packages/billing/src/*"],
+      "@repo/fumadocs": ["../../packages/fumadocs/src"],
+      "@repo/fumadocs/*": ["../../packages/fumadocs/src/*"]
     }
   },
   "include": [
@@ -24,6 +26,8 @@
     "bcryptjs.d.ts",
     "**/*.ts",
     "**/*.tsx",
+    ".source/**/*.ts",
+    ".source/**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],

@@ -39,9 +39,9 @@ export default function DashboardSideBar() {
   const isBillingActive = pathname === billingUrl;
 
   return (
-    <div className="hidden h-screen border-r lg:sticky lg:top-0 lg:block">
+    <div className="hidden h-screen border-r lg:sticky lg:top-0 lg:block overflow-hidden">
       <div className="flex h-full max-h-screen flex-col gap-2">
-        <div className="flex h-[55px] w-full shrink-0 items-center justify-between border-b px-3">
+        <div className="flex h-[55px] w-full shrink-0 items-center border-b">
           <WorkspaceSwitcher />
         </div>
         <div className="flex-1 overflow-y-auto py-2">

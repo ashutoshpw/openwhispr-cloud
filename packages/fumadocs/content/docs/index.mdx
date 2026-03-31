@@ -1,0 +1,33 @@
+---
+title: Welcome
+description: Welcome to the documentation for the Next.js 16 Starter Kit.
+---
+
+# Welcome
+
+This is the documentation for the **Next.js 16 Starter Kit** — a production-ready monorepo template built with:
+
+- **Next.js 16** with App Router
+- **Tailwind CSS v4** for styling
+- **BetterAuth** for authentication
+- **Drizzle ORM** with Neon PostgreSQL
+- **Stripe** for billing and subscriptions
+- **Turborepo** for monorepo orchestration
+
+## Getting Started
+
+Head over to the [Getting Started](/docs/getting-started) guide to set up the project locally.
+
+## Project Structure
+
+```
+.
+├── apps/
+│   └── next-app/           # Next.js 16 application
+├── packages/
+│   ├── auth/               # BetterAuth configuration
+│   ├── billing/            # Stripe billing logic
+│   ├── database/           # Drizzle ORM + Neon
+│   └── fumadocs/           # Documentation content
+└── turbo.json              # Turborepo config
+```

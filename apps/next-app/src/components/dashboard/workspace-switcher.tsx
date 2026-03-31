@@ -137,11 +137,11 @@ export function WorkspaceSwitcher() {
   }
 
   return (
-    <div className="flex items-center gap-1 px-1 py-1">
+    <div className="flex h-[55px] w-full items-center">
       <Button
         variant="ghost"
         asChild
-        className="min-w-0 flex-1 justify-start px-2"
+        className="min-w-0 flex-1 justify-start px-3 h-full rounded-none font-medium"
       >
         <Link href={`/dashboard/${encodeURIComponent(currentWorkspace.slug)}`}>
           <Building2 className="mr-2 h-4 w-4 shrink-0" />
@@ -153,7 +153,7 @@ export function WorkspaceSwitcher() {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 shrink-0 text-muted-foreground"
+            className="h-full w-10 shrink-0 rounded-none text-muted-foreground"
             aria-label="Switch workspace"
           >
             <ChevronsUpDown className="h-4 w-4" />
