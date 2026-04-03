@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn } from "@repo/auth/client";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -23,13 +23,15 @@ export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || searchParams.get("callbackURL") || "/dashboard";
 
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
     try {
       await signIn.social({
         provider: "google",
-        callbackURL: "/dashboard",
+        callbackURL: redirectTo,
       });
     } catch (error: unknown) {
       const message =
@@ -59,7 +61,7 @@ export default function SignInPage() {
       }
 
       toast.success("Signed in successfully!");
-      router.push("/dashboard");
+      router.push(redirectTo);
       router.refresh();
     } catch (error: unknown) {
       const message =

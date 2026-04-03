@@ -73,7 +73,7 @@ function getAuthConfig() {
     process.env.NEXT_PUBLIC_APP_URL ||
     (typeof window !== "undefined"
       ? window.location.origin
-      : "http://localhost:8801");
+      : "http://localhost:3000");
 
   return { baseURL };
 }

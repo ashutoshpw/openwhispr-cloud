@@ -11,7 +11,7 @@ import { eq } from "@repo/database";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import { organization } from "better-auth/plugins";
+import { organization, oidcProvider } from "better-auth/plugins";
 import { toNextJsHandler } from "better-auth/next-js";
 import bcrypt from "bcryptjs";
 
@@ -91,7 +91,7 @@ function getAuthConfig() {
   const baseURL =
     process.env.BETTER_AUTH_URL ||
     process.env.NEXT_PUBLIC_APP_URL ||
-    "http://localhost:8801";
+    "http://localhost:3000";
   const secret =
     process.env.BETTER_AUTH_SECRET || "development-secret-change-me";
 
@@ -166,7 +166,15 @@ class BetterAuthServer {
           maxAge: 5 * 60,
         },
       },
-      plugins: [nextCookies(), organization()],
+      plugins: [
+        nextCookies(),
+        organization(),
+        oidcProvider({
+          loginPage: "/auth/sign-in",
+          consentPage: "/consent",
+          allowDynamicClientRegistration: true,
+        }),
+      ],
     });
   }
 
