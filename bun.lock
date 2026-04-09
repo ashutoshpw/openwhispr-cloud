@@ -20,7 +20,6 @@
       "version": "0.1.0",
       "dependencies": {
         "@hookform/resolvers": "^3.3.4",
-        "@modelcontextprotocol/sdk": "^1.22.0",
         "@radix-ui/react-accordion": "^1.1.2",
         "@radix-ui/react-alert-dialog": "^1.1.15",
         "@radix-ui/react-avatar": "^1.0.4",
@@ -40,6 +39,7 @@
         "@repo/billing": "workspace:*",
         "@repo/database": "workspace:*",
         "@repo/fumadocs": "workspace:*",
+        "@repo/mcp-server": "workspace:*",
         "@stripe/stripe-js": "^3.4.0",
         "@tailwindcss/postcss": "^4.2.2",
         "@tanstack/react-query": "^4.35.3",
@@ -142,6 +142,20 @@
       "name": "@repo/fumadocs",
       "version": "0.0.0",
       "devDependencies": {
+        "typescript": "latest",
+      },
+    },
+    "packages/mcp-server": {
+      "name": "@repo/mcp-server",
+      "version": "0.0.0",
+      "dependencies": {
+        "@modelcontextprotocol/sdk": "^1.22.0",
+        "@repo/database": "workspace:*",
+        "mcp-handler": "^1.0.3",
+        "zod": "^3.23.5",
+      },
+      "devDependencies": {
+        "@types/node": "^22.0.0",
         "typescript": "latest",
       },
     },
@@ -534,6 +548,8 @@
     "@repo/database": ["@repo/database@workspace:packages/database"],
 
     "@repo/fumadocs": ["@repo/fumadocs@workspace:packages/fumadocs"],
+
+    "@repo/mcp-server": ["@repo/mcp-server@workspace:packages/mcp-server"],
 
     "@repo/next-app": ["@repo/next-app@workspace:apps/next-app"],
 
@@ -1734,6 +1750,8 @@
     "@repo/database/typescript": ["typescript@6.0.2", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-bGdAIrZ0wiGDo5l8c++HWtbaNCWTS4UTv7RaTH/ThVIgjkveJt83m74bBHMJkuCbslY8ixgLBVZJIOiQlQTjfQ=="],
 
     "@repo/fumadocs/typescript": ["typescript@6.0.2", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-bGdAIrZ0wiGDo5l8c++HWtbaNCWTS4UTv7RaTH/ThVIgjkveJt83m74bBHMJkuCbslY8ixgLBVZJIOiQlQTjfQ=="],
+
+    "@repo/mcp-server/typescript": ["typescript@6.0.2", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-bGdAIrZ0wiGDo5l8c++HWtbaNCWTS4UTv7RaTH/ThVIgjkveJt83m74bBHMJkuCbslY8ixgLBVZJIOiQlQTjfQ=="],
 
     "@repo/next-app/@types/bcryptjs": ["@types/bcryptjs@3.0.0", "", { "dependencies": { "bcryptjs": "*" } }, "sha512-WRZOuCuaz8UcZZE4R5HXTco2goQSI2XxjGY3hbM/xDvwmqFWd4ivooImsMx65OKM6CtNKbnZ5YL+YwAwK7c1dg=="],
 
