@@ -1,4 +1,9 @@
 import { getSiteAdminStatus } from "@/lib/auth-utils";
+import {
+  createErrorWithCode,
+  getErrorCode,
+  getErrorMessage,
+} from "@/lib/error-utils";
 import { stripe } from "@/lib/stripe/client";
 import { auth } from "@repo/auth/server";
 import { revalidatePath } from "next/cache";
@@ -44,10 +49,10 @@ export async function GET(
     const price = await stripe.prices.retrieve(id);
 
     return NextResponse.json(price);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching price:", error);
     return NextResponse.json(
-      { error: error.message || "Internal server error" },
+      { error: getErrorMessage(error) },
       { status: 500 },
     );
   }
@@ -88,13 +93,22 @@ export async function PUT(
       (price.metadata?.pricing_model as string | undefined) || null;
 
     if (validatedData.mode === "replace") {
+      const recurringConfig =
+        validatedData.billingType === "recurring"
+          ? validatedData.interval && validatedData.intervalCount
+            ? {
+                interval: validatedData.interval,
+                interval_count: validatedData.intervalCount,
+              }
+            : null
+          : undefined;
+
       if (
         !productId ||
         validatedData.unitAmount === undefined ||
         !validatedData.currency ||
         !validatedData.billingType ||
-        (validatedData.billingType === "recurring" &&
-          (!validatedData.interval || !validatedData.intervalCount))
+        recurringConfig === null
       ) {
         return NextResponse.json(
           { error: "Missing billing configuration for replacement." },
@@ -108,13 +122,7 @@ export async function PUT(
         currency: validatedData.currency,
         nickname: validatedData.nickname || price.nickname || undefined,
         active: validatedData.active ?? true,
-        recurring:
-          validatedData.billingType === "recurring"
-            ? {
-                interval: validatedData.interval!,
-                interval_count: validatedData.intervalCount!,
-              }
-            : undefined,
+        recurring: recurringConfig,
         metadata: {
           created_by: session.user.email || session.user.id,
           created_at: new Date().toISOString(),
@@ -177,10 +185,10 @@ export async function PUT(
     }
 
     return NextResponse.json(updatedPrice);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating price:", error);
     return NextResponse.json(
-      { error: error.message || "Internal server error" },
+      { error: getErrorMessage(error) },
       { status: 500 },
     );
   }
@@ -202,9 +210,12 @@ async function deleteStripePrice(priceId: string) {
 
   if (!response.ok) {
     const error = payload?.error ?? {};
-    const err = new Error(error.message || "Failed to delete price");
-    (err as any).code = error.code;
-    throw err;
+    throw createErrorWithCode(
+      typeof error.message === "string"
+        ? error.message
+        : "Failed to delete price",
+      typeof error.code === "string" ? error.code : undefined,
+    );
   }
 
   return payload;
@@ -237,10 +248,10 @@ export async function DELETE(
 
     try {
       await deleteStripePrice(id);
-    } catch (error: any) {
+    } catch (error: unknown) {
       if (
-        error?.code === "price_in_use" ||
-        error?.message?.includes("Price has been used")
+        getErrorCode(error) === "price_in_use" ||
+        getErrorMessage(error, "").includes("Price has been used")
       ) {
         return NextResponse.json(
           {
@@ -261,10 +272,10 @@ export async function DELETE(
     }
 
     return NextResponse.json({ status: "deleted" });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error deleting price:", error);
     return NextResponse.json(
-      { error: error.message || "Internal server error" },
+      { error: getErrorMessage(error) },
       { status: 500 },
     );
   }

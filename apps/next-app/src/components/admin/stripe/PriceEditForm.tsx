@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { getErrorMessage } from "@/lib/error-utils";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -197,9 +198,9 @@ export function PriceEditForm({ price }: PriceEditFormProps) {
       toast.success("Price updated successfully!");
       await new Promise((resolve) => setTimeout(resolve, 400));
       router.refresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      toast.error(error.message || "Failed to update price");
+      toast.error(getErrorMessage(error, "Failed to update price"));
     } finally {
       setIsSubmitting(false);
     }
@@ -302,7 +303,17 @@ export function PriceEditForm({ price }: PriceEditFormProps) {
                   <select
                     id="interval"
                     value={interval}
-                    onChange={(e) => setInterval(e.target.value as any)}
+                    onChange={(e) => {
+                      const nextValue = e.target.value;
+                      if (
+                        nextValue === "day" ||
+                        nextValue === "week" ||
+                        nextValue === "month" ||
+                        nextValue === "year"
+                      ) {
+                        setInterval(nextValue);
+                      }
+                    }}
                     className="w-full p-2 border rounded h-10"
                     required
                   >

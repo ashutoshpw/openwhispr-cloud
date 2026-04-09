@@ -7,8 +7,8 @@ export const template = async () => {
     const users = await db().select().from(user);
 
     return users;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching users:", error);
-    throw new Error(error.message);
+    throw new Error(error instanceof Error ? error.message : "Unknown error");
   }
 };

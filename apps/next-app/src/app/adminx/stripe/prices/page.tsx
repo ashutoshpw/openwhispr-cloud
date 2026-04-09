@@ -4,8 +4,10 @@
 import { PriceTable } from "@/components/admin/stripe/PriceTable";
 import { getStripePrices } from "@/lib/stripe/queries";
 
+type PriceTableRows = Parameters<typeof PriceTable>[0]["prices"];
+
 export default async function PricesPage() {
-  const prices = await getStripePrices({ limit: 100 });
+  const prices = (await getStripePrices({ limit: 100 })) as PriceTableRows;
 
   return (
     <div className="flex flex-col gap-4">
@@ -24,7 +26,7 @@ export default async function PricesPage() {
         </Button> */}
       </div>
 
-      <PriceTable prices={prices as any} />
+      <PriceTable prices={prices} />
     </div>
   );
 }

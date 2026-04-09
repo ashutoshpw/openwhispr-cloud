@@ -1,25 +1,33 @@
-import { baseURL } from "@/../baseUrl";
+import Script from "next/script";
 
 export function NextChatSDKBootstrap({ baseUrl }: { baseUrl: string }) {
+  const validatedBaseUrl = new URL(baseUrl);
+
+  if (
+    validatedBaseUrl.protocol !== "https:" &&
+    validatedBaseUrl.protocol !== "http:"
+  ) {
+    throw new Error("baseUrl must use http: or https: protocol");
+  }
+
+  // baseUrl is sourced from server configuration in app/layout.tsx, so it is
+  // treated as trusted application config rather than user input.
   return (
     <>
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `window.innerBaseUrl = "${baseUrl}";`,
-        }}
-      />
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `
+      <Script id="next-chat-sdk-base-url">
+        {`window.innerBaseUrl = ${JSON.stringify(validatedBaseUrl.toString())};`}
+      </Script>
+      <Script id="next-chat-sdk-bootstrap">
+        {`
 (function() {
-  const appOrigin = new URL("${baseUrl}").origin;
+  const appOrigin = new URL(${JSON.stringify(validatedBaseUrl.toString())}).origin;
   const isInIframe = window.self !== window.top;
   
   // Only add base tag if we're in an iframe (ChatGPT Apps SDK context)
   // The assetPrefix in next.config.js already handles base URL for direct browser access
   if (isInIframe) {
     const baseTag = document.createElement('base');
-    baseTag.href = "${baseUrl}";
+    baseTag.href = ${JSON.stringify(validatedBaseUrl.toString())};
     const existingBase = document.querySelector('base');
     if (!existingBase) {
       document.head.insertBefore(baseTag, document.head.firstChild);
@@ -92,7 +100,7 @@ export function NextChatSDKBootstrap({ baseUrl }: { baseUrl: string }) {
       }
 
       if (url.origin === window.location.origin) {
-        const newUrl = new URL("${baseUrl}");
+        const newUrl = new URL(${JSON.stringify(validatedBaseUrl.toString())});
         newUrl.pathname = url.pathname;
         newUrl.search = url.search;
         newUrl.hash = url.hash;
@@ -106,9 +114,8 @@ export function NextChatSDKBootstrap({ baseUrl }: { baseUrl: string }) {
     };
   }
 })();
-          `,
-        }}
-      />
+        `}
+      </Script>
     </>
   );
 }

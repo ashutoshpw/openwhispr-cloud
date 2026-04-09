@@ -1,3 +1,5 @@
+import { getPricingTiers } from "@/lib/stripe/queries";
+import { auth } from "@repo/auth/server";
 import {
   APP_SETTINGS_KEYS,
   BILLING_MANAGEMENT_ROLES,
@@ -16,8 +18,6 @@ import type {
   BillingUsageResponse,
   MemberRole,
 } from "@repo/billing/types";
-import { getPricingTiers } from "@/lib/stripe/queries";
-import { auth } from "@repo/auth/server";
 import { db } from "@repo/database";
 import { and, eq } from "@repo/database";
 import { member, organization } from "@repo/database/schema";

@@ -1,4 +1,5 @@
 import { getSiteAdminStatus } from "@/lib/auth-utils";
+import { getErrorMessage } from "@/lib/error-utils";
 import { stripe } from "@/lib/stripe/client";
 import { auth } from "@repo/auth/server";
 import { revalidatePath } from "next/cache";
@@ -90,8 +91,17 @@ export async function POST(req: NextRequest) {
     };
 
     if (validatedData.billing_type === "recurring") {
+      const interval = validatedData.interval;
+
+      if (!interval) {
+        return NextResponse.json(
+          { error: "Recurring prices must include an interval." },
+          { status: 400 },
+        );
+      }
+
       createParams.recurring = {
-        interval: validatedData.interval!,
+        interval,
         interval_count: validatedData.interval_count ?? 1,
         usage_type:
           validatedData.pricing_model === "usage" ? "metered" : "licensed",
@@ -137,7 +147,7 @@ export async function POST(req: NextRequest) {
     revalidatePath(`/adminx/stripe/products/${validatedData.product}`);
 
     return NextResponse.json(price);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating price:", error);
 
     if (error instanceof z.ZodError) {
@@ -148,7 +158,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: error.message || "Internal server error" },
+      { error: getErrorMessage(error) },
       { status: 500 },
     );
   }

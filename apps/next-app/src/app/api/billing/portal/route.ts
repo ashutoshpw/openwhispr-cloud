@@ -1,9 +1,9 @@
-import {
-  checkBillingPermission,
-  type BillingMiddlewareResult,
-} from "@repo/billing";
 import { createOrganizationPortalSession } from "@/lib/stripe/portal";
 import { auth } from "@repo/auth/server";
+import {
+  type BillingMiddlewareResult,
+  checkBillingPermission,
+} from "@repo/billing";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 

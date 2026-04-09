@@ -18,6 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { getErrorMessage } from "@/lib/error-utils";
 import {
   Archive,
   Copy,
@@ -110,9 +111,9 @@ export function ActionsMenu({
 
       toast.success("Default price updated");
       await refreshAfterAction();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Set default price error:", error);
-      toast.error(error.message || "Failed to set default price");
+      toast.error(getErrorMessage(error, "Failed to set default price"));
     } finally {
       setIsDeleting(false);
     }
@@ -231,10 +232,10 @@ export function ActionsMenu({
       }
 
       await refreshAfterAction(itemType === "coupon");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Archive/Delete error:", error);
       toast.error(
-        error.message ||
+        getErrorMessage(error) ||
           `Failed to ${(itemType === "product" || itemType === "price") && isActive ? "archive" : itemType === "coupon" ? "delete" : "unarchive"} ${itemType}`,
       );
     }
@@ -257,9 +258,9 @@ export function ActionsMenu({
         await handleOtherArchiveToggle();
       }
       closeDialog();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Action error:", error);
-      toast.error(error.message || "Failed to perform action");
+      toast.error(getErrorMessage(error, "Failed to perform action"));
     } finally {
       setIsDeleting(false);
     }

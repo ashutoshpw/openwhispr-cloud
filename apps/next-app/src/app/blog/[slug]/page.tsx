@@ -1,7 +1,7 @@
 import { blog } from "@/lib/source";
+import defaultMdxComponents from "fumadocs-ui/mdx";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import defaultMdxComponents from "fumadocs-ui/mdx";
 
 export default async function BlogPostPage(props: {
   params: Promise<{ slug: string }>;

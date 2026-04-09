@@ -1,4 +1,9 @@
 import { getSiteAdminStatus } from "@/lib/auth-utils";
+import {
+  createErrorWithCode,
+  getErrorCode,
+  getErrorMessage,
+} from "@/lib/error-utils";
 import { stripe } from "@/lib/stripe/client";
 import { auth } from "@repo/auth/server";
 import { revalidatePath } from "next/cache";
@@ -52,9 +57,12 @@ async function deletePrice(priceId: string) {
     }
 
     const error = payload?.error ?? {};
-    const err = new Error(error.message || "Failed to delete price");
-    (err as any).code = error.code;
-    throw err;
+    throw createErrorWithCode(
+      typeof error.message === "string"
+        ? error.message
+        : "Failed to delete price",
+      typeof error.code === "string" ? error.code : undefined,
+    );
   }
 
   return payload;
@@ -87,10 +95,10 @@ export async function POST(
       for (const price of prices) {
         try {
           await deletePrice(price.id);
-        } catch (error: any) {
+        } catch (error: unknown) {
           if (
-            error?.code === "price_in_use" ||
-            error?.message?.includes("Price has been used")
+            getErrorCode(error) === "price_in_use" ||
+            getErrorMessage(error, "").includes("Price has been used")
           ) {
             hasUsedPrices = true;
             continue;
@@ -117,13 +125,13 @@ export async function POST(
       revalidatePath(`/adminx/stripe/products/${id}`);
 
       return NextResponse.json({ status: "deleted" });
-    } catch (error: any) {
-      if (error?.code === "product_in_use") {
+    } catch (error: unknown) {
+      if (getErrorCode(error) === "product_in_use") {
         return NextResponse.json(
           {
             status: "in_use",
             reason:
-              error?.message ||
+              getErrorMessage(error) ||
               "Product cannot be deleted because it has been used in subscriptions or invoices.",
           },
           { status: 200 },
@@ -132,10 +140,10 @@ export async function POST(
 
       throw error;
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error deleting product:", error);
     return NextResponse.json(
-      { error: error.message || "Internal server error" },
+      { error: getErrorMessage(error) },
       { status: 500 },
     );
   }

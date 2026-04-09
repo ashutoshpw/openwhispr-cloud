@@ -85,6 +85,12 @@ export function PriceTable({ prices }: PriceTableProps) {
                 onClick={() =>
                   router.push(`/adminx/stripe/prices/${price.id}/edit`)
                 }
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    router.push(`/adminx/stripe/prices/${price.id}/edit`);
+                  }
+                }}
+                tabIndex={0}
               >
                 <td className="p-4 align-middle">
                   <div className="font-semibold">
@@ -127,6 +133,11 @@ export function PriceTable({ prices }: PriceTableProps) {
                 <td
                   className="p-4 align-middle"
                   onClick={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.stopPropagation();
+                    }
+                  }}
                 >
                   <ActionsMenu
                     itemType="price"

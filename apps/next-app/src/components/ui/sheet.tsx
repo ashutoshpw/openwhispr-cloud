@@ -17,7 +17,9 @@ type SheetPortalProps = React.ComponentPropsWithoutRef<
   typeof SheetPrimitive.Portal
 >;
 
-const SheetPortal = (props: SheetPortalProps) => <SheetPrimitive.Portal {...props} />;
+const SheetPortal = (props: SheetPortalProps) => (
+  <SheetPrimitive.Portal {...props} />
+);
 SheetPortal.displayName = SheetPrimitive.Portal.displayName;
 
 const SheetOverlay = React.forwardRef<

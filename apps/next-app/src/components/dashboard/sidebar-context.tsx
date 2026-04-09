@@ -1,13 +1,13 @@
 "use client";
 
 import {
+  type ReactNode,
   createContext,
   useCallback,
   useContext,
   useEffect,
   useRef,
   useState,
-  type ReactNode,
 } from "react";
 
 const STORAGE_KEY = "sidebar-width";

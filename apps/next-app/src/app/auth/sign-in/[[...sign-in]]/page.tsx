@@ -24,7 +24,10 @@ export default function SignInPage() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirect") || searchParams.get("callbackURL") || "/dashboard";
+  const redirectTo =
+    searchParams.get("redirect") ||
+    searchParams.get("callbackURL") ||
+    "/dashboard";
 
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);

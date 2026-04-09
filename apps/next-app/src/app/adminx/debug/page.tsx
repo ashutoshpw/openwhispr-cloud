@@ -29,9 +29,9 @@ export default async function DebugPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-muted-foreground">
+            <p className="text-sm font-medium text-muted-foreground">
               Has Session
-            </label>
+            </p>
             <div>
               <Badge variant={session ? "default" : "secondary"}>
                 {session ? "Yes" : "No"}
@@ -42,23 +42,23 @@ export default async function DebugPage() {
           {session && (
             <>
               <div>
-                <label className="text-sm font-medium text-muted-foreground">
+                <p className="text-sm font-medium text-muted-foreground">
                   User ID
-                </label>
+                </p>
                 <p className="font-mono text-sm">{session.user.id}</p>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-muted-foreground">
+                <p className="text-sm font-medium text-muted-foreground">
                   Email
-                </label>
+                </p>
                 <p>{session.user.email}</p>
               </div>
 
               <div>
-                <label className="text-sm font-medium text-muted-foreground">
+                <p className="text-sm font-medium text-muted-foreground">
                   Name
-                </label>
+                </p>
                 <p>{session.user.name}</p>
               </div>
             </>
@@ -72,9 +72,9 @@ export default async function DebugPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-muted-foreground">
+            <p className="text-sm font-medium text-muted-foreground">
               Current Role
-            </label>
+            </p>
             <div>
               <Badge
                 variant={userRole === "site-admin" ? "default" : "secondary"}
@@ -85,9 +85,9 @@ export default async function DebugPage() {
           </div>
 
           <div>
-            <label className="text-sm font-medium text-muted-foreground">
+            <p className="text-sm font-medium text-muted-foreground">
               Is Admin
-            </label>
+            </p>
             <div>
               <Badge variant={isAdmin ? "default" : "destructive"}>
                 {isAdmin ? "Yes ✓" : "No ✗"}
@@ -132,9 +132,9 @@ export default async function DebugPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-muted-foreground">
+            <p className="text-sm font-medium text-muted-foreground">
               Stripe Secret Key
-            </label>
+            </p>
             <div>
               <Badge
                 variant={
@@ -152,9 +152,9 @@ export default async function DebugPage() {
           </div>
 
           <div>
-            <label className="text-sm font-medium text-muted-foreground">
+            <p className="text-sm font-medium text-muted-foreground">
               Key Format
-            </label>
+            </p>
             <div>
               {process.env.STRIPE_SECRET_KEY?.startsWith("sk_test_") && (
                 <Badge variant="default">Valid (Test Mode) ✓</Badge>

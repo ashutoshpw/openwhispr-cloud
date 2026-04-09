@@ -66,6 +66,12 @@ export function ProductTable({ products: initialProducts }: ProductTableProps) {
                 onClick={() =>
                   router.push(`/adminx/stripe/products/${product.id}`)
                 }
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    router.push(`/adminx/stripe/products/${product.id}`);
+                  }
+                }}
+                tabIndex={0}
               >
                 <td className="p-4 align-middle">
                   <div className="flex items-center gap-3">
@@ -109,6 +115,11 @@ export function ProductTable({ products: initialProducts }: ProductTableProps) {
                 <td
                   className="p-4 align-middle"
                   onClick={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.stopPropagation();
+                    }
+                  }}
                 >
                   <ActionsMenu
                     itemType="product"

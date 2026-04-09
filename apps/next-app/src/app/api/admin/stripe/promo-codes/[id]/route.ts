@@ -1,9 +1,11 @@
 import { getSiteAdminStatus } from "@/lib/auth-utils";
+import { getErrorMessage } from "@/lib/error-utils";
 import { stripe } from "@/lib/stripe/client";
 import { auth } from "@repo/auth/server";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
+import type Stripe from "stripe";
 
 export async function GET(
   req: NextRequest,
@@ -27,10 +29,10 @@ export async function GET(
     const promotionCode = await stripe.promotionCodes.retrieve(id);
 
     return NextResponse.json(promotionCode);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching promo code:", error);
     return NextResponse.json(
-      { error: error.message || "Internal server error" },
+      { error: getErrorMessage(error) },
       { status: 500 },
     );
   }
@@ -57,7 +59,7 @@ export async function PUT(
     const { id } = await context.params;
     const body = await req.json();
 
-    const updateData: any = {};
+    const updateData: Stripe.PromotionCodeUpdateParams = {};
 
     if (body.active !== undefined) {
       updateData.active = body.active;
@@ -72,10 +74,10 @@ export async function PUT(
 
     revalidatePath("/adminx/stripe/promo-codes");
     return NextResponse.json(promotionCode);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error updating promo code:", error);
     return NextResponse.json(
-      { error: error.message || "Internal server error" },
+      { error: getErrorMessage(error) },
       { status: 500 },
     );
   }
@@ -108,10 +110,10 @@ export async function DELETE(
       success: true,
       message: "Promo code deactivated successfully",
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error deactivating promo code:", error);
     return NextResponse.json(
-      { error: error.message || "Internal server error" },
+      { error: getErrorMessage(error) },
       { status: 500 },
     );
   }

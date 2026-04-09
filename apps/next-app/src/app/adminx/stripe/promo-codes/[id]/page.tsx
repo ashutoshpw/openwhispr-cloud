@@ -72,52 +72,52 @@ export default async function PromoCodeDetailPage({
         <CardHeader>
           <CardTitle>Promo Code Information</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <label className="text-sm font-medium text-muted-foreground">
-              Code
-            </label>
-            <p className="text-2xl font-bold font-mono">{promoCode.code}</p>
-          </div>
-
-          <div>
-            <label className="text-sm font-medium text-muted-foreground">
-              ID
-            </label>
-            <p className="font-mono text-sm">{promoCode.id}</p>
-          </div>
-
-          <div>
-            <label className="text-sm font-medium text-muted-foreground">
-              Status
-            </label>
+        <CardContent>
+          <dl className="space-y-4">
             <div>
-              <Badge variant={promoCode.active ? "default" : "secondary"}>
-                {promoCode.active ? "Active" : "Inactive"}
-              </Badge>
+              <dt className="text-sm font-medium text-muted-foreground">
+                Code
+              </dt>
+              <dd className="text-2xl font-bold font-mono">{promoCode.code}</dd>
             </div>
-          </div>
 
-          <div>
-            <label className="text-sm font-medium text-muted-foreground">
-              Discount
-            </label>
-            <p className="text-lg font-semibold">{formatDiscount()}</p>
-          </div>
-
-          <div>
-            <label className="text-sm font-medium text-muted-foreground">
-              Linked Coupon
-            </label>
-            <div className="flex items-center gap-2">
-              <p className="font-mono text-sm">{promoCode.coupon.id}</p>
-              <Button asChild variant="ghost" size="sm">
-                <Link href={`/adminx/stripe/coupons/${promoCode.coupon.id}`}>
-                  View Coupon
-                </Link>
-              </Button>
+            <div>
+              <dt className="text-sm font-medium text-muted-foreground">ID</dt>
+              <dd className="font-mono text-sm">{promoCode.id}</dd>
             </div>
-          </div>
+
+            <div>
+              <dt className="text-sm font-medium text-muted-foreground">
+                Status
+              </dt>
+              <dd>
+                <Badge variant={promoCode.active ? "default" : "secondary"}>
+                  {promoCode.active ? "Active" : "Inactive"}
+                </Badge>
+              </dd>
+            </div>
+
+            <div>
+              <dt className="text-sm font-medium text-muted-foreground">
+                Discount
+              </dt>
+              <dd className="text-lg font-semibold">{formatDiscount()}</dd>
+            </div>
+
+            <div>
+              <dt className="text-sm font-medium text-muted-foreground">
+                Linked Coupon
+              </dt>
+              <dd className="flex items-center gap-2">
+                <p className="font-mono text-sm">{promoCode.coupon.id}</p>
+                <Button asChild variant="ghost" size="sm">
+                  <Link href={`/adminx/stripe/coupons/${promoCode.coupon.id}`}>
+                    View Coupon
+                  </Link>
+                </Button>
+              </dd>
+            </div>
+          </dl>
         </CardContent>
       </Card>
 
@@ -125,46 +125,48 @@ export default async function PromoCodeDetailPage({
         <CardHeader>
           <CardTitle>Usage & Limits</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <label className="text-sm font-medium text-muted-foreground">
-              Times Redeemed
-            </label>
-            <p className="text-lg font-semibold">
-              {promoCode.times_redeemed || 0}
-              {promoCode.max_redemptions && ` / ${promoCode.max_redemptions}`}
-            </p>
-          </div>
-
-          <div>
-            <label className="text-sm font-medium text-muted-foreground">
-              Expiration
-            </label>
-            <p>{formatDate(promoCode.expires_at)}</p>
-          </div>
-
-          {promoCode.restrictions?.first_time_transaction && (
+        <CardContent>
+          <dl className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-muted-foreground">
-                Restrictions
-              </label>
+              <dt className="text-sm font-medium text-muted-foreground">
+                Times Redeemed
+              </dt>
+              <dd className="text-lg font-semibold">
+                {promoCode.times_redeemed || 0}
+                {promoCode.max_redemptions && ` / ${promoCode.max_redemptions}`}
+              </dd>
+            </div>
+
+            <div>
+              <dt className="text-sm font-medium text-muted-foreground">
+                Expiration
+              </dt>
+              <dd>{formatDate(promoCode.expires_at)}</dd>
+            </div>
+
+            {promoCode.restrictions?.first_time_transaction && (
               <div>
-                <Badge variant="outline">First-time customers only</Badge>
+                <dt className="text-sm font-medium text-muted-foreground">
+                  Restrictions
+                </dt>
+                <dd>
+                  <Badge variant="outline">First-time customers only</Badge>
+                </dd>
               </div>
-            </div>
-          )}
+            )}
 
-          {promoCode.restrictions?.minimum_amount && (
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">
-                Minimum Amount
-              </label>
-              <p>
-                {promoCode.coupon.currency?.toUpperCase()}{" "}
-                {promoCode.restrictions.minimum_amount / 100}
-              </p>
-            </div>
-          )}
+            {promoCode.restrictions?.minimum_amount && (
+              <div>
+                <dt className="text-sm font-medium text-muted-foreground">
+                  Minimum Amount
+                </dt>
+                <dd>
+                  {promoCode.coupon.currency?.toUpperCase()}{" "}
+                  {promoCode.restrictions.minimum_amount / 100}
+                </dd>
+              </div>
+            )}
+          </dl>
         </CardContent>
       </Card>
 
@@ -172,22 +174,24 @@ export default async function PromoCodeDetailPage({
         <CardHeader>
           <CardTitle>Metadata</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <label className="text-sm font-medium text-muted-foreground">
-              Created
-            </label>
-            <p>{new Date(promoCode.created * 1000).toLocaleString()}</p>
-          </div>
-
-          {promoCode.metadata?.created_by && (
+        <CardContent>
+          <dl className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-muted-foreground">
-                Created By
-              </label>
-              <p>{promoCode.metadata.created_by}</p>
+              <dt className="text-sm font-medium text-muted-foreground">
+                Created
+              </dt>
+              <dd>{new Date(promoCode.created * 1000).toLocaleString()}</dd>
             </div>
-          )}
+
+            {promoCode.metadata?.created_by && (
+              <div>
+                <dt className="text-sm font-medium text-muted-foreground">
+                  Created By
+                </dt>
+                <dd>{promoCode.metadata.created_by}</dd>
+              </div>
+            )}
+          </dl>
         </CardContent>
       </Card>
     </div>

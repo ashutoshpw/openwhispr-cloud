@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { getErrorMessage } from "@/lib/error-utils";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -17,9 +18,34 @@ interface PromoCodeFormProps {
     amount_off: number | null;
     currency: string | null;
   }>;
-  promoCode?: any;
+  promoCode?: {
+    id: string;
+    code?: string | null;
+    active?: boolean | null;
+    max_redemptions?: number | null;
+    expires_at?: number | null;
+    coupon?: { id: string } | null;
+    restrictions?: {
+      first_time_transaction?: boolean | null;
+      minimum_amount?: number | null;
+      minimum_amount_currency?: string | null;
+    } | null;
+  };
   mode?: "create" | "edit";
 }
+
+type PromoCodePayload = {
+  code: string;
+  coupon: string;
+  active: boolean;
+  max_redemptions?: number;
+  expires_at?: number;
+  restrictions?: {
+    first_time_transaction?: boolean;
+    minimum_amount?: number;
+    minimum_amount_currency?: string;
+  };
+};
 
 export function PromoCodeForm({
   coupons,
@@ -69,7 +95,7 @@ export function PromoCodeForm({
     setIsLoading(true);
 
     try {
-      const promoCodeData: any = {
+      const promoCodeData: PromoCodePayload = {
         code: code.toUpperCase().trim(),
         coupon: couponId,
         active,
@@ -129,18 +155,23 @@ export function PromoCodeForm({
 
       router.push("/adminx/stripe/promo-codes");
       router.refresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      toast.error(error.message || "Failed to save promo code");
+      toast.error(getErrorMessage(error, "Failed to save promo code"));
     } finally {
       setIsLoading(false);
     }
   };
 
-  const formatCouponLabel = (coupon: any) => {
-    const discount = coupon.percent_off
-      ? `${coupon.percent_off}% off`
-      : `${coupon.currency?.toUpperCase()} ${coupon.amount_off / 100} off`;
+  const formatCouponLabel = (coupon: PromoCodeFormProps["coupons"][number]) => {
+    let discount = "Custom discount";
+
+    if (coupon.percent_off !== null) {
+      discount = `${coupon.percent_off}% off`;
+    } else if (coupon.amount_off !== null && coupon.currency) {
+      discount = `${coupon.currency.toUpperCase()} ${coupon.amount_off / 100} off`;
+    }
+
     return coupon.name ? `${coupon.name} (${discount})` : discount;
   };
 

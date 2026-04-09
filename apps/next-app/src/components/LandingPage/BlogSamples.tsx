@@ -47,8 +47,8 @@ export default function BlogSample() {
             <Link href={"/"} key={article?.id}>
               <article className="flex flex-col space-y-2 p-4 rounded-md border">
                 <Image
-                  src={article?.image!}
-                  alt={""}
+                  src={article.image}
+                  alt={article.title}
                   width={804}
                   height={452}
                   className="rounded-md border bg-muted transition-colors"
@@ -60,7 +60,7 @@ export default function BlogSample() {
                 </div>
                 {/* <p className="text-muted-foreground">{info?.subtitle}</p> */}
                 <p className="text-sm text-muted-foreground">
-                  {new Date(article?.date!)?.toLocaleDateString()}
+                  {new Date(article.date).toLocaleDateString()}
                 </p>
               </article>
             </Link>

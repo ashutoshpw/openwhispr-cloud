@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
+import { getErrorMessage } from "@/lib/error-utils";
 import { useTemplate } from "@/utils/hook/useTemplate";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ReloadIcon } from "@radix-ui/react-icons";
@@ -67,8 +68,10 @@ export default function ContactUs() {
       const result = await response.json();
 
       return result;
-    } catch (error) {
-      throw new Error("Storing Emails in db Frontend Error", error as any);
+    } catch (error: unknown) {
+      throw new Error(
+        `Storing Emails in db Frontend Error: ${getErrorMessage(error)}`,
+      );
     }
   };
   return (

@@ -38,12 +38,16 @@ export default async function MarketingPage() {
           <Button>Get Started</Button>
         </Link>
         <div className="my-3">
-          <video width="900" height="240" controls id="player1" preload="none">
-            <source
-              src="https://www.youtube.com/watch?v=ml9Fz2aUx9k"
-              type="video/mp4"
-            />
-          </video>
+          <iframe
+            title="Starter kit marketing video"
+            width="900"
+            height="506"
+            src="https://www.youtube.com/embed/ml9Fz2aUx9k"
+            allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
+            sandbox="allow-scripts allow-presentation"
+            allowFullScreen
+            className="aspect-video w-full max-w-[900px]"
+          />
         </div>
         <div className="flex flex-col min-h-screen max-w-[900px] items-center my-8">
           <article className="max-w-4xl mx-auto pb-8">

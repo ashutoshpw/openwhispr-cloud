@@ -115,6 +115,12 @@ export function CouponTable({ coupons: initialCoupons }: CouponTableProps) {
                 onClick={() =>
                   router.push(`/adminx/stripe/coupons/${coupon.id}`)
                 }
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    router.push(`/adminx/stripe/coupons/${coupon.id}`);
+                  }
+                }}
+                tabIndex={0}
               >
                 <td className="p-4 align-middle">
                   <div className="flex items-center gap-2">
@@ -160,6 +166,11 @@ export function CouponTable({ coupons: initialCoupons }: CouponTableProps) {
                 <td
                   className="p-4 align-middle"
                   onClick={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.stopPropagation();
+                    }
+                  }}
                 >
                   <ActionsMenu
                     itemType="coupon"

@@ -1,5 +1,5 @@
-import { docs, blogCollection } from "../.source/server";
 import { loader } from "fumadocs-core/source";
+import { blogCollection, docs } from "../.source/server";
 
 export const docsSource = loader({
   baseUrl: "/docs",

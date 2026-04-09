@@ -41,9 +41,7 @@ const AVATAR_COLORS = [
 ];
 
 function getAvatarColor(name: string): string {
-  const idx = name
-    .split("")
-    .reduce((acc, c) => acc + c.charCodeAt(0), 0);
+  const idx = name.split("").reduce((acc, c) => acc + c.charCodeAt(0), 0);
   return AVATAR_COLORS[idx % AVATAR_COLORS.length];
 }
 
@@ -54,11 +52,17 @@ function getInitials(name: string): string {
     : name.slice(0, 2).toUpperCase();
 }
 
-function WorkspaceAvatar({ name, className }: { name: string; className?: string }) {
+function WorkspaceAvatar({
+  name,
+  className,
+}: { name: string; className?: string }) {
   return (
     <Avatar className={cn("h-5 w-5 shrink-0", className)}>
       <AvatarFallback
-        className={cn(getAvatarColor(name), "text-white text-[10px] font-medium")}
+        className={cn(
+          getAvatarColor(name),
+          "text-white text-[10px] font-medium",
+        )}
       >
         {getInitials(name)}
       </AvatarFallback>
@@ -68,7 +72,9 @@ function WorkspaceAvatar({ name, className }: { name: string; className?: string
 
 export function WorkspaceSwitcher() {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
-  const [activeWorkspace, setActiveWorkspace] = useState<Workspace | null>(null);
+  const [activeWorkspace, setActiveWorkspace] = useState<Workspace | null>(
+    null,
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
@@ -83,7 +89,8 @@ export function WorkspaceSwitcher() {
           setIsLoading(false);
           return;
         }
-        const result: Workspace[] | WorkspaceListResponse = await response.json();
+        const result: Workspace[] | WorkspaceListResponse =
+          await response.json();
 
         const organizations = Array.isArray(result)
           ? result
@@ -197,11 +204,15 @@ export function WorkspaceSwitcher() {
             <ChevronsUpDown className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" alignOffset={-10} className="w-[260px] p-0">
+        <DropdownMenuContent
+          align="end"
+          alignOffset={-10}
+          className="w-[260px] p-0"
+        >
           {/* Search */}
           <div className="flex items-center px-3 py-2 border-b">
             <input
-              autoFocus
+              aria-label="Search teams"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Find Team..."
@@ -240,7 +251,10 @@ export function WorkspaceSwitcher() {
           {/* Create Team */}
           <div className="p-1">
             <DropdownMenuItem asChild>
-              <a href="/workspace/new" className="cursor-pointer flex items-start gap-3 py-2">
+              <a
+                href="/workspace/new"
+                className="cursor-pointer flex items-start gap-3 py-2"
+              >
                 <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border mt-0.5">
                   <Plus className="h-3 w-3" />
                 </div>

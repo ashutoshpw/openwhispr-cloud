@@ -1,4 +1,5 @@
 import { getSiteAdminStatus } from "@/lib/auth-utils";
+import { getErrorMessage } from "@/lib/error-utils";
 import { stripe } from "@/lib/stripe/client";
 import { auth } from "@repo/auth/server";
 import { revalidatePath } from "next/cache";
@@ -83,10 +84,10 @@ export async function GET(req: NextRequest) {
     });
 
     return NextResponse.json(products.data);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching products:", error);
     return NextResponse.json(
-      { error: error.message || "Internal server error" },
+      { error: getErrorMessage(error) },
       { status: 500 },
     );
   }
@@ -136,14 +137,15 @@ export async function POST(req: NextRequest) {
     });
 
     if (validatedData.initialPrice) {
+      const billingPeriod = validatedData.initialPrice.billingPeriod;
       const defaultPrice = await stripe.prices.create({
         product: product.id,
         unit_amount: validatedData.initialPrice.unitAmount,
         currency: validatedData.initialPrice.currency,
         recurring:
-          validatedData.initialPrice.type === "recurring"
+          validatedData.initialPrice.type === "recurring" && billingPeriod
             ? {
-                interval: validatedData.initialPrice.billingPeriod!,
+                interval: billingPeriod,
                 interval_count: validatedData.initialPrice.intervalCount || 1,
               }
             : undefined,
@@ -163,8 +165,8 @@ export async function POST(req: NextRequest) {
     revalidatePath("/adminx/stripe/products");
 
     return NextResponse.json(product);
-  } catch (error: any) {
-    console.error("Error creating product:", error.message);
+  } catch (error: unknown) {
+    console.error("Error creating product:", error);
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -174,7 +176,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: error.message || "Internal server error" },
+      { error: getErrorMessage(error) },
       { status: 500 },
     );
   }

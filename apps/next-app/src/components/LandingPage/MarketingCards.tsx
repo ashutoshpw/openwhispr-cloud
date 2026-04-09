@@ -99,7 +99,7 @@ const SpringAnimatedFeatures = () => {
               key={project.id}
               className="mt-5 text-left border p-6 rounded-md dark:bg-black"
             >
-              <a target="_blank" rel="noopener noreferrer">
+              <article>
                 <Image
                   src={project?.imageDark ? project?.imageDark : project.image}
                   width={40}
@@ -111,7 +111,7 @@ const SpringAnimatedFeatures = () => {
                 <div className="max-w-[250px] text-sm font-normal text-gray-500">
                   {project.description}
                 </div>
-              </a>
+              </article>
             </motion.div>
           );
         })}

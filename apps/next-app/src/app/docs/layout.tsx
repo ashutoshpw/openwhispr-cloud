@@ -1,6 +1,6 @@
-import { RootProvider } from "fumadocs-ui/provider/next";
-import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import { docsSource } from "@/lib/source";
+import { DocsLayout } from "fumadocs-ui/layouts/docs";
+import { RootProvider } from "fumadocs-ui/provider/next";
 import "fumadocs-ui/style.css";
 import type { ReactNode } from "react";
 

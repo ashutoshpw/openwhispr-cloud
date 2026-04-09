@@ -58,7 +58,7 @@
     "mcp-handler": "^1.0.3",
     "mini-svg-data-uri": "^1.4.4",
     "nanoid": "^5.0.7",
-    "next": "16.2.1",
+    "next": "16.2.3",
     "next-themes": "^0.3.0",
     "postcss": "^8.5.8",
     "posthog-js": "^1.347.1",

@@ -1,10 +1,16 @@
-import { registerPayment } from "@/utils/db/registerPayment";
+import { getErrorMessage } from "@/lib/error-utils";
+import { stripe } from "@/lib/stripe/client";
 import { type NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(req: NextRequest) {
+  const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!stripeWebhookSecret) {
+    return NextResponse.json(
+      { status: "Failed", error: "Stripe webhook is not configured" },
+      { status: 500 },
+    );
+  }
   const payload = await req.text();
   const res = JSON.parse(payload);
   const sig = req.headers.get("Stripe-Signature");
@@ -13,10 +19,17 @@ export async function POST(req: NextRequest) {
   const timeString = new Date(res?.created * 1000).toLocaleTimeString();
 
   try {
+    if (!sig) {
+      return NextResponse.json(
+        { status: "Failed", error: "Missing Stripe signature" },
+        { status: 400 },
+      );
+    }
+
     const event = stripe.webhooks.constructEvent(
       payload,
-      sig!,
-      process.env.STRIPE_WEBHOOK_SECRET!,
+      sig,
+      stripeWebhookSecret,
     );
 
     console.log("Event", event?.type);
@@ -60,10 +73,12 @@ export async function POST(req: NextRequest) {
      */
 
     return NextResponse.json({
-      status: "DB registration didn't work",
-      // response,
+      status: "Webhook received",
     });
-  } catch (error: any) {
-    return NextResponse.json({ status: "Failed", error });
+  } catch (error: unknown) {
+    return NextResponse.json(
+      { status: "Failed", error: getErrorMessage(error) },
+      { status: 400 },
+    );
   }
 }

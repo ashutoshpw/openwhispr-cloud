@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, Suspense, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 
 function ConsentContent() {
   const [loading, setLoading] = useState(false);
@@ -88,8 +88,7 @@ function ConsentContent() {
           if (data.redirect_uri || data.redirectURI) {
             window.location.href = data.redirect_uri || data.redirectURI;
           } else {
-            const redirectUri =
-              oauthParams?.redirect_uri || redirect_uri;
+            const redirectUri = oauthParams?.redirect_uri || redirect_uri;
             const state = oauthParams?.state;
             const authCode = data.code || data.authorization_code;
 
@@ -103,7 +102,10 @@ function ConsentContent() {
           }
         } else {
           const responseText = await response.text();
-          let errorData;
+          let errorData: {
+            error?: string;
+            error_description?: string;
+          } = {};
           try {
             errorData = JSON.parse(responseText);
           } catch {
@@ -130,8 +132,7 @@ function ConsentContent() {
               window.location.href =
                 fallbackData.redirect_uri || fallbackData.redirectURI;
             } else {
-              const redirectUri =
-                oauthParams?.redirect_uri || redirect_uri;
+              const redirectUri = oauthParams?.redirect_uri || redirect_uri;
               const state = oauthParams?.state;
               const authCode =
                 fallbackData.code || fallbackData.authorization_code;

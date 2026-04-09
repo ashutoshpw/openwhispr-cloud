@@ -1,3 +1,4 @@
+import { auth } from "@repo/auth/server";
 import {
   BILLING_MANAGEMENT_ROLES,
   getOrganizationPlan,
@@ -8,7 +9,6 @@ import {
   isReadOnly,
 } from "@repo/billing";
 import type { BillingSubscriptionResponse } from "@repo/billing";
-import { auth } from "@repo/auth/server";
 import { db } from "@repo/database";
 import { and, eq } from "@repo/database";
 import { member } from "@repo/database/schema";

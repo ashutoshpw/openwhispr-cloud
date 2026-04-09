@@ -1,4 +1,5 @@
 import { getSiteAdminStatus } from "@/lib/auth-utils";
+import { getErrorMessage } from "@/lib/error-utils";
 import { stripe } from "@/lib/stripe/client";
 import { auth } from "@repo/auth/server";
 import { revalidatePath } from "next/cache";
@@ -33,10 +34,10 @@ export async function POST(
     revalidatePath(`/adminx/stripe/products/${id}`);
 
     return NextResponse.json({ status: "archived", product });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error archiving product:", error);
     return NextResponse.json(
-      { error: error.message || "Internal server error" },
+      { error: getErrorMessage(error) },
       { status: 500 },
     );
   }

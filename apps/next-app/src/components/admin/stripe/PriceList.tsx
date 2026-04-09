@@ -37,7 +37,7 @@ export function PriceList({
     }).format(value);
   };
 
-  const formatInterval = (recurring: any) => {
+  const formatInterval = (recurring: Price["recurring"]) => {
     if (!recurring) return "One-time";
     const { interval, interval_count } = recurring;
     if (interval_count === 1) {

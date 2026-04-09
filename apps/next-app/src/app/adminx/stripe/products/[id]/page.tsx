@@ -114,82 +114,86 @@ export default async function ProductDetailPage({
           <CardHeader>
             <CardTitle>Product Information</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">
-                Product ID
-              </label>
-              <p className="font-mono text-sm">{product.id}</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">
-                Name
-              </label>
-              <p>{product.name}</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">
-                Description
-              </label>
-              <p className="text-sm">
-                {product.description || "No description"}
-              </p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">
-                Status
-              </label>
+          <CardContent>
+            <dl className="space-y-4">
               <div>
-                <Badge
-                  className={product.active ? "bg-emerald-500 text-white" : ""}
-                  variant={product.active ? "default" : "secondary"}
-                >
-                  {product.active ? "Active" : "Archived"}
-                </Badge>
+                <dt className="text-sm font-medium text-muted-foreground">
+                  Product ID
+                </dt>
+                <dd className="font-mono text-sm">{product.id}</dd>
               </div>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">
-                Created
-              </label>
-              <p className="text-sm">{formatDate(product.created)}</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">
-                Updated
-              </label>
-              <p className="text-sm">{formatDate(product.updated)}</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">
-                Statement descriptor
-              </label>
-              <p className="text-sm font-mono">
-                {product.statement_descriptor || "Not set"}
-              </p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">
-                Unit label
-              </label>
-              <p className="text-sm">
-                {product.unit_label ? product.unit_label : "Not set"}
-              </p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">
-                Default price
-              </label>
-              {product.default_price ? (
-                <p className="text-sm font-mono">
-                  {typeof product.default_price === "string"
-                    ? product.default_price
-                    : product.default_price.id}
-                </p>
-              ) : (
-                <p className="text-sm text-muted-foreground">Not set</p>
-              )}
-            </div>
+              <div>
+                <dt className="text-sm font-medium text-muted-foreground">
+                  Name
+                </dt>
+                <dd>{product.name}</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-muted-foreground">
+                  Description
+                </dt>
+                <dd className="text-sm">
+                  {product.description || "No description"}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-muted-foreground">
+                  Status
+                </dt>
+                <dd>
+                  <Badge
+                    className={
+                      product.active ? "bg-emerald-500 text-white" : ""
+                    }
+                    variant={product.active ? "default" : "secondary"}
+                  >
+                    {product.active ? "Active" : "Archived"}
+                  </Badge>
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-muted-foreground">
+                  Created
+                </dt>
+                <dd className="text-sm">{formatDate(product.created)}</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-muted-foreground">
+                  Updated
+                </dt>
+                <dd className="text-sm">{formatDate(product.updated)}</dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-muted-foreground">
+                  Statement descriptor
+                </dt>
+                <dd className="text-sm font-mono">
+                  {product.statement_descriptor || "Not set"}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-muted-foreground">
+                  Unit label
+                </dt>
+                <dd className="text-sm">
+                  {product.unit_label ? product.unit_label : "Not set"}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium text-muted-foreground">
+                  Default price
+                </dt>
+                {product.default_price ? (
+                  <dd className="text-sm font-mono">
+                    {typeof product.default_price === "string"
+                      ? product.default_price
+                      : product.default_price.id}
+                  </dd>
+                ) : (
+                  <dd className="text-sm text-muted-foreground">Not set</dd>
+                )}
+              </div>
+            </dl>
           </CardContent>
         </Card>
 
@@ -200,11 +204,11 @@ export default async function ProductDetailPage({
           <CardContent>
             {productImages.length > 0 ? (
               <div className="grid grid-cols-2 gap-2">
-                {productImages.map((image, index) => (
+                {productImages.map((image) => (
                   <img
-                    key={index}
+                    key={image}
                     src={image}
-                    alt={`${product.name} ${index + 1}`}
+                    alt={product.name}
                     className="rounded-md object-cover w-full h-32"
                   />
                 ))}
@@ -226,9 +230,9 @@ export default async function ProductDetailPage({
           <CardContent>
             {marketingFeatures.length ? (
               <ul className="space-y-2">
-                {marketingFeatures.map((feature, index) => (
+                {marketingFeatures.map((feature) => (
                   <li
-                    key={`${feature}-${index}`}
+                    key={feature}
                     className="flex items-start gap-2 rounded-md border p-3 text-sm"
                   >
                     <span className="mt-1 h-2 w-2 rounded-full bg-primary" />

@@ -50,59 +50,59 @@ export default async function UserDetailPage({
         <CardHeader>
           <CardTitle>User Information</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <label className="text-sm font-medium text-muted-foreground">
-              ID
-            </label>
-            <p className="font-mono text-sm">{user.id}</p>
-          </div>
-          <div>
-            <label className="text-sm font-medium text-muted-foreground">
-              Name
-            </label>
-            <p>{user.name}</p>
-          </div>
-          <div>
-            <label className="text-sm font-medium text-muted-foreground">
-              Email
-            </label>
-            <p>{user.email}</p>
-          </div>
-          <div>
-            <label className="text-sm font-medium text-muted-foreground">
-              Role
-            </label>
+        <CardContent>
+          <dl className="space-y-4">
             <div>
-              <Badge
-                variant={user.role === "site-admin" ? "default" : "secondary"}
-              >
-                {user.role}
-              </Badge>
+              <dt className="text-sm font-medium text-muted-foreground">ID</dt>
+              <dd className="font-mono text-sm">{user.id}</dd>
             </div>
-          </div>
-          <div>
-            <label className="text-sm font-medium text-muted-foreground">
-              Email Verified
-            </label>
             <div>
-              <Badge variant={user.emailVerified ? "default" : "outline"}>
-                {user.emailVerified ? "Yes" : "No"}
-              </Badge>
+              <dt className="text-sm font-medium text-muted-foreground">
+                Name
+              </dt>
+              <dd>{user.name}</dd>
             </div>
-          </div>
-          <div>
-            <label className="text-sm font-medium text-muted-foreground">
-              Created At
-            </label>
-            <p>{new Date(user.createdAt).toLocaleString()}</p>
-          </div>
-          <div>
-            <label className="text-sm font-medium text-muted-foreground">
-              Updated At
-            </label>
-            <p>{new Date(user.updatedAt).toLocaleString()}</p>
-          </div>
+            <div>
+              <dt className="text-sm font-medium text-muted-foreground">
+                Email
+              </dt>
+              <dd>{user.email}</dd>
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-muted-foreground">
+                Role
+              </dt>
+              <dd>
+                <Badge
+                  variant={user.role === "site-admin" ? "default" : "secondary"}
+                >
+                  {user.role}
+                </Badge>
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-muted-foreground">
+                Email Verified
+              </dt>
+              <dd>
+                <Badge variant={user.emailVerified ? "default" : "outline"}>
+                  {user.emailVerified ? "Yes" : "No"}
+                </Badge>
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-muted-foreground">
+                Created At
+              </dt>
+              <dd>{new Date(user.createdAt).toLocaleString()}</dd>
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-muted-foreground">
+                Updated At
+              </dt>
+              <dd>{new Date(user.updatedAt).toLocaleString()}</dd>
+            </div>
+          </dl>
         </CardContent>
       </Card>
     </div>

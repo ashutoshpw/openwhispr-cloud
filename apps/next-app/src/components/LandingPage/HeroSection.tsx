@@ -37,12 +37,12 @@ export default function HeroSection() {
           <div className="relative rounded-xl">
             <img
               src="/dash-light.jpg"
-              alt="Hero Image"
+              alt="Dashboard preview"
               className="block w-[1200px] rounded-[inherit] border object-contain shadow-lg dark:hidden"
             />
             <img
               src="/dash.jpg"
-              alt="Hero Image"
+              alt="Dashboard preview"
               className="dark:block w-[1200px] rounded-[inherit] border object-contain shadow-lg hidden"
             />
             <BorderBeam size={250} duration={12} delay={9} />

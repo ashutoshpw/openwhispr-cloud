@@ -1,11 +1,11 @@
+import { getPricingTiers } from "@/lib/stripe/queries";
+import { auth } from "@repo/auth/server";
 import { canUserCreateFreeWorkspace } from "@repo/billing";
 import { getAppSetting } from "@repo/billing";
 import {
   APP_SETTINGS_KEYS,
   DEFAULT_ENTERPRISE_CONTACT_LINK,
 } from "@repo/billing/constants";
-import { getPricingTiers } from "@/lib/stripe/queries";
-import { auth } from "@repo/auth/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { WorkspaceForm } from "./WorkspaceForm";

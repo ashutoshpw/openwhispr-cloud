@@ -1,4 +1,5 @@
 import { getSiteAdminStatus } from "@/lib/auth-utils";
+import { getErrorMessage } from "@/lib/error-utils";
 import { stripe } from "@/lib/stripe/client";
 import { auth } from "@repo/auth/server";
 import { revalidatePath } from "next/cache";
@@ -27,10 +28,10 @@ export async function GET(
     const coupon = await stripe.coupons.retrieve(id);
 
     return NextResponse.json(coupon);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching coupon:", error);
     return NextResponse.json(
-      { error: error.message || "Internal server error" },
+      { error: getErrorMessage(error) },
       { status: 500 },
     );
   }
@@ -63,10 +64,10 @@ export async function DELETE(
       success: true,
       message: "Coupon deleted successfully",
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error deleting coupon:", error);
     return NextResponse.json(
-      { error: error.message || "Internal server error" },
+      { error: getErrorMessage(error) },
       { status: 500 },
     );
   }

@@ -1,9 +1,11 @@
 import { getSiteAdminStatus } from "@/lib/auth-utils";
+import { getErrorMessage } from "@/lib/error-utils";
 import { stripe } from "@/lib/stripe/client";
 import { auth } from "@repo/auth/server";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
+import type Stripe from "stripe";
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,7 +24,7 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
 
-    const promoCodeData: any = {
+    const promoCodeData: Stripe.PromotionCodeCreateParams = {
       code: body.code,
       coupon: body.coupon,
       active: body.active ?? true,
@@ -49,10 +51,10 @@ export async function POST(req: NextRequest) {
 
     revalidatePath("/adminx/stripe/promo-codes");
     return NextResponse.json(promotionCode);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error creating promo code:", error);
     return NextResponse.json(
-      { error: error.message || "Internal server error" },
+      { error: getErrorMessage(error) },
       { status: 500 },
     );
   }
