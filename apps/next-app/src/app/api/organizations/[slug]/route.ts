@@ -5,25 +5,25 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
 interface RouteParams {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }
 
 const SLUG_REGEX = /^[a-z0-9](?:[a-z0-9-]{0,48}[a-z0-9])?$/;
 
 /**
- * GET /api/organizations/[id]
+ * GET /api/organizations/[slug]
  */
 export async function GET(_request: Request, { params }: RouteParams) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const { id } = await params;
+  const { slug } = await params;
 
   const [org] = await db()
     .select()
     .from(organization)
-    .where(eq(organization.id, id))
+    .where(eq(organization.slug, slug))
     .limit(1);
   if (!org) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -47,7 +47,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
 }
 
 /**
- * PUT /api/organizations/[id]
+ * PUT /api/organizations/[slug]
  * Update workspace name and/or slug. Only owners and admins.
  */
 export async function PUT(request: Request, { params }: RouteParams) {
@@ -55,12 +55,12 @@ export async function PUT(request: Request, { params }: RouteParams) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const { id } = await params;
+  const { slug: currentSlug } = await params;
 
   const [org] = await db()
     .select()
     .from(organization)
-    .where(eq(organization.id, id))
+    .where(eq(organization.slug, currentSlug))
     .limit(1);
   if (!org) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });

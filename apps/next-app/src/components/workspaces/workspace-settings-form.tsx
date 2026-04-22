@@ -53,7 +53,7 @@ export function WorkspaceSettingsForm({
   const slugValid = SLUG_REGEX.test(slug);
 
   async function update(field: "name" | "slug", value: string) {
-    const res = await fetch(`/api/organizations/${organizationId}`, {
+    const res = await fetch(`/api/organizations/${savedSlug}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ [field]: value }),
