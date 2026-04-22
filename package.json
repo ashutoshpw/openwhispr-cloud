@@ -21,6 +21,7 @@
     "db:seed": "bun run scripts/seed-admin.ts",
     "init-auth": "bun run scripts/init-auth.ts",
     "setup": "bun run scripts/setup.ts",
+    "env:link": "bun run scripts/link-env.ts",
     "setup:stripe": "bun run scripts/setup-stripe.ts",
     "setup:posthog": "bun run scripts/setup-posthog.ts",
     "setup:referral": "bun run scripts/setup-referral.ts",

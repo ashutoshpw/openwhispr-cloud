@@ -9,7 +9,13 @@
       "Bash(bun run:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(bunx path-to-port:*)"
+      "Bash(bunx path-to-port:*)",
+      "Bash(command -v yarn)",
+      "Bash(yarn cache *)",
+      "Bash(command -v pnpm)",
+      "Bash(pnpm store *)",
+      "Bash(command -v bun)",
+      "Bash(bun install *)"
     ]
   }
 }
