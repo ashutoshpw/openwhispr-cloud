@@ -6,6 +6,7 @@ import {
   CreditCard,
   Folder,
   HomeIcon,
+  Plug,
   Settings,
   SlidersHorizontal,
   Users,
@@ -37,7 +38,10 @@ export const workspaceNav: NavConfig = {
   main: [
     {
       title: "",
-      items: [{ label: "Home", icon: HomeIcon, segment: "" }],
+      items: [
+        { label: "Home", icon: HomeIcon, segment: "" },
+        { label: "Integrations", icon: Plug, segment: "~/integrations" },
+      ],
     },
     {
       id: "agents",
@@ -74,6 +78,7 @@ export const projectNav: NavConfig = {
       items: [
         { label: "Home", icon: HomeIcon, segment: "" },
         { label: "Finance", icon: Folder, segment: "finance" },
+        { label: "Integrations", icon: Plug, segment: "integrations" },
       ],
     },
     {
