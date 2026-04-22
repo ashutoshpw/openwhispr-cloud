@@ -80,6 +80,11 @@ export function InstalledIntegrationsList({
                     {new Date(installation.lastVerifiedAt).toLocaleString()}
                   </span>
                 )}
+                {isError && installation.lastError && (
+                  <p className="mt-1 text-destructive">
+                    {installation.lastError}
+                  </p>
+                )}
               </CardContent>
             </Card>
           </Link>

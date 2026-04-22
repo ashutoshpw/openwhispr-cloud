@@ -1,5 +1,7 @@
 "use client";
 
+import type { ConfigSchema } from "@/components/integrations/install-integration-form";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,9 +28,9 @@ import type {
   Integration,
   IntegrationInstallation,
 } from "@repo/database/schema";
-import { Loader2 } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 interface InstallationManagerProps {
@@ -53,6 +55,20 @@ export function InstallationManager({
   const [savingName, setSavingName] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [rotating, setRotating] = useState(false);
+  const [secretValues, setSecretValues] = useState<Record<string, string>>({});
+
+  const configSchema =
+    (integration.configSchema as ConfigSchema | null) ?? null;
+  const secretFields = useMemo(() => {
+    const props = configSchema?.properties ?? {};
+    return Object.entries(props).filter(
+      ([, prop]) => prop.format === "password",
+    );
+  }, [configSchema]);
+  const hasSecretChanges = Object.values(secretValues).some(
+    (v) => v.trim().length > 0,
+  );
 
   const dirty =
     displayName.trim() !== savedName && displayName.trim().length > 0;
@@ -98,6 +114,34 @@ export function InstallationManager({
     }
   }
 
+  async function handleRotateSecrets() {
+    const secretConfig: Record<string, string> = {};
+    for (const [key] of secretFields) {
+      const v = secretValues[key]?.trim();
+      if (v) secretConfig[key] = v;
+    }
+    if (Object.keys(secretConfig).length === 0) return;
+    setRotating(true);
+    try {
+      const res = await fetch(`/api/installations/${installation.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ secretConfig }),
+      });
+      if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j.error ?? "Rotation failed");
+      }
+      setSecretValues({});
+      toast.success("Credentials updated");
+      router.refresh();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Rotation failed");
+    } finally {
+      setRotating(false);
+    }
+  }
+
   async function handleDelete() {
     setDeleting(true);
     try {
@@ -119,6 +163,13 @@ export function InstallationManager({
 
   return (
     <div className="grid gap-6 max-w-[800px]">
+      {installation.status === "error" && installation.lastError && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Verification failed</AlertTitle>
+          <AlertDescription>{installation.lastError}</AlertDescription>
+        </Alert>
+      )}
       <Card>
         <CardHeader>
           <CardTitle>Display name</CardTitle>
@@ -166,6 +217,66 @@ export function InstallationManager({
           </Button>
         </CardFooter>
       </Card>
+
+      {secretFields.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Rotate credentials</CardTitle>
+            <CardDescription>
+              Provide new values to replace the stored secret(s).
+              {secretFields.length > 1 && (
+                <span className="block mt-1">
+                  All secret fields are stored together; provide values for
+                  every field you wish to keep.
+                </span>
+              )}
+              {installation.hasSecret ? null : (
+                <span className="block mt-1 text-muted-foreground">
+                  No credential is currently stored.
+                </span>
+              )}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            {secretFields.map(([key, prop]) => {
+              const id = `secret-${key}`;
+              const label = prop.title ?? key;
+              return (
+                <div key={key} className="grid gap-1.5">
+                  <Label htmlFor={id}>{label}</Label>
+                  <Input
+                    id={id}
+                    type="password"
+                    autoComplete="new-password"
+                    value={secretValues[key] ?? ""}
+                    onChange={(e) =>
+                      setSecretValues((v) => ({
+                        ...v,
+                        [key]: e.target.value,
+                      }))
+                    }
+                    placeholder="••••••••"
+                  />
+                  {prop.description && (
+                    <p className="text-xs text-muted-foreground">
+                      {prop.description}
+                    </p>
+                  )}
+                </div>
+              );
+            })}
+          </CardContent>
+          <CardFooter>
+            <Button
+              onClick={handleRotateSecrets}
+              disabled={!hasSecretChanges || rotating}
+            >
+              {rotating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Update credentials
+            </Button>
+          </CardFooter>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>
