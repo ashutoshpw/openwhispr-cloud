@@ -11,7 +11,9 @@ interface RouteParams {
  */
 export async function POST(_req: Request, { params }: RouteParams) {
   const { id } = await params;
-  const result = await loadAuthorizedInstallation(id);
+  const result = await loadAuthorizedInstallation(id, {
+    requireWriteRole: true,
+  });
   if ("error" in result) return result.error;
 
   const verify = await reverifyInstallation(result.row, result.integrationSlug);

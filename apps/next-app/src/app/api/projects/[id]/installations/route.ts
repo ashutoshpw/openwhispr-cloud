@@ -15,7 +15,10 @@ interface RouteParams {
   params: Promise<{ id: string }>;
 }
 
-async function checkProjectMembership(projectId: string) {
+async function checkProjectMembership(
+  projectId: string,
+  options: { requireWriteRole?: boolean } = {},
+) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user?.id) {
     return {
@@ -46,6 +49,16 @@ async function checkProjectMembership(projectId: string) {
     return {
       error: NextResponse.json(
         { error: "Not a member of this organization" },
+        { status: 403 },
+      ),
+    };
+  }
+  if (options.requireWriteRole && m.role !== "owner" && m.role !== "admin") {
+    return {
+      error: NextResponse.json(
+        {
+          error: "Only workspace owners and admins can install integrations.",
+        },
         { status: 403 },
       ),
     };
@@ -88,7 +101,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
  */
 export async function POST(request: Request, { params }: RouteParams) {
   const { id } = await params;
-  const check = await checkProjectMembership(id);
+  const check = await checkProjectMembership(id, { requireWriteRole: true });
   if ("error" in check) return check.error;
 
   const body = await request.json().catch(() => null);

@@ -12,10 +12,12 @@ import { NextResponse } from "next/server";
 export type AuthorizedInstallation = {
   row: IntegrationInstallation;
   integrationSlug: string;
+  membership: { role: string };
 };
 
 export async function loadAuthorizedInstallation(
   installationId: string,
+  options: { requireWriteRole?: boolean } = {},
 ): Promise<AuthorizedInstallation | { error: NextResponse }> {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user?.id) {
@@ -55,5 +57,17 @@ export async function loadAuthorizedInstallation(
       error: NextResponse.json({ error: "Forbidden" }, { status: 403 }),
     };
   }
-  return { row: row.installation, integrationSlug: row.slug };
+  if (options.requireWriteRole && m.role !== "owner" && m.role !== "admin") {
+    return {
+      error: NextResponse.json(
+        { error: "Only workspace owners and admins can modify installations." },
+        { status: 403 },
+      ),
+    };
+  }
+  return {
+    row: row.installation,
+    integrationSlug: row.slug,
+    membership: { role: m.role },
+  };
 }

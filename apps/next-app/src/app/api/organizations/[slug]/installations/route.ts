@@ -15,7 +15,10 @@ interface RouteParams {
   params: Promise<{ slug: string }>;
 }
 
-async function checkOrgMembership(slug: string) {
+async function checkOrgMembership(
+  slug: string,
+  options: { requireWriteRole?: boolean } = {},
+) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user?.id) {
     return {
@@ -48,6 +51,16 @@ async function checkOrgMembership(slug: string) {
   if (!m) {
     return {
       error: NextResponse.json({ error: "Forbidden" }, { status: 403 }),
+    };
+  }
+  if (options.requireWriteRole && m.role !== "owner" && m.role !== "admin") {
+    return {
+      error: NextResponse.json(
+        {
+          error: "Only workspace owners and admins can install integrations.",
+        },
+        { status: 403 },
+      ),
     };
   }
   return { organization: org };
@@ -94,7 +107,7 @@ export async function GET(_req: Request, { params }: RouteParams) {
  */
 export async function POST(request: Request, { params }: RouteParams) {
   const { slug } = await params;
-  const check = await checkOrgMembership(slug);
+  const check = await checkOrgMembership(slug, { requireWriteRole: true });
   if ("error" in check) return check.error;
 
   const body = await request.json().catch(() => null);

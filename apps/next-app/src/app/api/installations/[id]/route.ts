@@ -28,7 +28,9 @@ export async function GET(_req: Request, { params }: RouteParams) {
  */
 export async function PATCH(request: Request, { params }: RouteParams) {
   const { id } = await params;
-  const result = await loadAuthorizedInstallation(id);
+  const result = await loadAuthorizedInstallation(id, {
+    requireWriteRole: true,
+  });
   if ("error" in result) return result.error;
 
   const body = await request.json().catch(() => null);
@@ -71,7 +73,9 @@ export async function PATCH(request: Request, { params }: RouteParams) {
  */
 export async function DELETE(_req: Request, { params }: RouteParams) {
   const { id } = await params;
-  const result = await loadAuthorizedInstallation(id);
+  const result = await loadAuthorizedInstallation(id, {
+    requireWriteRole: true,
+  });
   if ("error" in result) return result.error;
   if (result.row.isSystemManaged) {
     return NextResponse.json(
