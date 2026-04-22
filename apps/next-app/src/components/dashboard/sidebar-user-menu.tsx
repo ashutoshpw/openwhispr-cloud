@@ -181,10 +181,7 @@ export function SidebarUserMenu() {
             <div className="font-medium">Platform Status</div>
             <div className="text-muted-foreground">All systems normal</div>
           </div>
-          <span
-            aria-hidden
-            className="h-2 w-2 rounded-full bg-emerald-500"
-          />
+          <span aria-hidden className="h-2 w-2 rounded-full bg-emerald-500" />
         </div>
       </DropdownMenuContent>
     </DropdownMenu>
