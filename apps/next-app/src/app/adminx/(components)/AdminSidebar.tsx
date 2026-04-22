@@ -11,6 +11,7 @@ import {
   Layers,
   LayoutDashboard,
   Package,
+  Plug,
   Settings,
   Shield,
   Sliders,
@@ -33,6 +34,7 @@ export default function AdminSidebar() {
     { href: "/adminx/members", icon: UserCog, label: "Members" },
     { href: "/adminx/payments", icon: CreditCard, label: "Payments" },
     { href: "/adminx/sessions", icon: Activity, label: "Sessions" },
+    { href: "/adminx/integrations", icon: Plug, label: "Integrations" },
     { href: "/adminx/settings", icon: Settings, label: "Settings" },
   ];
 
