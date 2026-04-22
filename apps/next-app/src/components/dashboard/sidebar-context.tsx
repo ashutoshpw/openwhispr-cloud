@@ -20,17 +20,22 @@ interface SidebarContextValue {
   width: number;
   collapsed: boolean;
   toggle: () => void;
+  activeMenuId: string | null;
+  setActiveMenuId: (id: string | null) => void;
 }
 
 const SidebarContext = createContext<SidebarContextValue>({
   width: DEFAULT_WIDTH,
   collapsed: false,
   toggle: () => {},
+  activeMenuId: null,
+  setActiveMenuId: () => {},
 });
 
 export function SidebarProvider({ children }: { children: ReactNode }) {
   const [width, setWidth] = useState(DEFAULT_WIDTH);
   const [isResizing, setIsResizing] = useState(false);
+  const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const lastExpandedWidth = useRef(DEFAULT_WIDTH);
 
   // Hydrate from localStorage after mount
@@ -93,7 +98,9 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
   );
 
   return (
-    <SidebarContext.Provider value={{ width, collapsed, toggle }}>
+    <SidebarContext.Provider
+      value={{ width, collapsed, toggle, activeMenuId, setActiveMenuId }}
+    >
       <div
         className="h-screen overflow-hidden lg:grid"
         style={{

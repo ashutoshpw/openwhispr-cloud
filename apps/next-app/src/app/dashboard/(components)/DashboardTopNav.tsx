@@ -1,10 +1,9 @@
 "use client";
 
-import { ModeToggle } from "@/components/ModeToggle";
-import { Profile } from "@/components/Profile";
 import { CommandMenu } from "@/components/dashboard/command-menu";
 import { InvitationBell } from "@/components/dashboard/invitation-bell";
 import { ProjectSwitcher } from "@/components/dashboard/project-switcher";
+import { SidebarUserMenu } from "@/components/dashboard/sidebar-user-menu";
 import { useSidebar } from "@/components/dashboard/sidebar-context";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -106,6 +105,9 @@ export default function DashboardTopNav({ children }: { children: ReactNode }) {
                 </Link>
               </SheetClose>
             </div>
+            <div className="mt-auto border-t pt-3">
+              <SidebarUserMenu />
+            </div>
           </SheetContent>
         </Sheet>
 
@@ -126,8 +128,6 @@ export default function DashboardTopNav({ children }: { children: ReactNode }) {
         <div className="flex justify-center items-center gap-3 ml-auto">
           <CommandMenu />
           <InvitationBell />
-          <Profile />
-          <ModeToggle />
         </div>
       </header>
       {children}
