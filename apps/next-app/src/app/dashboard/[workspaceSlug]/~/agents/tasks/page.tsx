@@ -1,10 +1,5 @@
-import { auth } from "@repo/auth/server";
-import { db } from "@repo/database";
-import { and, eq } from "@repo/database";
-import { member, organization } from "@repo/database/schema";
+import { requireOrganizationMembership } from "@/lib/auth/require-membership";
 import { ClipboardList } from "lucide-react";
-import { headers } from "next/headers";
-import { notFound, redirect } from "next/navigation";
 
 interface PageProps {
   params: Promise<{ workspaceSlug: string }>;
@@ -12,41 +7,10 @@ interface PageProps {
 
 export default async function AgentTasksPage({ params }: PageProps) {
   const { workspaceSlug } = await params;
-
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session?.user?.id) {
-    redirect(
-      `/auth/sign-in?redirect=/dashboard/${workspaceSlug}/~/agents/tasks`,
-    );
-  }
-
-  const org = await db()
-    .select()
-    .from(organization)
-    .where(eq(organization.slug, workspaceSlug))
-    .limit(1);
-
-  if (!org[0]) {
-    notFound();
-  }
-
-  const membership = await db()
-    .select()
-    .from(member)
-    .where(
-      and(
-        eq(member.organizationId, org[0].id),
-        eq(member.userId, session.user.id),
-      ),
-    )
-    .limit(1);
-
-  if (!membership[0]) {
-    notFound();
-  }
+  await requireOrganizationMembership(
+    workspaceSlug,
+    `/dashboard/${workspaceSlug}/~/agents/tasks`,
+  );
 
   return (
     <div className="flex flex-col gap-4 px-4 pt-5">
