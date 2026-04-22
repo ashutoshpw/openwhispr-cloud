@@ -1,10 +1,13 @@
 import {
   boolean,
+  index,
   integer,
+  jsonb,
   pgTable,
   serial,
   text,
   timestamp,
+  unique,
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -383,3 +386,73 @@ export const oauthConsent = pgTable("oauth_consent", {
 export type OAuthApplication = typeof oauthApplication.$inferSelect;
 export type OAuthAccessToken = typeof oauthAccessToken.$inferSelect;
 export type OAuthConsent = typeof oauthConsent.$inferSelect;
+
+// ============================================================================
+// Integrations (registry + installations)
+// ============================================================================
+
+export const integration = pgTable("integration", {
+  id: text("id").primaryKey(),
+  slug: text("slug").notNull().unique(),
+  name: text("name").notNull(),
+  description: text("description"),
+  category: text("category").notNull(), // 'email', 'crm', 'analytics', 'tools', 'other'
+  iconUrl: text("icon_url"),
+  docsUrl: text("docs_url"),
+  status: text("status").notNull().default("active"), // active | beta | deprecated | hidden
+  isSystemManaged: boolean("is_system_managed").default(false).notNull(),
+  configSchema: jsonb("config_schema"), // JSON Schema for install form
+  metadata: jsonb("metadata"), // features, requirements, pricing, hidden, authType, etc
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
+export const integrationInstallation = pgTable(
+  "integration_installation",
+  {
+    id: text("id").primaryKey(),
+    integrationId: text("integration_id")
+      .notNull()
+      .references(() => integration.id, { onDelete: "cascade" }),
+    organizationId: text("organization_id")
+      .notNull()
+      .references(() => organization.id, { onDelete: "cascade" }),
+    projectId: text("project_id").references(() => project.id, {
+      onDelete: "cascade",
+    }),
+    displayName: text("display_name"),
+    configEncrypted: text("config_encrypted"),
+    configPublic: jsonb("config_public"),
+    status: text("status").notNull().default("active"), // active | error | disabled
+    lastVerifiedAt: timestamp("last_verified_at"),
+    lastError: text("last_error"),
+    isSystemManaged: boolean("is_system_managed").default(false).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    unique("integration_installation_unique")
+      .on(
+        table.organizationId,
+        table.projectId,
+        table.integrationId,
+        table.displayName,
+      )
+      .nullsNotDistinct(),
+    index("integration_installation_org_idx").on(table.organizationId),
+    index("integration_installation_project_idx").on(table.projectId),
+  ],
+);
+
+export type Integration = typeof integration.$inferSelect;
+export type NewIntegration = typeof integration.$inferInsert;
+export type IntegrationInstallation =
+  typeof integrationInstallation.$inferSelect;
+export type NewIntegrationInstallation =
+  typeof integrationInstallation.$inferInsert;
