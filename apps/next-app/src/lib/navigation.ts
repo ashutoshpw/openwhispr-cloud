@@ -125,3 +125,64 @@ export function buildHref(
     ? `/dashboard/${workspaceSlug}/${segment}`
     : `/dashboard/${workspaceSlug}`;
 }
+
+/**
+ * A flattened, searchable representation of a navigation destination.
+ * Each top-level item and each drill-down child becomes one FinderRow.
+ */
+export type FinderRow = {
+  label: string;
+  href: string;
+  icon: LucideIcon;
+  /** Breadcrumb context shown muted on the right (e.g. ["Settings"]). */
+  breadcrumb: string[];
+};
+
+/**
+ * Flatten a NavConfig into a list of searchable rows for the sidebar finder.
+ *
+ * - Top-level items appear with an empty breadcrumb (or [workspaceLabel]).
+ * - Drill-down children appear with the parent section's title in their breadcrumb.
+ * - Bottom items are included as well, with no breadcrumb.
+ */
+export function flattenNav(
+  config: NavConfig,
+  workspaceSlug: string,
+  projectSlug: string | undefined,
+  workspaceLabel?: string,
+): FinderRow[] {
+  const rows: FinderRow[] = [];
+  const baseCrumb = workspaceLabel ? [workspaceLabel] : [];
+
+  for (const section of config.main) {
+    for (const item of section.items) {
+      rows.push({
+        label: item.label,
+        href: buildHref(workspaceSlug, projectSlug, item.segment),
+        icon: item.icon,
+        breadcrumb: baseCrumb,
+      });
+    }
+    if (section.children) {
+      for (const child of section.children) {
+        rows.push({
+          label: child.label,
+          href: buildHref(workspaceSlug, projectSlug, child.segment),
+          icon: child.icon,
+          breadcrumb: section.title ? [...baseCrumb, section.title] : baseCrumb,
+        });
+      }
+    }
+  }
+
+  for (const item of config.bottom) {
+    rows.push({
+      label: item.label,
+      href: buildHref(workspaceSlug, projectSlug, item.segment),
+      icon: item.icon,
+      breadcrumb: baseCrumb,
+    });
+  }
+
+  return rows;
+}
