@@ -5,9 +5,8 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.text();
-    const bodyData = JSON.parse(body);
-    const { email, password } = bodyData;
+    const body = await request.json();
+    const { email, password } = body;
 
     if (!email || !password) {
       return NextResponse.json(
@@ -16,25 +15,32 @@ export async function POST(request: Request) {
       );
     }
 
-    const result = await baseServer.signInEmail({ email, password });
+    // Use better-auth's Response so the Set-Cookie session header is preserved.
+    const authResponse = await baseServer.signInEmailResponse({
+      email,
+      password,
+    });
 
-    if (result?.error) {
-      return NextResponse.json(
-        { error: { message: result.error.message, code: result.error.code } },
-        { status: 400 },
-      );
+    // Best-effort analytics tracking — don't block sign-in on this.
+    if (authResponse.ok) {
+      try {
+        const cloned = authResponse.clone();
+        const data = (await cloned.json()) as {
+          user?: { id?: string };
+        };
+        const userId = data?.user?.id;
+        if (userId) {
+          await trackServerEvent(ANALYTICS_EVENTS.USER_LOGGED_IN, userId, {
+            email,
+            provider: "email",
+          });
+        }
+      } catch {
+        // Ignore analytics failures.
+      }
     }
 
-    // Track user login in PostHog
-    const userId = (result?.data as { user?: { id?: string } })?.user?.id;
-    if (userId) {
-      await trackServerEvent(ANALYTICS_EVENTS.USER_LOGGED_IN, userId, {
-        email,
-        provider: "email",
-      });
-    }
-
-    return NextResponse.json({ data: result?.data });
+    return authResponse;
   } catch (error) {
     return NextResponse.json(
       {

@@ -15,7 +15,8 @@
       "Bash(command -v pnpm)",
       "Bash(pnpm store *)",
       "Bash(command -v bun)",
-      "Bash(bun install *)"
+      "Bash(bun install *)",
+      "Skill(agent-browser)"
     ]
   }
 }

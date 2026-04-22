@@ -209,6 +209,16 @@ class BetterAuthServer {
     }
   }
 
+  async signInEmailResponse(params: {
+    email: string;
+    password: string;
+  }): Promise<Response> {
+    return this.authInstance.api.signInEmail({
+      body: params,
+      asResponse: true,
+    });
+  }
+
   async signUpEmail(params: {
     email: string;
     password: string;
@@ -228,6 +238,17 @@ class BetterAuthServer {
         },
       };
     }
+  }
+
+  async signUpEmailResponse(params: {
+    email: string;
+    password: string;
+    name: string;
+  }): Promise<Response> {
+    return this.authInstance.api.signUpEmail({
+      body: params,
+      asResponse: true,
+    });
   }
 
   async signOut() {
@@ -307,6 +328,10 @@ export const baseServer = {
     const server = getBetterAuthServer();
     return server.signInEmail(params);
   },
+  signInEmailResponse: async (params: { email: string; password: string }) => {
+    const server = getBetterAuthServer();
+    return server.signInEmailResponse(params);
+  },
   signUpEmail: async (params: {
     email: string;
     password: string;
@@ -314,6 +339,14 @@ export const baseServer = {
   }) => {
     const server = getBetterAuthServer();
     return server.signUpEmail(params);
+  },
+  signUpEmailResponse: async (params: {
+    email: string;
+    password: string;
+    name: string;
+  }) => {
+    const server = getBetterAuthServer();
+    return server.signUpEmailResponse(params);
   },
   signOut: async () => {
     const server = getBetterAuthServer();
