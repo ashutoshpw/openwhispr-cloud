@@ -1,0 +1,4 @@
+bun run check:max-lines
+bun run check:staged-types
+bun run check:no-middleware
+bunx lint-staged

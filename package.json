@@ -19,6 +19,7 @@
     "db:query": "bun run --filter @repo/database db:query --",
     "db:studio": "bun run --filter @repo/database db:studio",
     "db:seed": "bun run scripts/seed-admin.ts",
+    "seed:integrations": "bun run scripts/seed-integrations.ts",
     "init-auth": "bun run scripts/init-auth.ts",
     "setup": "bun run scripts/setup.ts",
     "env:link": "bun run scripts/link-env.ts",
@@ -33,19 +34,22 @@
     "check:max-lines": "bun run scripts/check-max-lines.ts",
     "check:staged-types": "bun run scripts/check-staged-types.ts",
     "check:no-middleware": "bun run scripts/check-no-middleware.ts",
-    "prepare": "simple-git-hooks"
+    "prepare": "husky"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@inquirer/prompts": "^8.2.0",
     "dotenv": "^17.2.3",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.10",
     "posthog-node": "^5.24.15",
-    "simple-git-hooks": "^2.13.1",
     "tsx": "^4.21.0",
     "turbo": "^2.5.0",
     "typescript": "latest"
   },
-  "simple-git-hooks": {
-    "pre-commit": "bun run check:max-lines && bun run check:staged-types && bun run check:no-middleware"
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,mjs,cjs,mts,cts,json,jsonc,css}": [
+      "biome check --write --no-errors-on-unmatched"
+    ]
   }
 }
