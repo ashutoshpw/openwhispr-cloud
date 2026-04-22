@@ -28,14 +28,6 @@ export default async function ProjectIntegrationsPage({ params }: PageProps) {
 
   const baseHref = `/dashboard/${workspaceSlug}/${projectSlug}/integrations`;
 
-  // Show available integrations that are not yet installed at this scope
-  const installedIntegrationIds = new Set(
-    installs.map((i) => i.integration.id),
-  );
-  const availableNotInstalled = available.filter(
-    (i) => !installedIntegrationIds.has(i.id),
-  );
-
   return (
     <div className="flex flex-col gap-6 px-4 pt-5 pb-20">
       <div>
@@ -59,7 +51,7 @@ export default async function ProjectIntegrationsPage({ params }: PageProps) {
             Available
           </h3>
           <AvailableIntegrationsList
-            integrations={availableNotInstalled}
+            integrations={available}
             baseHref={baseHref}
           />
         </section>

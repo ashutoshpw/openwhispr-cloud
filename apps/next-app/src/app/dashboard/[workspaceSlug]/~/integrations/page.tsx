@@ -26,10 +26,6 @@ export default async function WorkspaceIntegrationsPage({ params }: PageProps) {
   ]);
 
   const baseHref = `/dashboard/${workspaceSlug}/~/integrations`;
-  const installedIds = new Set(installs.map((i) => i.integration.id));
-  const availableNotInstalled = available.filter(
-    (i) => !installedIds.has(i.id),
-  );
 
   return (
     <div className="flex flex-col gap-6 px-4 pt-5 pb-20">
@@ -59,7 +55,7 @@ export default async function WorkspaceIntegrationsPage({ params }: PageProps) {
             Available
           </h3>
           <AvailableIntegrationsList
-            integrations={availableNotInstalled}
+            integrations={available}
             baseHref={baseHref}
           />
         </section>
