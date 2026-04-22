@@ -1,10 +1,16 @@
 "use client";
+import { useSession } from "@repo/auth/client";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { BorderBeam } from "../magicui/border-beam";
 import { Button } from "../ui/button";
 import { AnimatedGradientTextComponent } from "./AnimatedGradientComponent";
 export default function HeroSection() {
+  const { data: session } = useSession();
+  const isSignedIn = Boolean(session?.user);
+  const ctaHref = isSignedIn ? "/dashboard" : "/auth/sign-in";
+  const ctaLabel = isSignedIn ? "Dashboard" : "Get Started";
+
   return (
     <div className="flex flex-col items-center justify-center">
       <div className="my-5">
@@ -17,9 +23,9 @@ export default function HeroSection() {
         Build a SAAS with a solid foundation.
       </p>
       <div className="flex gap-3">
-        <Link href="/dashboard" className="mt-5">
+        <Link href={ctaHref} className="mt-5">
           <Button className="animate-buttonheartbeat rounded-md bg-blue-600 hover:bg-blue-300 text-sm font-semibold text-white">
-            Get Started
+            {ctaLabel}
           </Button>
         </Link>
         <Link href="#" target="_blank" className="mt-5">
