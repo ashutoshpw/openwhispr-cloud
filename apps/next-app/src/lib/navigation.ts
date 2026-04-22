@@ -5,7 +5,6 @@ import {
   ClipboardList,
   CreditCard,
   Folder,
-  FolderCog,
   HomeIcon,
   Settings,
   SlidersHorizontal,
@@ -93,8 +92,7 @@ export const projectNav: NavConfig = {
       icon: Settings,
       items: [],
       children: [
-        { label: "Project", icon: FolderCog, segment: "settings" },
-        { label: "General", icon: SlidersHorizontal, segment: "~/settings" },
+        { label: "General", icon: SlidersHorizontal, segment: "settings" },
         { label: "Members", icon: Users, segment: "~/settings/members" },
         { label: "Billing", icon: CreditCard, segment: "~/settings/billing" },
       ],

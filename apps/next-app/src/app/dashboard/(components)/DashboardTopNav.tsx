@@ -3,8 +3,8 @@
 import { CommandMenu } from "@/components/dashboard/command-menu";
 import { InvitationBell } from "@/components/dashboard/invitation-bell";
 import { ProjectSwitcher } from "@/components/dashboard/project-switcher";
-import { SidebarUserMenu } from "@/components/dashboard/sidebar-user-menu";
 import { useSidebar } from "@/components/dashboard/sidebar-context";
+import { SidebarUserMenu } from "@/components/dashboard/sidebar-user-menu";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {

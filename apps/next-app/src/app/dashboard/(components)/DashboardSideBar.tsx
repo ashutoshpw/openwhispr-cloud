@@ -36,9 +36,7 @@ function SidebarNavItem({
       )}
       href={href}
     >
-      <div className="rounded-lg p-1 bg-white dark:bg-black">
-        <item.icon className="h-3.5 w-3.5" />
-      </div>
+      <item.icon className="h-4 w-4 shrink-0" />
       {item.label}
     </Link>
   );
@@ -58,11 +56,7 @@ function DrillDownRow({
       onClick={onClick}
       className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-50"
     >
-      {Icon && (
-        <div className="rounded-lg p-1 bg-white dark:bg-black">
-          <Icon className="h-3.5 w-3.5" />
-        </div>
-      )}
+      {Icon && <Icon className="h-4 w-4 shrink-0" />}
       <span className="flex-1 text-left">{section.title}</span>
       <ChevronRight className="h-3.5 w-3.5" />
     </button>
@@ -235,21 +229,36 @@ export default function DashboardSideBar() {
                     {activeDrillSection.title}
                   </button>
                   <Separator className="mb-2" />
-                  {activeDrillSection.children?.map((item) => {
-                    const href = buildHref(
-                      workspaceSlug,
-                      projectSlug,
-                      item.segment,
+                  {(() => {
+                    const childHrefs = (activeDrillSection.children ?? []).map(
+                      (item) => ({
+                        item,
+                        href: buildHref(
+                          workspaceSlug,
+                          projectSlug,
+                          item.segment,
+                        ),
+                      }),
                     );
-                    return (
+                    const matches = childHrefs.filter(
+                      ({ href }) =>
+                        pathname === href || pathname.startsWith(`${href}/`),
+                    );
+                    const activeHref =
+                      matches.length > 0
+                        ? matches.reduce((a, b) =>
+                            b.href.length > a.href.length ? b : a,
+                          ).href
+                        : null;
+                    return childHrefs.map(({ item, href }) => (
                       <SidebarNavItem
                         key={item.segment}
                         item={item}
                         href={href}
-                        active={isItemActive(pathname, href, item.segment)}
+                        active={href === activeHref}
                       />
-                    );
-                  })}
+                    ));
+                  })()}
                 </nav>
               )}
             </div>
