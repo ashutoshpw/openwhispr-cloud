@@ -5,8 +5,10 @@ import {
   ClipboardList,
   CreditCard,
   Folder,
+  FolderCog,
   HomeIcon,
   Settings,
+  SlidersHorizontal,
   Users,
 } from "lucide-react";
 
@@ -48,12 +50,19 @@ export const workspaceNav: NavConfig = {
         { label: "Usage", icon: BarChart3, segment: "~/agents/usage" },
       ],
     },
+    {
+      id: "settings",
+      title: "Settings",
+      icon: Settings,
+      items: [],
+      children: [
+        { label: "General", icon: SlidersHorizontal, segment: "~/settings" },
+        { label: "Members", icon: Users, segment: "~/settings/members" },
+        { label: "Billing", icon: CreditCard, segment: "~/settings/billing" },
+      ],
+    },
   ],
-  bottom: [
-    { label: "Settings", icon: Settings, segment: "~/settings" },
-    { label: "Members", icon: Users, segment: "~/settings/members" },
-    { label: "Billing", icon: CreditCard, segment: "~/settings/billing" },
-  ],
+  bottom: [],
 };
 
 /**
@@ -78,12 +87,20 @@ export const projectNav: NavConfig = {
         { label: "Usage", icon: BarChart3, segment: "~/agents/usage" },
       ],
     },
+    {
+      id: "settings",
+      title: "Settings",
+      icon: Settings,
+      items: [],
+      children: [
+        { label: "Project", icon: FolderCog, segment: "settings" },
+        { label: "General", icon: SlidersHorizontal, segment: "~/settings" },
+        { label: "Members", icon: Users, segment: "~/settings/members" },
+        { label: "Billing", icon: CreditCard, segment: "~/settings/billing" },
+      ],
+    },
   ],
-  bottom: [
-    { label: "Settings", icon: Settings, segment: "~/settings" },
-    { label: "Members", icon: Users, segment: "~/settings/members" },
-    { label: "Billing", icon: CreditCard, segment: "~/settings/billing" },
-  ],
+  bottom: [],
 };
 
 /**
