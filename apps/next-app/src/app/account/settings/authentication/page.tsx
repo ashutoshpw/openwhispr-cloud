@@ -48,9 +48,7 @@ export default async function AuthenticationPage() {
   return (
     <div className="flex max-w-[800px] flex-col gap-6 px-4 pt-5 pb-20">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">
-          Authentication
-        </h1>
+        <h1 className="text-2xl font-normal tracking-tight">Authentication</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           Manage how you sign in to your account.
         </p>

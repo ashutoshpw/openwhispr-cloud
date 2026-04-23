@@ -122,7 +122,7 @@ export function ProjectSwitcher() {
           }
         >
           {currentProject && <FolderKanban className="mr-2 h-4 w-4 shrink-0" />}
-          <span className="truncate">
+          <span className="truncate font-normal">
             {currentProject?.name || "All Projects"}
           </span>
         </Link>

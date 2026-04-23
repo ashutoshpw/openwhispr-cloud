@@ -24,7 +24,7 @@ export default async function AccountSettingsPage() {
   return (
     <div className="flex flex-col gap-6 px-4 pt-5 pb-20 max-w-[800px]">
       <div>
-        <h1 className="text-2xl font-semibold">General</h1>
+        <h1 className="text-2xl font-normal tracking-tight">General</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Manage how you appear across the platform.
         </p>
