@@ -25,18 +25,42 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import * as React from "react";
+
+type UpgradeCta = { shouldShow: boolean; href?: string };
 
 export function SidebarUserMenu() {
   const { data: session } = useSession();
   const router = useRouter();
+  const params = useParams();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
+  const [cta, setCta] = React.useState<UpgradeCta>({ shouldShow: false });
 
   React.useEffect(() => {
     setMounted(true);
   }, []);
+
+  const workspaceSlug =
+    typeof params?.workspaceSlug === "string" ? params.workspaceSlug : null;
+
+  React.useEffect(() => {
+    if (!workspaceSlug) {
+      setCta({ shouldShow: false });
+      return;
+    }
+    let cancelled = false;
+    fetch(`/api/billing/cta?slug=${encodeURIComponent(workspaceSlug)}`)
+      .then((r) => (r.ok ? r.json() : { shouldShow: false }))
+      .then((data: UpgradeCta) => {
+        if (!cancelled) setCta(data);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [workspaceSlug]);
 
   const name = session?.user?.name ?? "";
   const email = session?.user?.email ?? "";
@@ -77,17 +101,19 @@ export function SidebarUserMenu() {
       </DropdownMenuTrigger>
       <DropdownMenuContent side="top" align="start" className="w-72 p-0">
         <div className="flex items-start gap-3 px-3 py-3">
-          <Avatar className="h-9 w-9 shrink-0">
-            <AvatarImage src={image} alt={name || "User"} />
-            <AvatarFallback>{initial}</AvatarFallback>
-          </Avatar>
           <div className="min-w-0 flex-1">
-            <div className="truncate text-sm font-medium">
-              {name || email || "Account"}
-            </div>
-            <div className="truncate text-xs text-muted-foreground">
-              {email}
-            </div>
+            {name ? (
+              <>
+                <div className="truncate text-sm font-medium">{name}</div>
+                <div className="truncate text-xs text-muted-foreground">
+                  {email}
+                </div>
+              </>
+            ) : (
+              <div className="truncate text-sm font-medium">
+                {email || "Account"}
+              </div>
+            )}
           </div>
           <Link
             href={settingsHref}
@@ -103,9 +129,10 @@ export function SidebarUserMenu() {
             onClick={() => {
               // TODO: wire up feedback surface
             }}
+            className="flex items-center justify-between"
           >
-            <MessageSquare className="mr-2 h-4 w-4" />
             <span>Feedback</span>
+            <MessageSquare className="h-4 w-4 text-muted-foreground" />
           </DropdownMenuItem>
 
           <DropdownMenuItem
@@ -129,13 +156,13 @@ export function SidebarUserMenu() {
                     aria-label={label}
                     onClick={() => setTheme(value)}
                     className={cn(
-                      "flex h-6 w-6 items-center justify-center rounded-full transition-colors",
+                      "flex h-5 w-5 items-center justify-center rounded-full transition-colors",
                       active
                         ? "bg-background text-foreground shadow-sm"
                         : "text-muted-foreground hover:text-foreground",
                     )}
                   >
-                    <Icon className="h-3.5 w-3.5" />
+                    <Icon className="h-3 w-3" />
                   </button>
                 );
               })}
@@ -143,35 +170,51 @@ export function SidebarUserMenu() {
           </DropdownMenuItem>
 
           <DropdownMenuItem asChild>
-            <Link href="/">
-              <Home className="mr-2 h-4 w-4" />
+            <Link href="/" className="flex items-center justify-between">
               <span>Home Page</span>
+              <Home className="h-4 w-4 text-muted-foreground" />
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/changelog">
-              <FileText className="mr-2 h-4 w-4" />
+            <Link
+              href="/changelog"
+              className="flex items-center justify-between"
+            >
               <span>Changelog</span>
+              <FileText className="h-4 w-4 text-muted-foreground" />
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/help">
-              <LifeBuoy className="mr-2 h-4 w-4" />
+            <Link href="/help" className="flex items-center justify-between">
               <span>Help</span>
+              <LifeBuoy className="h-4 w-4 text-muted-foreground" />
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/docs">
-              <BookOpen className="mr-2 h-4 w-4" />
+            <Link href="/docs" className="flex items-center justify-between">
               <span>Docs</span>
+              <BookOpen className="h-4 w-4 text-muted-foreground" />
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleSignOut}>
-            <LogOut className="mr-2 h-4 w-4" />
+          <DropdownMenuItem
+            onClick={handleSignOut}
+            className="flex items-center justify-between"
+          >
             <span>Log Out</span>
+            <LogOut className="h-4 w-4 text-muted-foreground" />
           </DropdownMenuItem>
         </div>
+        {cta.shouldShow && cta.href ? (
+          <div className="px-3 pb-2">
+            <Link
+              href={cta.href}
+              className="flex w-full items-center justify-center rounded-md bg-foreground px-3 py-1.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+            >
+              Upgrade to Pro
+            </Link>
+          </div>
+        ) : null}
         <div className="flex items-center justify-between border-t px-3 py-2 text-xs">
           <div>
             <div className="font-medium">Platform Status</div>
