@@ -16,7 +16,21 @@
       "Bash(pnpm store *)",
       "Bash(command -v bun)",
       "Bash(bun install *)",
-      "Skill(agent-browser)"
+      "Skill(agent-browser)",
+      "Bash(agent-browser --session-name vercel open https://vercel.com/w3-research)",
+      "Bash(agent-browser --session-name vercel wait --load networkidle)",
+      "Bash(agent-browser *)",
+      "Bash(chmod +x /Users/ashutosh/Dev/W3Mirror/cold-email-platform/.husky/pre-commit)",
+      "Bash(git config *)",
+      "Bash(pnpm exec *)",
+      "Bash(bunx tsc *)",
+      "Bash(bunx --bun tsc --noEmit)",
+      "Bash(pnpm db:generate)",
+      "Bash(npx drizzle-kit *)",
+      "Bash(grep -n \"return \\(\\\\|</div>$\\\\|export \" apps/next-app/src/app/dashboard/\\\\[workspaceSlug\\\\]/~/settings/billing/BillingSettings.tsx)",
+      "Bash(pnpm --filter next-app exec tsc --noEmit)",
+      "Bash(npx tsc *)",
+      "Bash(bunx biome *)"
     ]
   }
 }
