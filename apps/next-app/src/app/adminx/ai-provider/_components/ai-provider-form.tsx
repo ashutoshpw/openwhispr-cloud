@@ -19,10 +19,16 @@ interface Props {
   initial: Initial;
 }
 
+type TestResult =
+  | { ok: true; url: string; modelCount: number | null }
+  | { ok: false; error: string; url?: string; status?: number };
+
 export function AiProviderForm({ initial }: Props) {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [clearing, setClearing] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState<TestResult | null>(null);
 
   const [baseUrl, setBaseUrl] = useState(initial.baseUrl ?? "");
   const [apiKey, setApiKey] = useState("");
@@ -52,6 +58,35 @@ export function AiProviderForm({ initial }: Props) {
       toast.error(err instanceof Error ? err.message : "Save failed");
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function handleTest() {
+    setTesting(true);
+    setTestResult(null);
+    try {
+      const res = await fetch("/api/admin/ai-provider/test", {
+        method: "POST",
+      });
+      const raw = (await res.json().catch(() => ({}))) as Record<
+        string,
+        unknown
+      >;
+      if (!res.ok && typeof raw.ok !== "boolean") {
+        throw new Error(
+          typeof raw.error === "string" ? raw.error : "Test failed",
+        );
+      }
+      const payload = raw as unknown as TestResult;
+      setTestResult(payload);
+      if (payload.ok) toast.success("Connection OK");
+      else toast.error(payload.error || "Connection failed");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Test failed";
+      setTestResult({ ok: false, error: message });
+      toast.error(message);
+    } finally {
+      setTesting(false);
     }
   }
 
@@ -132,12 +167,59 @@ export function AiProviderForm({ initial }: Props) {
         </p>
       </div>
 
-      <div>
+      <div className="flex items-center gap-2">
         <Button type="submit" disabled={submitting}>
           {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Save settings
         </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleTest}
+          disabled={testing || !initial.hasApiKey}
+          title={
+            initial.hasApiKey ? undefined : "Save an API key before testing"
+          }
+        >
+          {testing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Test connection
+        </Button>
       </div>
+
+      {testResult && (
+        <div
+          className={
+            testResult.ok
+              ? "rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-900 dark:border-green-900 dark:bg-green-950/40 dark:text-green-200"
+              : "rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive"
+          }
+        >
+          {testResult.ok ? (
+            <>
+              <div className="font-medium">Connection OK</div>
+              <div className="text-xs opacity-80">
+                {testResult.url}
+                {testResult.modelCount !== null
+                  ? ` · ${testResult.modelCount} models returned`
+                  : ""}
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="font-medium">
+                Connection failed
+                {testResult.status ? ` (HTTP ${testResult.status})` : ""}
+              </div>
+              <div className="break-words text-xs opacity-80">
+                {testResult.error}
+              </div>
+              {testResult.url && (
+                <div className="text-xs opacity-60">{testResult.url}</div>
+              )}
+            </>
+          )}
+        </div>
+      )}
     </form>
   );
 }
