@@ -1,10 +1,10 @@
-import { AvailableIntegrationsList } from "@/components/integrations/available-integrations-list";
-import { InstalledIntegrationsList } from "@/components/integrations/installed-integrations-list";
 import { requireOrganizationMembership } from "@/lib/auth/require-membership";
 import {
   listAvailableIntegrations,
   listScopedInstallations,
 } from "@/lib/integrations/queries";
+import { ConsoleView } from "./(components)/ConsoleView";
+import { IntegrationsPageShell } from "./(components)/IntegrationsPageShell";
 
 interface PageProps {
   params: Promise<{ workspaceSlug: string }>;
@@ -25,41 +25,13 @@ export default async function WorkspaceIntegrationsPage({ params }: PageProps) {
     listAvailableIntegrations(),
   ]);
 
-  const baseHref = `/dashboard/${workspaceSlug}/~/integrations`;
-
   return (
-    <div className="flex flex-col gap-6 px-4 pt-5 pb-20">
-      <div>
-        <h2 className="font-semibold text-3xl tracking-tight">
-          Workspace integrations
-        </h2>
-        <p className="text-muted-foreground mt-1">
-          Integrations installed at the workspace level are available to every
-          project in{" "}
-          <span className="font-medium text-foreground">
-            {organization.name}
-          </span>
-          .
-        </p>
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-3">
-        <section className="lg:col-span-2 grid gap-3">
-          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-            Installed
-          </h3>
-          <InstalledIntegrationsList items={installs} baseHref={baseHref} />
-        </section>
-        <section className="grid gap-3">
-          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-            Available
-          </h3>
-          <AvailableIntegrationsList
-            integrations={available}
-            baseHref={baseHref}
-          />
-        </section>
-      </div>
-    </div>
+    <IntegrationsPageShell workspaceSlug={workspaceSlug} activeTab="console">
+      <ConsoleView
+        workspaceSlug={workspaceSlug}
+        installs={installs}
+        available={available}
+      />
+    </IntegrationsPageShell>
   );
 }
