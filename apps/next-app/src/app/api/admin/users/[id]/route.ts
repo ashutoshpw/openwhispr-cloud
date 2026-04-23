@@ -1,8 +1,8 @@
 import { getSiteAdminStatus } from "@/lib/auth-utils";
 import { auth } from "@repo/auth/server";
-import { db } from "@repo/database";
-import { eq } from "@repo/database";
-import { user } from "@repo/database/schema";
+import { and, db, eq } from "@repo/database";
+import { member, organization, user } from "@repo/database/schema";
+import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -88,6 +88,72 @@ export async function PATCH(
     console.error("Error updating user:", error);
     return NextResponse.json(
       { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
+}
+
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const { id } = await params;
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!(await getSiteAdminStatus(session.user.id))) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    if (id === session.user.id) {
+      return NextResponse.json(
+        { error: "You cannot delete your own account" },
+        { status: 400 },
+      );
+    }
+
+    const ownedOrgs = await db()
+      .select({
+        id: organization.id,
+        name: organization.name,
+        slug: organization.slug,
+      })
+      .from(organization)
+      .innerJoin(
+        member,
+        and(eq(member.organizationId, organization.id), eq(member.userId, id)),
+      )
+      .where(eq(member.role, "owner"));
+
+    if (ownedOrgs.length > 0) {
+      return NextResponse.json(
+        {
+          error:
+            "User still owns organizations. Reassign or delete them first.",
+          code: "USER_OWNS_ORGANIZATIONS",
+          organizations: ownedOrgs,
+        },
+        { status: 409 },
+      );
+    }
+
+    const [deleted] = await db()
+      .delete(user)
+      .where(eq(user.id, id))
+      .returning({ id: user.id });
+
+    if (!deleted) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
+
+    revalidatePath("/adminx/users");
+    return NextResponse.json({ status: "deleted", id: deleted.id });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return NextResponse.json(
+      { error: "Failed to delete user", message },
       { status: 500 },
     );
   }

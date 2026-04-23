@@ -1,3 +1,4 @@
+import { RowActionsMenu } from "@/components/admin/RowActionsMenu";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,15 +37,30 @@ export default async function UserDetailPage({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">User Details</h1>
-          <p className="text-muted-foreground">
-            View and edit user information
-          </p>
+        <div className="flex items-center gap-3">
+          <div>
+            <h1 className="text-3xl font-bold">User Details</h1>
+            <p className="text-muted-foreground">
+              View and edit user information
+            </p>
+          </div>
+          {user.archivedAt && (
+            <Badge variant="outline" className="ml-2">
+              Archived
+            </Badge>
+          )}
         </div>
-        <Button asChild variant="outline">
-          <Link href="/adminx/users">Back to Users</Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button asChild variant="outline">
+            <Link href="/adminx/users">Back to Users</Link>
+          </Button>
+          <RowActionsMenu
+            archived={Boolean(user.archivedAt)}
+            archiveUrl={`/api/admin/users/${user.id}/archive`}
+            unarchiveUrl={`/api/admin/users/${user.id}/unarchive`}
+            deleteUrl={`/api/admin/users/${user.id}`}
+          />
+        </div>
       </div>
       <Card>
         <CardHeader>

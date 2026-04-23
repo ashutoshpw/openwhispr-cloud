@@ -1,10 +1,14 @@
 "use client";
 
+import { CreateUserDialog } from "@/components/admin/CreateUserDialog";
+import { RowActionsMenu } from "@/components/admin/RowActionsMenu";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import type { User } from "@repo/database/schema";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface UserTableProps {
@@ -12,6 +16,7 @@ interface UserTableProps {
 }
 
 export function UserTable({ users: initialUsers }: UserTableProps) {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [users] = useState(initialUsers);
 
@@ -23,13 +28,14 @@ export function UserTable({ users: initialUsers }: UserTableProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         <Input
           placeholder="Search users..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="max-w-sm"
         />
+        <CreateUserDialog />
       </div>
       <div className="rounded-md border">
         <table className="w-full">
@@ -56,37 +62,61 @@ export function UserTable({ users: initialUsers }: UserTableProps) {
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.map((user) => (
-              <tr
-                key={user.id}
-                className="border-b transition-colors hover:bg-muted/50"
-              >
-                <td className="p-4 align-middle">{user.name}</td>
-                <td className="p-4 align-middle">{user.email}</td>
-                <td className="p-4 align-middle">
-                  <Badge
-                    variant={
-                      user.role === "site-admin" ? "default" : "secondary"
-                    }
-                  >
-                    {user.role}
-                  </Badge>
-                </td>
-                <td className="p-4 align-middle">
-                  <Badge variant={user.emailVerified ? "default" : "outline"}>
-                    {user.emailVerified ? "Yes" : "No"}
-                  </Badge>
-                </td>
-                <td className="p-4 align-middle">
-                  {new Date(user.createdAt).toLocaleDateString()}
-                </td>
-                <td className="p-4 align-middle">
-                  <Button asChild variant="outline" size="sm">
-                    <Link href={`/adminx/users/${user.id}`}>View</Link>
-                  </Button>
-                </td>
-              </tr>
-            ))}
+            {filteredUsers.map((user) => {
+              const archived = Boolean(user.archivedAt);
+              return (
+                <tr
+                  key={user.id}
+                  className={cn(
+                    "border-b transition-colors hover:bg-muted/50",
+                    archived && "text-muted-foreground",
+                  )}
+                >
+                  <td className="p-4 align-middle">
+                    <span className="flex items-center gap-2">
+                      {user.name}
+                      {archived && (
+                        <Badge variant="outline" className="text-xs">
+                          Archived
+                        </Badge>
+                      )}
+                    </span>
+                  </td>
+                  <td className="p-4 align-middle">{user.email}</td>
+                  <td className="p-4 align-middle">
+                    <Badge
+                      variant={
+                        user.role === "site-admin" ? "default" : "secondary"
+                      }
+                    >
+                      {user.role}
+                    </Badge>
+                  </td>
+                  <td className="p-4 align-middle">
+                    <Badge variant={user.emailVerified ? "default" : "outline"}>
+                      {user.emailVerified ? "Yes" : "No"}
+                    </Badge>
+                  </td>
+                  <td className="p-4 align-middle">
+                    {new Date(user.createdAt).toLocaleDateString()}
+                  </td>
+                  <td className="p-4 align-middle">
+                    <div className="flex items-center gap-2">
+                      <Button asChild variant="outline" size="sm">
+                        <Link href={`/adminx/users/${user.id}`}>View</Link>
+                      </Button>
+                      <RowActionsMenu
+                        archived={archived}
+                        archiveUrl={`/api/admin/users/${user.id}/archive`}
+                        unarchiveUrl={`/api/admin/users/${user.id}/unarchive`}
+                        deleteUrl={`/api/admin/users/${user.id}`}
+                        onDone={() => router.refresh()}
+                      />
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
         {filteredUsers.length === 0 && (

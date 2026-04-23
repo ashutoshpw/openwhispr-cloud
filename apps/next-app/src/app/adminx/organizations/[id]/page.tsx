@@ -1,5 +1,7 @@
 import { ProjectTable } from "@/components/admin/ProjectTable";
+import { RowActionsMenu } from "@/components/admin/RowActionsMenu";
 import { OrgBillingForm } from "@/components/admin/billing/org-billing-form";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getOrgBilling } from "@/lib/billing/get-org-billing";
@@ -60,15 +62,30 @@ export default async function OrganizationDetailPage({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Organization Details</h1>
-          <p className="text-muted-foreground">
-            View and edit organization information
-          </p>
+        <div className="flex items-center gap-3">
+          <div>
+            <h1 className="text-3xl font-bold">Organization Details</h1>
+            <p className="text-muted-foreground">
+              View and edit organization information
+            </p>
+          </div>
+          {organizationData.status === "suspended" && (
+            <Badge variant="outline" className="ml-2">
+              Archived
+            </Badge>
+          )}
         </div>
-        <Button asChild variant="outline">
-          <Link href="/adminx/organizations">Back to Organizations</Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button asChild variant="outline">
+            <Link href="/adminx/organizations">Back to Organizations</Link>
+          </Button>
+          <RowActionsMenu
+            archived={organizationData.status === "suspended"}
+            archiveUrl={`/api/admin/organizations/${organizationData.id}/archive`}
+            unarchiveUrl={`/api/admin/organizations/${organizationData.id}/unarchive`}
+            deleteUrl={`/api/admin/organizations/${organizationData.id}`}
+          />
+        </div>
       </div>
       <Card>
         <CardHeader>
