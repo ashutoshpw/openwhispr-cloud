@@ -1,6 +1,7 @@
 "use client";
 
 import { useSidebar } from "@/components/dashboard/sidebar-context";
+import { SidebarFinder } from "@/components/dashboard/sidebar-finder";
 import { SidebarUserMenu } from "@/components/dashboard/sidebar-user-menu";
 import { WorkspaceSwitcher } from "@/components/dashboard/workspace-switcher";
 import { Separator } from "@/components/ui/separator";
@@ -172,6 +173,8 @@ export default function DashboardSideBar() {
           <WorkspaceSwitcher />
         </div>
 
+        <SidebarFinder />
+
         <div className="flex-1 overflow-y-auto py-2">
           <div className="relative h-full overflow-hidden">
             {/* Pane A: root menu */}
@@ -181,7 +184,7 @@ export default function DashboardSideBar() {
                 activeMenuId ? "-translate-x-full" : "translate-x-0",
               )}
             >
-              <nav className="grid items-start px-2 text-sm font-medium">
+              <nav className="grid items-start px-2 text-sm font-normal">
                 {config.main.map((section) => (
                   <SidebarSection
                     key={section.id || section.title || "top"}
@@ -219,11 +222,11 @@ export default function DashboardSideBar() {
               )}
             >
               {activeDrillSection && (
-                <nav className="grid items-start px-2 text-sm font-medium">
+                <nav className="grid items-start px-2 text-sm font-normal">
                   <button
                     type="button"
                     onClick={handleBack}
-                    className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-medium text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-50 mb-1"
+                    className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-normal text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-50 mb-1"
                   >
                     <ChevronLeft className="h-3.5 w-3.5" />
                     {activeDrillSection.title}
