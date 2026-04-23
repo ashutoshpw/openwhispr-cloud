@@ -11,9 +11,11 @@ import {
 } from "@/components/ui/card";
 import { signIn } from "@repo/auth/client";
 import { Github, Mail } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 type Linked = { email: boolean; google: boolean; github: boolean };
+type Provider = "google" | "github";
 
 export function SignInMethodsCard({
   email,
@@ -26,15 +28,45 @@ export function SignInMethodsCard({
   googleEnabled: boolean;
   githubEnabled: boolean;
 }) {
+  const router = useRouter();
   const [pending, setPending] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const connect = async (provider: "google" | "github") => {
+  const otherLinkedCount =
+    (linked.email ? 1 : 0) + (linked.google ? 1 : 0) + (linked.github ? 1 : 0);
+
+  const connect = async (provider: Provider) => {
+    setError(null);
     setPending(provider);
     try {
       await signIn.social({
         provider,
         callbackURL: "/account/settings/authentication",
       });
+    } finally {
+      setPending(null);
+    }
+  };
+
+  const disconnect = async (provider: Provider) => {
+    setError(null);
+    setPending(provider);
+    try {
+      const res = await fetch(`/api/account/social/${provider}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        if (data.error === "last_sign_in_method") {
+          setError(
+            "Cannot disconnect your only sign-in method. Add another first.",
+          );
+        } else {
+          setError("Failed to disconnect.");
+        }
+        return;
+      }
+      router.refresh();
     } finally {
       setPending(null);
     }
@@ -63,72 +95,103 @@ export function SignInMethodsCard({
             </Badge>
           </li>
 
-          <li className="flex items-center justify-between px-6 py-4">
-            <div className="flex items-center gap-3">
-              <GoogleIcon className="h-5 w-5" />
-              <div>
-                <div className="text-sm font-medium">Google</div>
-                <div className="text-xs text-muted-foreground">
-                  {googleEnabled
-                    ? linked.google
-                      ? "Connected"
-                      : "Not connected"
-                    : "Disabled by administrator"}
-                </div>
-              </div>
-            </div>
-            {googleEnabled ? (
-              linked.google ? (
-                <Badge variant="secondary">Connected</Badge>
-              ) : (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={pending === "google"}
-                  onClick={() => connect("google")}
-                >
-                  {pending === "google" ? "Redirecting..." : "Connect"}
-                </Button>
-              )
-            ) : (
-              <Badge variant="outline">Unavailable</Badge>
-            )}
-          </li>
+          <SocialRow
+            provider="google"
+            label="Google"
+            icon={<GoogleIcon className="h-5 w-5" />}
+            enabled={googleEnabled}
+            connected={linked.google}
+            pending={pending === "google"}
+            canDisconnect={otherLinkedCount > 1}
+            onConnect={() => connect("google")}
+            onDisconnect={() => disconnect("google")}
+          />
 
-          <li className="flex items-center justify-between px-6 py-4">
-            <div className="flex items-center gap-3">
-              <Github className="h-5 w-5 text-muted-foreground" />
-              <div>
-                <div className="text-sm font-medium">GitHub</div>
-                <div className="text-xs text-muted-foreground">
-                  {githubEnabled
-                    ? linked.github
-                      ? "Connected"
-                      : "Not connected"
-                    : "Disabled by administrator"}
-                </div>
-              </div>
-            </div>
-            {githubEnabled ? (
-              linked.github ? (
-                <Badge variant="secondary">Connected</Badge>
-              ) : (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={pending === "github"}
-                  onClick={() => connect("github")}
-                >
-                  {pending === "github" ? "Redirecting..." : "Connect"}
-                </Button>
-              )
-            ) : (
-              <Badge variant="outline">Unavailable</Badge>
-            )}
-          </li>
+          <SocialRow
+            provider="github"
+            label="GitHub"
+            icon={<Github className="h-5 w-5 text-muted-foreground" />}
+            enabled={githubEnabled}
+            connected={linked.github}
+            pending={pending === "github"}
+            canDisconnect={otherLinkedCount > 1}
+            onConnect={() => connect("github")}
+            onDisconnect={() => disconnect("github")}
+          />
+
+          {error ? (
+            <li className="px-6 py-3 text-sm text-destructive">{error}</li>
+          ) : null}
         </ul>
       </CardContent>
     </Card>
+  );
+}
+
+function SocialRow({
+  label,
+  icon,
+  enabled,
+  connected,
+  pending,
+  canDisconnect,
+  onConnect,
+  onDisconnect,
+}: {
+  provider: Provider;
+  label: string;
+  icon: React.ReactNode;
+  enabled: boolean;
+  connected: boolean;
+  pending: boolean;
+  canDisconnect: boolean;
+  onConnect: () => void;
+  onDisconnect: () => void;
+}) {
+  return (
+    <li className="flex items-center justify-between px-6 py-4">
+      <div className="flex items-center gap-3">
+        {icon}
+        <div>
+          <div className="text-sm font-medium">{label}</div>
+          <div className="text-xs text-muted-foreground">
+            {enabled
+              ? connected
+                ? "Connected"
+                : "Not connected"
+              : "Disabled by administrator"}
+          </div>
+        </div>
+      </div>
+      {enabled ? (
+        connected ? (
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={pending || !canDisconnect}
+            title={
+              !canDisconnect
+                ? "Add another sign-in method before disconnecting"
+                : undefined
+            }
+            onClick={onDisconnect}
+          >
+            {pending ? "Disconnecting..." : "Disconnect"}
+          </Button>
+        ) : (
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={pending}
+            onClick={onConnect}
+          >
+            {pending ? "Redirecting..." : "Connect"}
+          </Button>
+        )
+      ) : (
+        <Badge variant="outline">Unavailable</Badge>
+      )}
+    </li>
   );
 }
 
