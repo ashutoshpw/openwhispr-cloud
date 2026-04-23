@@ -52,5 +52,8 @@
     "*.{ts,tsx,js,jsx,mjs,cjs,mts,cts,json,jsonc,css}": [
       "biome check --write --no-errors-on-unmatched"
     ]
+  },
+  "dependencies": {
+    "@stripe/react-stripe-js": "^6.2.0"
   }
 }

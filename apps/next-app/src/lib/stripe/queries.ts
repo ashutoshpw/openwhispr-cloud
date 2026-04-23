@@ -1,6 +1,39 @@
 import { db } from "@repo/database";
 import { sql } from "@repo/database";
+import { planTier as planTierTable } from "@repo/database/schema";
 import { stripe } from "./client";
+
+/**
+ * Load plan_tier rows and build a lookup keyed by both the raw key and a
+ * normalized form (underscores stripped) so Stripe `metadata.plan_tier`
+ * values like "tier_1" resolve to plan_tier.key "tier1".
+ */
+async function loadPlanTierLookup(): Promise<
+  Map<
+    string,
+    { displayName: string; description: string | null; sortOrder: number }
+  >
+> {
+  const map = new Map<
+    string,
+    { displayName: string; description: string | null; sortOrder: number }
+  >();
+  try {
+    const rows = await db().select().from(planTierTable);
+    for (const row of rows) {
+      const entry = {
+        displayName: row.displayName,
+        description: row.description,
+        sortOrder: row.sortOrder,
+      };
+      map.set(row.key, entry);
+      map.set(row.key.replace(/_/g, ""), entry);
+    }
+  } catch (error) {
+    console.warn("Could not load plan_tier display names:", error);
+  }
+  return map;
+}
 
 const STRIPE_SCHEMA = process.env.STRIPE_SCHEMA ?? "stripe";
 
@@ -369,8 +402,11 @@ const DEFAULT_PRICING_TIERS: PricingTier[] = [
  */
 export async function getPricingTiers(): Promise<PricingTier[]> {
   try {
-    // Fetch active products
-    const products = await getStripeProducts({ active: true });
+    // Fetch active products + plan_tier overrides in parallel
+    const [products, planTierLookup] = await Promise.all([
+      getStripeProducts({ active: true }),
+      loadPlanTierLookup(),
+    ]);
 
     if (!products || products.length === 0) {
       console.warn("No active products found. Using default pricing tiers.");
@@ -442,10 +478,16 @@ export async function getPricingTiers(): Promise<PricingTier[]> {
         metadata.pricing_type === "contact" ||
         (monthlyPrice === null && yearlyPrice === null);
 
+      const planTierKey = metadata.plan_tier;
+      const override = planTierKey
+        ? (planTierLookup.get(planTierKey) ??
+          planTierLookup.get(planTierKey.replace(/_/g, "")))
+        : undefined;
+
       const tier: PricingTier = {
         id: productData.id,
-        name: productData.name || "Unnamed Plan",
-        description: productData.description || "",
+        name: override?.displayName || productData.name || "Unnamed Plan",
+        description: override?.description || productData.description || "",
         monthlyPrice,
         yearlyPrice,
         monthlyPriceId,
@@ -455,7 +497,7 @@ export async function getPricingTiers(): Promise<PricingTier[]> {
         exclusive: metadata.exclusive === "true" || isContactPricing,
         displayOrder: metadata.display_order
           ? Number.parseInt(metadata.display_order, 10)
-          : 99,
+          : (override?.sortOrder ?? 99),
         isContactPricing,
         actionLabel: isContactPricing
           ? metadata.action_label || "Contact Sales"

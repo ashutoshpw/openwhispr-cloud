@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useCreateWorkspace } from "@/components/workspace/create/CreateWorkspaceContext";
 import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
 import Link from "next/link";
@@ -79,6 +80,7 @@ export function WorkspaceSwitcher() {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const router = useRouter();
+  const createWorkspace = useCreateWorkspace();
 
   useEffect(() => {
     const fetchWorkspaces = async () => {
@@ -156,11 +158,13 @@ export function WorkspaceSwitcher() {
 
   if (!activeWorkspace) {
     return (
-      <Button variant="ghost" className="w-full justify-start" asChild>
-        <a href="/workspace/new">
-          <Plus className="mr-2 h-4 w-4" />
-          Create Workspace
-        </a>
+      <Button
+        variant="ghost"
+        className="w-full justify-start"
+        onClick={() => createWorkspace.open()}
+      >
+        <Plus className="mr-2 h-4 w-4" />
+        Create Workspace
       </Button>
     );
   }
@@ -250,21 +254,23 @@ export function WorkspaceSwitcher() {
 
           {/* Create Team */}
           <div className="p-1">
-            <DropdownMenuItem asChild>
-              <a
-                href="/workspace/new"
-                className="cursor-pointer flex items-start gap-3 py-2"
-              >
-                <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border mt-0.5">
-                  <Plus className="h-3 w-3" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium">Create Team</span>
-                  <span className="text-xs text-muted-foreground">
-                    Collaborate with others in a shared workspace
-                  </span>
-                </div>
-              </a>
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault();
+                setOpen(false);
+                createWorkspace.open();
+              }}
+              className="cursor-pointer flex items-start gap-3 py-2"
+            >
+              <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border mt-0.5">
+                <Plus className="h-3 w-3" />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-sm font-medium">Create Workspace</span>
+                <span className="text-xs text-muted-foreground">
+                  Collaborate with others in a shared workspace
+                </span>
+              </div>
             </DropdownMenuItem>
           </div>
         </DropdownMenuContent>
