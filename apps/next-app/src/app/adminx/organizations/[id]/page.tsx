@@ -64,7 +64,9 @@ export default async function OrganizationDetailPage({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div>
-            <h1 className="text-3xl font-bold">Organization Details</h1>
+            <h1 className="text-2xl font-normal tracking-tight">
+              Organization Details
+            </h1>
             <p className="text-muted-foreground">
               View and edit organization information
             </p>

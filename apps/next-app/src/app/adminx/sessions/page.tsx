@@ -21,7 +21,9 @@ export default async function SessionsPage() {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h1 className="text-3xl font-bold">Session Management</h1>
+        <h1 className="text-2xl font-normal tracking-tight">
+          Session Management
+        </h1>
         <p className="text-muted-foreground">
           View and manage active user sessions
         </p>

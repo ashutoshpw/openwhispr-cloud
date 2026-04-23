@@ -18,7 +18,7 @@ export default async function UsersPage() {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h1 className="text-3xl font-bold">User Management</h1>
+        <h1 className="text-2xl font-normal tracking-tight">User Management</h1>
         <p className="text-muted-foreground">
           View and manage all registered users
         </p>

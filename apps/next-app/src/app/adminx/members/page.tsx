@@ -33,7 +33,9 @@ export default async function MembersPage() {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h1 className="text-3xl font-bold">Member Management</h1>
+        <h1 className="text-2xl font-normal tracking-tight">
+          Member Management
+        </h1>
         <p className="text-muted-foreground">
           View and manage organization memberships
         </p>

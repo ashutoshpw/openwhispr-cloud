@@ -4,7 +4,7 @@ export default async function SettingsPage() {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h1 className="text-3xl font-bold">System Settings</h1>
+        <h1 className="text-2xl font-normal tracking-tight">System Settings</h1>
         <p className="text-muted-foreground">
           Configure system-wide settings and preferences
         </p>

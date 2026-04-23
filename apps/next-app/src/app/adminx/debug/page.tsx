@@ -17,7 +17,9 @@ export default async function DebugPage() {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h1 className="text-3xl font-bold">Debug Information</h1>
+        <h1 className="text-2xl font-normal tracking-tight">
+          Debug Information
+        </h1>
         <p className="text-muted-foreground">
           Check your authentication and admin status
         </p>

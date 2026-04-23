@@ -14,7 +14,7 @@ export default async function AdminAgentsPage() {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-semibold text-2xl tracking-tight">Agents</h1>
+          <h1 className="text-2xl font-normal tracking-tight">Agents</h1>
           <p className="text-sm text-muted-foreground">
             Manage the AI agent registry available to all workspaces.
           </p>

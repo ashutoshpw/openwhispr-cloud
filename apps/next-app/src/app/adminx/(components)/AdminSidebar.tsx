@@ -1,6 +1,7 @@
 "use client";
 
 import { useSidebar } from "@/components/dashboard/sidebar-context";
+import { SidebarUserMenu } from "@/components/dashboard/sidebar-user-menu";
 import { Separator } from "@/components/ui/separator";
 import {
   type AdminNavItem,
@@ -214,6 +215,10 @@ export default function AdminSidebar() {
               )}
             </div>
           </div>
+        </div>
+
+        <div className="shrink-0 border-t border-neutral-100 p-2 dark:border-neutral-800">
+          <SidebarUserMenu />
         </div>
       </div>
     </div>

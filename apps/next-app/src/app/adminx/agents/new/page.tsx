@@ -5,7 +5,7 @@ export default function NewAgentPage() {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h1 className="font-semibold text-2xl tracking-tight">New agent</h1>
+        <h1 className="text-2xl font-normal tracking-tight">New agent</h1>
         <p className="text-sm text-muted-foreground">
           Add a new AI agent to the registry.
         </p>

@@ -21,7 +21,7 @@ export default async function EditAgentPage({ params }: PageProps) {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h1 className="font-semibold text-2xl tracking-tight">{row.name}</h1>
+        <h1 className="text-2xl font-normal tracking-tight">{row.name}</h1>
         <p className="text-sm text-muted-foreground">
           Slug: <span className="font-mono">{row.slug}</span>
         </p>

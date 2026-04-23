@@ -21,7 +21,9 @@ export default async function OrganizationsPage() {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h1 className="text-3xl font-bold">Organization Management</h1>
+        <h1 className="text-2xl font-normal tracking-tight">
+          Organization Management
+        </h1>
         <p className="text-muted-foreground">
           View and manage all organizations
         </p>

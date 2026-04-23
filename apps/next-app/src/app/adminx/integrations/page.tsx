@@ -15,9 +15,7 @@ export default async function AdminIntegrationsPage() {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-semibold text-2xl tracking-tight">
-            Integrations
-          </h1>
+          <h1 className="text-2xl font-normal tracking-tight">Integrations</h1>
           <p className="text-sm text-muted-foreground">
             Manage the integration registry available to all workspaces.
           </p>

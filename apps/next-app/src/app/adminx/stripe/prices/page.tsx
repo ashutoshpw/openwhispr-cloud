@@ -13,7 +13,7 @@ export default async function PricesPage() {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Prices</h1>
+          <h1 className="text-2xl font-normal tracking-tight">Prices</h1>
           <p className="text-muted-foreground">
             View and manage prices across your products
           </p>

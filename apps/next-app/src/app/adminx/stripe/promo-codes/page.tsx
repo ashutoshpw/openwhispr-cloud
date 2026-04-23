@@ -32,7 +32,9 @@ export default async function PromoCodesPage() {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Promotion Codes</h1>
+          <h1 className="text-2xl font-normal tracking-tight">
+            Promotion Codes
+          </h1>
           <p className="text-muted-foreground">
             Create and manage customer-facing promo codes
           </p>

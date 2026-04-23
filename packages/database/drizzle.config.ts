@@ -6,7 +6,7 @@ import { resolve } from "node:path";
 config({ path: resolve(__dirname, "../../.env.local") });
 
 export default defineConfig({
-  schema: "./src/schema.ts",
+  schema: ["./src/schema.ts", "./src/schema-agents.ts"],
   schemaFilter: ["public", "archived"],
   out: "./drizzle",
   dialect: "postgresql",

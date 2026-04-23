@@ -11,7 +11,7 @@ export default async function CouponsPage() {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Coupons</h1>
+          <h1 className="text-2xl font-normal tracking-tight">Coupons</h1>
           <p className="text-muted-foreground">
             Manage discount coupons and promotion codes
           </p>

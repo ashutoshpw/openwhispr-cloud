@@ -10,7 +10,7 @@ export default async function AdminAiProviderPage() {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h1 className="font-semibold text-2xl tracking-tight">AI Provider</h1>
+        <h1 className="text-2xl font-normal tracking-tight">AI Provider</h1>
         <p className="text-sm text-muted-foreground">
           Configure the OpenAI-compatible provider used for agent sessions.
           Values are stored in the database and apply immediately — no redeploy

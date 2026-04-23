@@ -82,7 +82,9 @@ export default async function CouponDetailPage({
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Coupon Details</h1>
+          <h1 className="text-2xl font-normal tracking-tight">
+            Coupon Details
+          </h1>
           <p className="text-muted-foreground">View coupon information</p>
         </div>
         <div className="flex gap-2">

@@ -21,7 +21,9 @@ export default async function NewPromoCodePage() {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Create Promo Code</h1>
+          <h1 className="text-2xl font-normal tracking-tight">
+            Create Promo Code
+          </h1>
           <p className="text-muted-foreground">
             Create a new customer-facing promo code
           </p>

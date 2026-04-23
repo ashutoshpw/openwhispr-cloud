@@ -18,7 +18,7 @@ export default async function EditProductPage({
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h1 className="text-3xl font-bold">Edit Product</h1>
+        <h1 className="text-2xl font-normal tracking-tight">Edit Product</h1>
         <p className="text-muted-foreground">Update product information</p>
       </div>
       <ProductForm product={product as Stripe.Product} mode="edit" />

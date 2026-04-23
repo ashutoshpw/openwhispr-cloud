@@ -20,7 +20,7 @@ export default async function PlanFeaturesPage() {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h1 className="text-3xl font-bold">Plan Features</h1>
+        <h1 className="text-2xl font-normal tracking-tight">Plan Features</h1>
         <p className="text-muted-foreground">
           Configure features included in each pricing tier (Stripe product).
         </p>

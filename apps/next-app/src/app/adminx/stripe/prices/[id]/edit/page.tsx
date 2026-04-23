@@ -69,7 +69,7 @@ export default async function EditPricePage({
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Edit Price</h1>
+          <h1 className="text-2xl font-normal tracking-tight">Edit Price</h1>
           <p className="text-muted-foreground">
             Update this price or replace it with new billing details.
           </p>

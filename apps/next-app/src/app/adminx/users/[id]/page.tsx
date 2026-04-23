@@ -39,7 +39,9 @@ export default async function UserDetailPage({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div>
-            <h1 className="text-3xl font-bold">User Details</h1>
+            <h1 className="text-2xl font-normal tracking-tight">
+              User Details
+            </h1>
             <p className="text-muted-foreground">
               View and edit user information
             </p>

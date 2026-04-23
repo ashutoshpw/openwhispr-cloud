@@ -5,9 +5,7 @@ export default function NewIntegrationPage() {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h1 className="font-semibold text-2xl tracking-tight">
-          New integration
-        </h1>
+        <h1 className="text-2xl font-normal tracking-tight">New integration</h1>
         <p className="text-sm text-muted-foreground">
           Add a new integration to the registry.
         </p>

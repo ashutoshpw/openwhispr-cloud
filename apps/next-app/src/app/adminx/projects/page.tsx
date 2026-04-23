@@ -35,7 +35,9 @@ export default async function ProjectsPage() {
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <h1 className="text-3xl font-bold">Project Management</h1>
+        <h1 className="text-2xl font-normal tracking-tight">
+          Project Management
+        </h1>
         <p className="text-muted-foreground">
           View and manage all projects across organizations
         </p>
