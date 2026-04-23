@@ -99,6 +99,16 @@ export const organization = pgTable("organization", {
   logo: text("logo"),
   stripeCustomerId: text("stripe_customer_id"),
   status: text("status").notNull().default("active"), // pending | active | readonly | suspended
+  invoiceEmail: varchar("invoice_email", { length: 254 }),
+  companyName: varchar("company_name", { length: 64 }),
+  billingCountry: varchar("billing_country", { length: 2 }),
+  billingAddress: text("billing_address"),
+  invoiceLanguage: varchar("invoice_language", { length: 10 })
+    .notNull()
+    .default("en"),
+  invoicePurchaseOrder: varchar("invoice_purchase_order", { length: 64 }),
+  taxIdType: varchar("tax_id_type", { length: 32 }),
+  taxIdValue: varchar("tax_id_value", { length: 64 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
@@ -239,6 +249,60 @@ export const orgAuditLogs = pgTable("org_audit_logs", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Billing: Per-organization plan/billing state (admin-managed)
+export const orgBilling = pgTable("org_billing", {
+  id: text("id").primaryKey(),
+  organizationId: text("organization_id")
+    .notNull()
+    .unique()
+    .references(() => organization.id, { onDelete: "cascade" }),
+
+  // Plan state - free-form strings (e.g., "free", "tier1", "tier2", "tier3")
+  // Display names are managed via the planTier table.
+  planTier: text("plan_tier").notNull().default("free"),
+  planStatus: text("plan_status").notNull().default("active"),
+  // "active" | "trialing" | "past_due" | "canceled" | "incomplete" | "paused"
+
+  // Stripe linkage (nullable; admin-set tiers may have no subscription)
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  stripeProductId: text("stripe_product_id"),
+  stripePriceId: text("stripe_price_id"),
+
+  // Lifecycle
+  trialEndsAt: timestamp("trial_ends_at"),
+  currentPeriodStart: timestamp("current_period_start"),
+  currentPeriodEnd: timestamp("current_period_end"),
+  cancelAtPeriodEnd: boolean("cancel_at_period_end").default(false).notNull(),
+  canceledAt: timestamp("canceled_at"),
+
+  // Admin overrides
+  manualOverride: boolean("manual_override").default(false).notNull(),
+  notes: text("notes"),
+  updatedBy: text("updated_by"),
+
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
+// Billing: Plan tier registry - admin-managed display names for plan tier keys.
+// Lets admins rename "tier1" -> "Pro" without touching code.
+export const planTier = pgTable("plan_tier", {
+  id: text("id").primaryKey(),
+  key: text("key").notNull().unique(), // e.g., "free", "tier1", "tier2"
+  displayName: text("display_name").notNull(), // e.g., "Free", "Pro", "Business"
+  description: text("description"),
+  isPaid: boolean("is_paid").default(false).notNull(),
+  sortOrder: integer("sort_order").default(0).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
 // App settings (for configurable values like enterprise contact link)
 export const appSettings = pgTable("app_settings", {
   id: text("id").primaryKey(),
@@ -261,6 +325,10 @@ export type OrgAuditLog = typeof orgAuditLogs.$inferSelect;
 export type NewOrgAuditLog = typeof orgAuditLogs.$inferInsert;
 export type AppSetting = typeof appSettings.$inferSelect;
 export type NewAppSetting = typeof appSettings.$inferInsert;
+export type OrgBilling = typeof orgBilling.$inferSelect;
+export type NewOrgBilling = typeof orgBilling.$inferInsert;
+export type PlanTier = typeof planTier.$inferSelect;
+export type NewPlanTier = typeof planTier.$inferInsert;
 
 // ============================================================================
 // Referral System
