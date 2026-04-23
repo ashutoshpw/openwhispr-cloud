@@ -1,36 +1,40 @@
 import { ActiveSessionsCard } from "@/components/account/authentication/active-sessions-card";
+import { PasskeyCard } from "@/components/account/authentication/passkey-card";
 import { SignInMethodsCard } from "@/components/account/authentication/sign-in-methods-card";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { TwoFactorCard } from "@/components/account/authentication/two-factor-card";
 import { requireSession } from "@/lib/auth/require-membership";
 import { db, eq } from "@repo/database";
-import { account } from "@repo/database/schema";
+import { account, user as userTable } from "@repo/database/schema";
 
 export const dynamic = "force-dynamic";
 
 export default async function AuthenticationPage() {
   const { user } = await requireSession("/account/settings/authentication");
 
-  const accounts = await db()
-    .select({
-      id: account.id,
-      providerId: account.providerId,
-      accountId: account.accountId,
-      createdAt: account.createdAt,
-    })
-    .from(account)
-    .where(eq(account.userId, user.id));
+  const [accounts, userRows] = await Promise.all([
+    db()
+      .select({
+        id: account.id,
+        providerId: account.providerId,
+        accountId: account.accountId,
+        createdAt: account.createdAt,
+      })
+      .from(account)
+      .where(eq(account.userId, user.id)),
+    db()
+      .select({ twoFactorEnabled: userTable.twoFactorEnabled })
+      .from(userTable)
+      .where(eq(userTable.id, user.id))
+      .limit(1),
+  ]);
 
   const linked = {
     email: accounts.some((a) => a.providerId === "credential"),
     google: accounts.some((a) => a.providerId === "google"),
     github: accounts.some((a) => a.providerId === "github"),
   };
+
+  const twoFactorEnabled = userRows[0]?.twoFactorEnabled ?? false;
 
   const googleEnabled = Boolean(
     process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID &&
@@ -61,19 +65,9 @@ export default async function AuthenticationPage() {
 
       <ActiveSessionsCard />
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Two-Factor Authentication</CardTitle>
-          <CardDescription>
-            Passkeys and authenticator app (TOTP) support are coming soon.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">
-            Two-factor protection will land in a follow-up release.
-          </p>
-        </CardContent>
-      </Card>
+      <TwoFactorCard enabled={twoFactorEnabled} />
+
+      <PasskeyCard />
     </div>
   );
 }
