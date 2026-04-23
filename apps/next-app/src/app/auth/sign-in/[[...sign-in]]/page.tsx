@@ -11,17 +11,23 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { signIn } from "@repo/auth/client";
+import { passkey, signIn, twoFactor } from "@repo/auth/client";
+import { KeyRound } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+
+type Stage = "credentials" | "totp" | "backup";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isPasskeyLoading, setIsPasskeyLoading] = useState(false);
+  const [stage, setStage] = useState<Stage>("credentials");
+  const [code, setCode] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo =
@@ -46,12 +52,32 @@ export default function SignInPage() {
     }
   };
 
+  const handlePasskeySignIn = async () => {
+    setIsPasskeyLoading(true);
+    try {
+      const result = await passkey.signIn();
+      if (result?.error) {
+        toast.error(result.error.message ?? "Passkey sign-in failed.");
+        return;
+      }
+      toast.success("Signed in successfully!");
+      router.push(redirectTo);
+      router.refresh();
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Passkey sign-in failed.";
+      toast.error(message);
+    } finally {
+      setIsPasskeyLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const { data, error } = await signIn.email({
+      const { data, error, twoFactorRedirect } = await signIn.email({
         email,
         password,
       });
@@ -63,9 +89,16 @@ export default function SignInPage() {
         return;
       }
 
-      toast.success("Signed in successfully!");
-      router.push(redirectTo);
-      router.refresh();
+      if (twoFactorRedirect) {
+        setStage("totp");
+        return;
+      }
+
+      if (data) {
+        toast.success("Signed in successfully!");
+        router.push(redirectTo);
+        router.refresh();
+      }
     } catch (error: unknown) {
       const message =
         error instanceof Error
@@ -77,52 +110,128 @@ export default function SignInPage() {
     }
   };
 
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      const result =
+        stage === "backup"
+          ? await twoFactor.verifyBackupCode({ code })
+          : await twoFactor.verifyTotp({ code });
+      if (result.error) {
+        toast.error(result.error.message ?? "Invalid code.");
+        return;
+      }
+      toast.success("Signed in successfully!");
+      router.push(redirectTo);
+      router.refresh();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <PageWrapper>
       <div className="flex w-full justify-center my-20">
         <Card className="w-[400px]">
           <CardHeader>
-            <CardTitle>Sign In</CardTitle>
+            <CardTitle>
+              {stage === "credentials"
+                ? "Sign In"
+                : stage === "backup"
+                  ? "Use a backup code"
+                  : "Two-factor verification"}
+            </CardTitle>
             <CardDescription>
-              Enter your email and password to sign in to your account
+              {stage === "credentials"
+                ? "Enter your email and password to sign in to your account"
+                : stage === "backup"
+                  ? "Enter one of your saved backup codes."
+                  : "Enter the 6-digit code from your authenticator app."}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="name@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
-                  <Link
-                    href="/auth/forgot-password"
-                    className="text-sm underline text-muted-foreground hover:text-foreground"
-                  >
-                    Forgot password?
-                  </Link>
+            {stage === "credentials" ? (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="name@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
                 </div>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Signing in..." : "Sign In"}
-              </Button>
-            </form>
-            {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password">Password</Label>
+                    <Link
+                      href="/auth/forgot-password"
+                      className="text-sm underline text-muted-foreground hover:text-foreground"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </div>
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? "Signing in..." : "Sign In"}
+                </Button>
+              </form>
+            ) : (
+              <form onSubmit={handleVerify} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="tfa-code">
+                    {stage === "backup" ? "Backup code" : "Verification code"}
+                  </Label>
+                  <Input
+                    id="tfa-code"
+                    inputMode={stage === "backup" ? "text" : "numeric"}
+                    pattern={stage === "backup" ? undefined : "[0-9]*"}
+                    maxLength={stage === "backup" ? undefined : 6}
+                    value={code}
+                    onChange={(e) =>
+                      setCode(
+                        stage === "backup"
+                          ? e.target.value
+                          : e.target.value.replace(/\D/g, "").slice(0, 6),
+                      )
+                    }
+                    required
+                    autoFocus
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isLoading || code.length === 0}
+                >
+                  {isLoading ? "Verifying..." : "Verify"}
+                </Button>
+                <button
+                  type="button"
+                  className="w-full text-center text-sm text-muted-foreground underline"
+                  onClick={() => {
+                    setCode("");
+                    setStage(stage === "backup" ? "totp" : "backup");
+                  }}
+                >
+                  {stage === "backup"
+                    ? "Use authenticator code instead"
+                    : "Use a backup code instead"}
+                </button>
+              </form>
+            )}
+
+            {stage === "credentials" ? (
               <>
                 <div className="relative my-4">
                   <div className="absolute inset-0 flex items-center">
@@ -134,28 +243,49 @@ export default function SignInPage() {
                     </span>
                   </div>
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
-                  onClick={handleGoogleSignIn}
-                  disabled={isGoogleLoading}
-                >
-                  {isGoogleLoading ? (
-                    <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
-                    <Icons.google className="mr-2 h-4 w-4" />
+                <div className="space-y-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={handlePasskeySignIn}
+                    disabled={isPasskeyLoading}
+                  >
+                    {isPasskeyLoading ? (
+                      <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <KeyRound className="mr-2 h-4 w-4" />
+                    )}
+                    Sign in with passkey
+                  </Button>
+                  {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      onClick={handleGoogleSignIn}
+                      disabled={isGoogleLoading}
+                    >
+                      {isGoogleLoading ? (
+                        <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <Icons.google className="mr-2 h-4 w-4" />
+                      )}
+                      Google
+                    </Button>
                   )}
-                  Google
-                </Button>
+                </div>
               </>
-            )}
-            <div className="mt-4 text-center text-sm">
-              Don&apos;t have an account?{" "}
-              <Link href="/auth/sign-up" className="underline">
-                Sign up
-              </Link>
-            </div>
+            ) : null}
+
+            {stage === "credentials" ? (
+              <div className="mt-4 text-center text-sm">
+                Don&apos;t have an account?{" "}
+                <Link href="/auth/sign-up" className="underline">
+                  Sign up
+                </Link>
+              </div>
+            ) : null}
           </CardContent>
         </Card>
       </div>
