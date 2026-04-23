@@ -121,3 +121,39 @@ export async function syncOrgBillingOnSubscriptionDeleted(
     })
     .where(eq(orgBilling.organizationId, organizationId));
 }
+
+/**
+ * Mark org_billing.planStatus = "past_due" on a failed invoice.
+ * Skips terminal statuses ("canceled") so a finalized cancellation isn't
+ * resurrected. Trialing/active/incomplete all transition to past_due.
+ */
+export async function syncOrgBillingOnPaymentFailed(
+  organizationId: string,
+): Promise<void> {
+  const current = await getOrgBilling(organizationId);
+  if (current.planStatus === "canceled") return;
+  if (current.planStatus === "past_due") return;
+
+  await db()
+    .update(orgBilling)
+    .set({ planStatus: "past_due" })
+    .where(eq(orgBilling.organizationId, organizationId));
+}
+
+/**
+ * Restore org_billing.planStatus to "active" after a successful payment when
+ * the org was previously "past_due". Other statuses (trialing, canceled, etc.)
+ * are left alone — the subscription.updated event is the source of truth for
+ * lifecycle transitions.
+ */
+export async function syncOrgBillingOnPaymentSucceeded(
+  organizationId: string,
+): Promise<void> {
+  const current = await getOrgBilling(organizationId);
+  if (current.planStatus !== "past_due") return;
+
+  await db()
+    .update(orgBilling)
+    .set({ planStatus: "active" })
+    .where(eq(orgBilling.organizationId, organizationId));
+}

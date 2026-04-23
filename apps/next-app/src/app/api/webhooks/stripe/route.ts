@@ -6,6 +6,8 @@ import {
 } from "@/lib/analytics/server";
 import {
   syncOrgBillingFromSubscription,
+  syncOrgBillingOnPaymentFailed,
+  syncOrgBillingOnPaymentSucceeded,
   syncOrgBillingOnSubscriptionDeleted,
 } from "@/lib/billing/sync-from-stripe";
 import {
@@ -369,6 +371,8 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
     performedBy: "system",
   });
 
+  await syncOrgBillingOnPaymentFailed(org[0].id);
+
   console.log(`[Webhook] Payment failed for workspace ${org[0].id}`);
 }
 
@@ -400,6 +404,8 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
     },
     performedBy: "system",
   });
+
+  await syncOrgBillingOnPaymentSucceeded(org[0].id);
 
   // If workspace was in readonly due to payment issues, reactivate it
   if (org[0].status === ORG_STATUS.READONLY) {
