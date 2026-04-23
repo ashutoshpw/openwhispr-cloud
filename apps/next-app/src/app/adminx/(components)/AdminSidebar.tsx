@@ -1,127 +1,219 @@
 "use client";
 
+import { useSidebar } from "@/components/dashboard/sidebar-context";
 import { Separator } from "@/components/ui/separator";
-import clsx from "clsx";
 import {
-  Activity,
-  Building2,
-  CreditCard,
-  DollarSign,
-  FolderKanban,
-  Layers,
-  LayoutDashboard,
-  Package,
-  Plug,
-  Settings,
-  Shield,
-  Sliders,
-  Tag,
-  Ticket,
-  UserCog,
-  Users,
-} from "lucide-react";
+  type AdminNavItem,
+  type AdminNavSection,
+  adminxNav,
+} from "@/lib/adminx-navigation";
+import { cn } from "@/lib/utils";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useMemo, useRef } from "react";
+
+function isHrefActive(pathname: string, href: string) {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function SidebarNavItem({
+  item,
+  active,
+}: {
+  item: AdminNavItem;
+  active: boolean;
+}) {
+  return (
+    <Link
+      href={item.href}
+      className={cn(
+        "flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-50",
+        active &&
+          "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-50",
+      )}
+    >
+      <item.icon className="h-4 w-4 shrink-0" />
+      {item.label}
+    </Link>
+  );
+}
+
+function DrillDownRow({
+  section,
+  onClick,
+}: {
+  section: AdminNavSection;
+  onClick: () => void;
+}) {
+  const Icon = section.icon;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-50"
+    >
+      {Icon && <Icon className="h-4 w-4 shrink-0" />}
+      <span className="flex-1 text-left">{section.title}</span>
+      <ChevronRight className="h-3.5 w-3.5" />
+    </button>
+  );
+}
+
+function SidebarSection({
+  section,
+  pathname,
+  onDrillDown,
+}: {
+  section: AdminNavSection;
+  pathname: string;
+  onDrillDown: (id: string) => void;
+}) {
+  if (section.id && section.children && section.children.length > 0) {
+    return (
+      <div className="mb-1">
+        <DrillDownRow
+          section={section}
+          onClick={() => section.id && onDrillDown(section.id)}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="mb-1">
+      {section.title && (
+        <div className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+          {section.title}
+        </div>
+      )}
+      {section.items.map((item) => (
+        <SidebarNavItem
+          key={item.href}
+          item={item}
+          active={isHrefActive(pathname, item.href)}
+        />
+      ))}
+    </div>
+  );
+}
 
 export default function AdminSidebar() {
   const pathname = usePathname();
+  const { activeMenuId, setActiveMenuId } = useSidebar();
 
-  const navItems = [
-    { href: "/adminx/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-    { href: "/adminx/users", icon: Users, label: "Users" },
-    { href: "/adminx/organizations", icon: Building2, label: "Organizations" },
-    { href: "/adminx/projects", icon: FolderKanban, label: "Projects" },
-    { href: "/adminx/members", icon: UserCog, label: "Members" },
-    { href: "/adminx/payments", icon: CreditCard, label: "Payments" },
-    { href: "/adminx/sessions", icon: Activity, label: "Sessions" },
-    { href: "/adminx/integrations", icon: Plug, label: "Integrations" },
-    { href: "/adminx/settings", icon: Settings, label: "Settings" },
-  ];
+  const activeDrillSection = useMemo(
+    () => adminxNav.main.find((s) => s.id && s.id === activeMenuId) ?? null,
+    [activeMenuId],
+  );
 
-  const stripeItems = [
-    { href: "/adminx/stripe/products", icon: Package, label: "Products" },
-    { href: "/adminx/stripe/prices", icon: DollarSign, label: "Prices" },
-    { href: "/adminx/stripe/coupons", icon: Ticket, label: "Coupons" },
-    { href: "/adminx/stripe/promo-codes", icon: Tag, label: "Promo Codes" },
-  ];
+  const userDismissedRef = useRef(false);
+  const prevPathnameRef = useRef(pathname);
 
-  const billingItems = [
-    {
-      href: "/adminx/billing/plan-tiers",
-      icon: Tag,
-      label: "Plan Tiers",
-    },
-    {
-      href: "/adminx/billing/plan-features",
-      icon: Layers,
-      label: "Plan Features",
-    },
-    {
-      href: "/adminx/billing/org-features",
-      icon: Shield,
-      label: "Org Overrides",
-    },
-    { href: "/adminx/billing/settings", icon: Sliders, label: "App Settings" },
-  ];
+  useEffect(() => {
+    if (prevPathnameRef.current !== pathname) {
+      userDismissedRef.current = false;
+      prevPathnameRef.current = pathname;
+    }
+    if (activeMenuId) return;
+    if (userDismissedRef.current) return;
+    for (const section of adminxNav.main) {
+      if (!section.id || !section.children) continue;
+      for (const child of section.children) {
+        if (isHrefActive(pathname, child.href)) {
+          setActiveMenuId(section.id);
+          return;
+        }
+      }
+    }
+  }, [pathname, activeMenuId, setActiveMenuId]);
 
-  const renderNavItem = (item: {
-    href: string;
-    icon: React.ComponentType<{ className?: string }>;
-    label: string;
-  }) => {
-    const Icon = item.icon;
-    const isActive =
-      pathname === item.href || pathname.startsWith(`${item.href}/`);
-    return (
-      <Link
-        key={item.href}
-        className={clsx(
-          "flex items-center gap-2 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50",
-          {
-            "flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-2 text-gray-900 transition-all hover:text-gray-900 dark:bg-gray-800 dark:text-gray-50 dark:hover:text-gray-50":
-              isActive,
-          },
-        )}
-        href={item.href}
-      >
-        <div className="rounded-lg p-1 bg-white dark:bg-black">
-          <Icon className="h-3 w-3" />
-        </div>
-        {item.label}
-      </Link>
-    );
+  const handleBack = () => {
+    userDismissedRef.current = true;
+    setActiveMenuId(null);
   };
 
   return (
-    <div className="lg:block hidden border-r h-full">
+    <div className="hidden h-screen border-r border-neutral-200/70 bg-neutral-100/60 lg:sticky lg:top-0 lg:block overflow-hidden dark:border-neutral-800 dark:bg-neutral-900/40">
       <div className="flex h-full max-h-screen flex-col gap-2">
-        <div className="flex h-[55px] items-center justify-between border-b px-3 w-full">
+        <div className="flex h-[55px] w-full shrink-0 items-center border-b border-neutral-100 px-4 dark:border-neutral-800">
           <Link href="/adminx/dashboard" className="font-semibold">
             Admin Portal
           </Link>
         </div>
-        <div className="flex-1 overflow-auto py-2">
-          <nav className="grid items-start px-4 text-sm font-medium">
-            {navItems.map(renderNavItem)}
 
-            <Separator className="my-3" />
-            <div className="px-3 py-2">
-              <h2 className="mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Stripe Management
-              </h2>
+        <div className="flex-1 overflow-y-auto py-2">
+          <div className="relative h-full overflow-hidden">
+            <div
+              className={cn(
+                "transition-transform duration-200 ease-in-out",
+                activeMenuId ? "-translate-x-full" : "translate-x-0",
+              )}
+            >
+              <nav className="grid items-start px-2 text-sm font-normal">
+                {adminxNav.main.map((section) => (
+                  <SidebarSection
+                    key={section.id || section.title || "top"}
+                    section={section}
+                    pathname={pathname}
+                    onDrillDown={setActiveMenuId}
+                  />
+                ))}
+                {adminxNav.bottom.length > 0 && (
+                  <>
+                    <Separator className="my-3" />
+                    {adminxNav.bottom.map((item) => (
+                      <SidebarNavItem
+                        key={item.href}
+                        item={item}
+                        active={isHrefActive(pathname, item.href)}
+                      />
+                    ))}
+                  </>
+                )}
+              </nav>
             </div>
 
-            {stripeItems.map(renderNavItem)}
-
-            <Separator className="my-3" />
-            <div className="px-3 py-2">
-              <h2 className="mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                Billing Config
-              </h2>
+            <div
+              className={cn(
+                "absolute inset-0 transition-transform duration-200 ease-in-out",
+                activeMenuId ? "translate-x-0" : "translate-x-full",
+              )}
+            >
+              {activeDrillSection && (
+                <nav className="grid items-start px-2 text-sm font-normal">
+                  <button
+                    type="button"
+                    onClick={handleBack}
+                    className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-normal text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-50 mb-1"
+                  >
+                    <ChevronLeft className="h-3.5 w-3.5" />
+                    {activeDrillSection.title}
+                  </button>
+                  <Separator className="mb-2" />
+                  {(() => {
+                    const children = activeDrillSection.children ?? [];
+                    const matches = children.filter((item) =>
+                      isHrefActive(pathname, item.href),
+                    );
+                    const activeHref =
+                      matches.length > 0
+                        ? matches.reduce((a, b) =>
+                            b.href.length > a.href.length ? b : a,
+                          ).href
+                        : null;
+                    return children.map((item) => (
+                      <SidebarNavItem
+                        key={item.href}
+                        item={item}
+                        active={item.href === activeHref}
+                      />
+                    ));
+                  })()}
+                </nav>
+              )}
             </div>
-
-            {billingItems.map(renderNavItem)}
-          </nav>
+          </div>
         </div>
       </div>
     </div>
