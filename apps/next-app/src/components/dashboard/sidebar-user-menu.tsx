@@ -25,14 +25,12 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import * as React from "react";
 
 export function SidebarUserMenu() {
   const { data: session } = useSession();
   const router = useRouter();
-  const params = useParams();
-  const workspaceSlug = params.workspaceSlug as string | undefined;
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
 
@@ -45,9 +43,7 @@ export function SidebarUserMenu() {
   const image = session?.user?.image ?? "";
   const initial = (name?.[0] || email?.[0] || "U").toUpperCase();
 
-  const settingsHref = workspaceSlug
-    ? `/dashboard/${workspaceSlug}/~/settings`
-    : "/dashboard";
+  const settingsHref = "/account/settings";
 
   const handleSignOut = async () => {
     try {
