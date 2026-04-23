@@ -15,7 +15,9 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
 interface RouteParams {
-  params: Promise<{ id: string }>;
+  // The dynamic segment is named `slug` to match sibling routes under
+  // /api/organizations/[slug]/*, but callers pass the organization id here.
+  params: Promise<{ slug: string }>;
 }
 
 const DEFAULT_BASE = "https://api.openai.com/v1";
@@ -54,7 +56,7 @@ async function requireOrgWriter(organizationId: string) {
 }
 
 export async function GET(_request: Request, { params }: RouteParams) {
-  const { id } = await params;
+  const { slug: id } = await params;
   const guard = await requireOrgWriter(id);
   if ("error" in guard) return guard.error;
   const config = await getOrgOpenAIConfigMasked(id);
@@ -62,7 +64,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
 }
 
 export async function POST(request: Request, { params }: RouteParams) {
-  const { id } = await params;
+  const { slug: id } = await params;
   const guard = await requireOrgWriter(id);
   if ("error" in guard) return guard.error;
 
@@ -108,7 +110,7 @@ export async function POST(request: Request, { params }: RouteParams) {
 }
 
 export async function DELETE(_request: Request, { params }: RouteParams) {
-  const { id } = await params;
+  const { slug: id } = await params;
   const guard = await requireOrgWriter(id);
   if ("error" in guard) return guard.error;
   await deleteOrgOpenAIConfig(id);
@@ -123,7 +125,7 @@ export async function DELETE(_request: Request, { params }: RouteParams) {
 
 export async function PUT(_request: Request, { params }: RouteParams) {
   // Test the effective org config by hitting /v1/models.
-  const { id } = await params;
+  const { slug: id } = await params;
   const guard = await requireOrgWriter(id);
   if ("error" in guard) return guard.error;
 
