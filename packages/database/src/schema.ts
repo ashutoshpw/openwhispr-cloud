@@ -236,6 +236,23 @@ export const orgFeatures = pgTable(
   ],
 );
 
+// User-level audit log (account-scoped events: session revocation, 2FA toggles, etc.)
+export const userAuditLogs = pgTable(
+  "user_audit_logs",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    action: text("action").notNull(),
+    metadata: text("metadata"), // JSON string for additional context
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [index("user_audit_logs_user_id_idx").on(table.userId)],
+);
+
 // Billing: Organization audit logs for billing/subscription changes
 export const orgAuditLogs = pgTable("org_audit_logs", {
   id: text("id").primaryKey(),
@@ -344,6 +361,8 @@ export type OrgFeature = typeof orgFeatures.$inferSelect;
 export type NewOrgFeature = typeof orgFeatures.$inferInsert;
 export type OrgAuditLog = typeof orgAuditLogs.$inferSelect;
 export type NewOrgAuditLog = typeof orgAuditLogs.$inferInsert;
+export type UserAuditLog = typeof userAuditLogs.$inferSelect;
+export type NewUserAuditLog = typeof userAuditLogs.$inferInsert;
 export type AppSetting = typeof appSettings.$inferSelect;
 export type NewAppSetting = typeof appSettings.$inferInsert;
 export type OrgBilling = typeof orgBilling.$inferSelect;
