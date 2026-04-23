@@ -13,6 +13,9 @@ export const APP_SETTINGS_KEYS = {
   FREE_WORKSPACE_LIMIT: "free_workspace_limit",
   TRIAL_DURATION_DAYS: "trial_duration_days",
   PENDING_ORG_TTL_HOURS: "pending_org_ttl_hours",
+  OPENAI_BASE_URL: "openai_base_url",
+  OPENAI_API_KEY: "openai_api_key",
+  OPENAI_DEFAULT_MODEL: "openai_default_model",
 } as const;
 
 /**

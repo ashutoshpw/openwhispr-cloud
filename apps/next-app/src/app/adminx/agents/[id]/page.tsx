@@ -1,0 +1,47 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { agent, db, eq } from "@repo/database";
+import { notFound } from "next/navigation";
+import { AgentForm } from "../_components/agent-form";
+
+interface PageProps {
+  params: Promise<{ id: string }>;
+}
+
+export const dynamic = "force-dynamic";
+
+export default async function EditAgentPage({ params }: PageProps) {
+  const { id } = await params;
+  const [row] = await db()
+    .select()
+    .from(agent)
+    .where(eq(agent.id, id))
+    .limit(1);
+  if (!row) notFound();
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div>
+        <h1 className="font-semibold text-2xl tracking-tight">{row.name}</h1>
+        <p className="text-sm text-muted-foreground">
+          Slug: <span className="font-mono">{row.slug}</span>
+        </p>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Details</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <AgentForm
+            mode="edit"
+            initial={{
+              ...row,
+              temperature:
+                row.temperature !== null ? Number(row.temperature) : null,
+            }}
+          />
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

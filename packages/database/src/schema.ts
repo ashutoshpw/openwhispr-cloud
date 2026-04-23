@@ -22,6 +22,7 @@ export const user = pgTable("user", {
   username: text("username").unique(),
   role: text("role").notNull().default("user"),
   twoFactorEnabled: boolean("two_factor_enabled").default(false).notNull(),
+  archivedAt: timestamp("archived_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()

@@ -1,5 +1,6 @@
 // Re-export everything from schema and client
 export * from "./schema";
+export * from "./schema-agents";
 export { db } from "./client";
 
 // Re-export drizzle-orm operators for convenience
