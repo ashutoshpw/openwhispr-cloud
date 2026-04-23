@@ -321,6 +321,17 @@ export const getSession = () => getClientInstance().getSession();
 export const useSession = () => getClientInstance().useSession();
 export const getBaseClient = () => getClientInstance().getBaseClient();
 
+/**
+ * Force the better-auth session store to refetch from the server.
+ * Use this after mutating the user via a non-better-auth route
+ * (e.g. our `/api/account` PATCH) so `useSession()` consumers see the change.
+ */
+export const refetchSession = async () => {
+  const client = getClientInstance().getBaseClient();
+  // disableCookieCache forces a server round-trip and updates the store
+  await client.getSession({ query: { disableCookieCache: true } });
+};
+
 export const forgotPassword = {
   request: (params: RequestPasswordResetParams) =>
     getClientInstance().requestPasswordReset(params),

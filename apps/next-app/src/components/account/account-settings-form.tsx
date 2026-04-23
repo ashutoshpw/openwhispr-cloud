@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { refetchSession } from "@repo/auth/client";
 import { upload } from "@vercel/blob/client";
 import { Loader2, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -39,6 +40,9 @@ async function patchAccount(body: Record<string, unknown>) {
   if (!res.ok) {
     throw new Error(payload?.error ?? "Update failed");
   }
+  // Invalidate the better-auth client session so useSession() consumers
+  // (e.g. the sidebar user menu) pick up the new name/image immediately.
+  await refetchSession().catch(() => {});
   return payload;
 }
 

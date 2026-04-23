@@ -37,9 +37,35 @@ export function SidebarUserMenu() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
   const [cta, setCta] = React.useState<UpgradeCta>({ shouldShow: false });
+  const [profile, setProfile] = React.useState<{
+    name: string;
+    email: string;
+    image: string;
+  } | null>(null);
 
   React.useEffect(() => {
     setMounted(true);
+  }, []);
+
+  // The better-auth session can lag behind direct DB updates to the user row
+  // (we update via /api/account, not via better-auth). Fetch the canonical
+  // profile so the sidebar always shows the latest name/email/image.
+  React.useEffect(() => {
+    let cancelled = false;
+    fetch("/api/account")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (cancelled || !data) return;
+        setProfile({
+          name: data.name ?? "",
+          email: data.email ?? "",
+          image: data.image ?? "",
+        });
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const workspaceSlug =
@@ -62,9 +88,9 @@ export function SidebarUserMenu() {
     };
   }, [workspaceSlug]);
 
-  const name = session?.user?.name ?? "";
-  const email = session?.user?.email ?? "";
-  const image = session?.user?.image ?? "";
+  const name = profile?.name ?? session?.user?.name ?? "";
+  const email = profile?.email ?? session?.user?.email ?? "";
+  const image = profile?.image ?? session?.user?.image ?? "";
   const initial = (name?.[0] || email?.[0] || "U").toUpperCase();
 
   const settingsHref = "/account/settings";
