@@ -70,3 +70,5 @@ docker-compose.override.yml
 !.gemini/**
 !.codex/
 !.codex/**
+
+.claude/scheduled_tasks.lock
