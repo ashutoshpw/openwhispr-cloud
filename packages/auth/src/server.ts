@@ -5,6 +5,7 @@
  */
 import "server-only";
 
+import { passkey } from "@better-auth/passkey";
 import { db } from "@repo/database";
 import { eq } from "@repo/database";
 import * as schema from "@repo/database/schema";
@@ -13,7 +14,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { toNextJsHandler } from "better-auth/next-js";
-import { oidcProvider, organization } from "better-auth/plugins";
+import { oidcProvider, organization, twoFactor } from "better-auth/plugins";
 
 import type { UnifiedSession, UnifiedUser } from "./types";
 
@@ -105,6 +106,7 @@ class BetterAuthServer {
     const config = getAuthConfig();
 
     this.authInstance = betterAuth({
+      appName: "Cold Email Platform",
       database: drizzleAdapter(db(), {
         provider: "pg",
         schema,
@@ -187,6 +189,13 @@ class BetterAuthServer {
       plugins: [
         nextCookies(),
         organization(),
+        twoFactor(),
+        passkey({
+          rpName: "Cold Email Platform",
+          rpID: process.env.PASSKEY_RP_ID,
+          origin:
+            process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL,
+        }),
         oidcProvider({
           loginPage: "/auth/sign-in",
           consentPage: "/consent",

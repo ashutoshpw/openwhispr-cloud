@@ -12,6 +12,7 @@
     "./config": "./src/config.ts"
   },
   "dependencies": {
+    "@better-auth/passkey": "1.4.18",
     "@repo/database": "workspace:*",
     "bcryptjs": "^2.4.3",
     "better-auth": "^1.2.12",

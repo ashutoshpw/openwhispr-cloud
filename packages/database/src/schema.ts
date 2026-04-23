@@ -21,6 +21,7 @@ export const user = pgTable("user", {
   image: text("image"),
   username: text("username").unique(),
   role: text("role").notNull().default("user"),
+  twoFactorEnabled: boolean("two_factor_enabled").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
@@ -547,3 +548,33 @@ export type IntegrationInstallation =
   typeof integrationInstallation.$inferSelect;
 export type NewIntegrationInstallation =
   typeof integrationInstallation.$inferInsert;
+
+// BetterAuth two-factor plugin
+export const twoFactor = pgTable("two_factor", {
+  id: text("id").primaryKey(),
+  secret: text("secret").notNull(),
+  backupCodes: text("backup_codes").notNull(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+});
+
+// BetterAuth passkey plugin
+export const passkey = pgTable("passkey", {
+  id: text("id").primaryKey(),
+  name: text("name"),
+  publicKey: text("public_key").notNull(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  credentialID: text("credential_id").notNull(),
+  counter: integer("counter").notNull(),
+  deviceType: text("device_type").notNull(),
+  backedUp: boolean("backed_up").notNull(),
+  transports: text("transports"),
+  createdAt: timestamp("created_at").defaultNow(),
+  aaguid: text("aaguid"),
+});
+
+export type TwoFactor = typeof twoFactor.$inferSelect;
+export type Passkey = typeof passkey.$inferSelect;

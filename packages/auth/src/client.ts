@@ -5,22 +5,26 @@
  */
 "use client";
 
+import { passkeyClient } from "@better-auth/passkey/client";
+import {
+  organizationClient,
+  twoFactorClient,
+} from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/react";
-import { organizationClient } from "better-auth/client/plugins";
 
 import type {
-  SignInResult,
-  SignUpResult,
-  SignOutResult,
   GetSessionResult,
-  UseSessionResult,
   RequestPasswordResetParams,
   RequestPasswordResetResult,
   ResetPasswordParams,
   ResetPasswordResult,
+  SignInResult,
   SignInSocialParams,
+  SignOutResult,
+  SignUpResult,
   UnifiedSession,
   UnifiedUser,
+  UseSessionResult,
 } from "./types";
 
 // Session mapper
@@ -86,7 +90,7 @@ class BetterAuthClient {
 
     this.client = createAuthClient({
       baseURL: config.baseURL,
-      plugins: [organizationClient()],
+      plugins: [organizationClient(), twoFactorClient(), passkeyClient()],
     });
   }
 
@@ -106,6 +110,19 @@ class BetterAuthClient {
             message: result.error.message || "Failed to sign in",
             code: result.error.code,
           },
+        };
+      }
+      const data = result.data as
+        | {
+            twoFactorRedirect?: boolean;
+            twoFactorMethods?: string[];
+          }
+        | null
+        | undefined;
+      if (data && "twoFactorRedirect" in data && data.twoFactorRedirect) {
+        return {
+          twoFactorRedirect: true,
+          twoFactorMethods: data.twoFactorMethods,
         };
       }
       const mappedSession = result.data
@@ -398,3 +415,42 @@ export const useActiveOrganization = () =>
 
 export const useListOrganizations = () =>
   getClientInstance().getBaseClient().useListOrganizations();
+
+// Two-factor authentication convenience exports
+export const twoFactor = {
+  enable: (params: { password: string; issuer?: string }) =>
+    getClientInstance().getBaseClient().twoFactor.enable(params),
+  disable: (params: { password: string }) =>
+    getClientInstance().getBaseClient().twoFactor.disable(params),
+  getTotpUri: (params: { password: string }) =>
+    getClientInstance().getBaseClient().twoFactor.getTotpUri(params),
+  verifyTotp: (params: { code: string; trustDevice?: boolean }) =>
+    getClientInstance().getBaseClient().twoFactor.verifyTotp(params),
+  verifyBackupCode: (params: {
+    code: string;
+    disableSession?: boolean;
+    trustDevice?: boolean;
+  }) => getClientInstance().getBaseClient().twoFactor.verifyBackupCode(params),
+  generateBackupCodes: (params: { password: string }) =>
+    getClientInstance().getBaseClient().twoFactor.generateBackupCodes(params),
+};
+
+// Passkey convenience exports
+export const passkey = {
+  add: (params?: {
+    name?: string;
+    authenticatorAttachment?: "platform" | "cross-platform";
+  }) =>
+    getClientInstance()
+      .getBaseClient()
+      .passkey.addPasskey(params ?? {}),
+  list: () => getClientInstance().getBaseClient().passkey.listUserPasskeys(),
+  delete: (params: { id: string }) =>
+    getClientInstance().getBaseClient().passkey.deletePasskey(params),
+  update: (params: { id: string; name: string }) =>
+    getClientInstance().getBaseClient().passkey.updatePasskey(params),
+  signIn: (params?: { autoFill?: boolean }) =>
+    getClientInstance()
+      .getBaseClient()
+      .signIn.passkey(params ?? {}),
+};

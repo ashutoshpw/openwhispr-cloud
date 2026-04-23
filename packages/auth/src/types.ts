@@ -25,6 +25,8 @@ export interface AuthError {
 
 export interface SignInResult {
   data?: UnifiedSession | null;
+  twoFactorRedirect?: boolean;
+  twoFactorMethods?: string[];
   error?: AuthError;
 }
 
