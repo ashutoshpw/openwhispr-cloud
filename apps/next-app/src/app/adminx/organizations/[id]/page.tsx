@@ -1,11 +1,15 @@
 import { ProjectTable } from "@/components/admin/ProjectTable";
+import { OrgBillingForm } from "@/components/admin/billing/org-billing-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getOrgBilling } from "@/lib/billing/get-org-billing";
 import { db } from "@repo/database";
 import { eq } from "@repo/database";
-import { organization, project } from "@repo/database/schema";
+import { organization, planTier, project } from "@repo/database/schema";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
+export const dynamic = "force-dynamic";
 
 async function getOrganization(id: string) {
   try {
@@ -40,14 +44,18 @@ export default async function OrganizationDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const [organizationData, projects] = await Promise.all([
+  const [organizationData, projects, billing, tiers] = await Promise.all([
     getOrganization(id),
     getOrganizationProjects(id),
+    getOrgBilling(id),
+    db().select().from(planTier),
   ]);
 
   if (!organizationData) {
     notFound();
   }
+
+  tiers.sort((a, b) => a.sortOrder - b.sortOrder);
 
   return (
     <div className="flex flex-col gap-4">
@@ -105,6 +113,30 @@ export default async function OrganizationDetailPage({
             </span>
             <p>{new Date(organizationData.updatedAt).toLocaleString()}</p>
           </div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Billing</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <OrgBillingForm
+            organizationId={organizationData.id}
+            initial={{
+              planTier: billing.planTier,
+              planStatus: billing.planStatus,
+              manualOverride: billing.manualOverride,
+              notes: billing.notes,
+              trialEndsAt: billing.trialEndsAt,
+              stripeSubscriptionId: billing.stripeSubscriptionId,
+              currentPeriodEnd: billing.currentPeriodEnd,
+            }}
+            tiers={tiers.map((t) => ({
+              key: t.key,
+              displayName: t.displayName,
+              isPaid: t.isPaid,
+            }))}
+          />
         </CardContent>
       </Card>
       <Card>

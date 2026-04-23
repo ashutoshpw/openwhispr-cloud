@@ -47,6 +47,11 @@ export default function AdminSidebar() {
 
   const billingItems = [
     {
+      href: "/adminx/billing/plan-tiers",
+      icon: Tag,
+      label: "Plan Tiers",
+    },
+    {
       href: "/adminx/billing/plan-features",
       icon: Layers,
       label: "Plan Features",
