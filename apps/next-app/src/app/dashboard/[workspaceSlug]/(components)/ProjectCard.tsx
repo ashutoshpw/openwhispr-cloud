@@ -122,29 +122,35 @@ export function ProjectCard({
         <Link
           href={href}
           aria-label={`Open ${project.name}`}
-          className="absolute inset-0 rounded-lg focus:outline-none"
+          className="absolute inset-0 z-0 rounded-lg focus:outline-none"
         />
-        <ProjectAvatar id={project.id} name={project.name} size="sm" />
-        <div className="relative min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <span className="truncate text-sm font-medium">{project.name}</span>
-            {project.isDefault && (
-              <Badge variant="secondary" className="text-[10px] font-normal">
-                default
-              </Badge>
-            )}
+        <div className="pointer-events-none relative z-[1] flex flex-1 items-center gap-3">
+          <ProjectAvatar id={project.id} name={project.name} size="sm" />
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <span className="truncate text-sm font-medium">
+                {project.name}
+              </span>
+              {project.isDefault && (
+                <Badge variant="secondary" className="text-[10px] font-normal">
+                  default
+                </Badge>
+              )}
+            </div>
+            <div className="truncate text-xs text-muted-foreground">
+              {subtitle}
+            </div>
           </div>
-          <div className="truncate text-xs text-muted-foreground">
-            {subtitle}
-          </div>
+          {relative && (
+            <span className="hidden shrink-0 text-xs text-muted-foreground sm:inline">
+              {relative}
+            </span>
+          )}
+          <div className="shrink-0">{activityDot}</div>
         </div>
-        {relative && (
-          <span className="relative hidden shrink-0 text-xs text-muted-foreground sm:inline">
-            {relative}
-          </span>
-        )}
-        <div className="relative shrink-0">{activityDot}</div>
-        <div className="relative shrink-0">{actions}</div>
+        <div className="pointer-events-auto relative z-[2] shrink-0">
+          {actions}
+        </div>
       </Card>
     );
   }
@@ -154,9 +160,9 @@ export function ProjectCard({
       <Link
         href={href}
         aria-label={`Open ${project.name}`}
-        className="absolute inset-0 rounded-lg focus:outline-none"
+        className="absolute inset-0 z-0 rounded-lg focus:outline-none"
       />
-      <div className="relative flex items-start gap-3">
+      <div className="pointer-events-none relative z-[1] flex items-start gap-3">
         <ProjectAvatar id={project.id} name={project.name} />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
@@ -173,10 +179,10 @@ export function ProjectCard({
         </div>
         <div className="flex shrink-0 items-center gap-1">
           {activityDot}
-          {actions}
+          <div className="pointer-events-auto">{actions}</div>
         </div>
       </div>
-      <div className="relative mt-auto pt-6 text-xs text-muted-foreground">
+      <div className="pointer-events-none relative z-[1] mt-auto pt-6 text-xs text-muted-foreground">
         {relative ?? "—"}
       </div>
     </Card>
