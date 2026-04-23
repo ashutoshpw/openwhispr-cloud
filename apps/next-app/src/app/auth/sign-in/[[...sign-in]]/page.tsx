@@ -15,7 +15,7 @@ import { passkey, signIn, twoFactor } from "@repo/auth/client";
 import { KeyRound } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 type Stage = "credentials" | "totp" | "backup";
@@ -34,6 +34,33 @@ export default function SignInPage() {
     searchParams.get("redirect") ||
     searchParams.get("callbackURL") ||
     "/dashboard";
+
+  useEffect(() => {
+    if (
+      typeof window === "undefined" ||
+      !("PublicKeyCredential" in window) ||
+      typeof PublicKeyCredential.isConditionalMediationAvailable !== "function"
+    ) {
+      return;
+    }
+    let cancelled = false;
+    PublicKeyCredential.isConditionalMediationAvailable()
+      .then(async (available) => {
+        if (!available || cancelled) return;
+        const result = await passkey.signIn({ autoFill: true });
+        if (cancelled) return;
+        if (result && !result.error) {
+          router.push(redirectTo);
+          router.refresh();
+        }
+      })
+      .catch(() => {
+        // Conditional mediation not supported or aborted; ignore.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [redirectTo, router]);
 
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
@@ -161,6 +188,7 @@ export default function SignInPage() {
                     placeholder="name@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    autoComplete="username webauthn"
                     required
                   />
                 </div>
@@ -179,6 +207,7 @@ export default function SignInPage() {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="current-password webauthn"
                     required
                   />
                 </div>
