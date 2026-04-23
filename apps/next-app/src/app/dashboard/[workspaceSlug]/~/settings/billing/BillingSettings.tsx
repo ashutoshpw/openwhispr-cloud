@@ -33,24 +33,34 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 
+import { Separator } from "@/components/ui/separator";
+import {
+  BillingDetailsForm,
+  type BillingDetailsInitial,
+} from "./BillingDetailsForm";
+
 interface BillingSettingsProps {
   organizationId: string;
   organizationSlug: string;
+  organizationName: string;
   subscription: BillingSubscriptionResponse;
   usage: BillingUsageResponse;
   pricingTiers: PricingTier[];
   canManageBilling: boolean;
   enterpriseContactLink: string;
+  billingDetails: BillingDetailsInitial;
 }
 
 export function BillingSettings({
   organizationId,
   organizationSlug,
+  organizationName,
   subscription,
   usage,
   pricingTiers,
   canManageBilling,
   enterpriseContactLink,
+  billingDetails,
 }: BillingSettingsProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -437,6 +447,16 @@ export function BillingSettings({
           </AlertDescription>
         </Alert>
       )}
+
+      <Separator className="my-4" />
+
+      <BillingDetailsForm
+        workspaceSlug={organizationSlug}
+        organizationId={organizationId}
+        organizationName={organizationName}
+        initial={billingDetails}
+        canManageBilling={canManageBilling}
+      />
     </div>
   );
 }

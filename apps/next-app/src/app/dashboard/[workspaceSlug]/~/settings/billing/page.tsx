@@ -123,6 +123,7 @@ export default async function BillingSettingsPage({ params }: PageProps) {
         <BillingSettings
           organizationId={orgId}
           organizationSlug={workspaceSlug}
+          organizationName={org[0].name}
           subscription={subscription}
           usage={usage}
           pricingTiers={pricingTiers}
@@ -130,6 +131,16 @@ export default async function BillingSettingsPage({ params }: PageProps) {
           enterpriseContactLink={
             enterpriseLink || DEFAULT_ENTERPRISE_CONTACT_LINK
           }
+          billingDetails={{
+            invoiceEmail: org[0].invoiceEmail ?? null,
+            companyName: org[0].companyName ?? null,
+            billingCountry: org[0].billingCountry ?? null,
+            billingAddress: org[0].billingAddress ?? null,
+            invoiceLanguage: org[0].invoiceLanguage ?? "en",
+            invoicePurchaseOrder: org[0].invoicePurchaseOrder ?? null,
+            taxIdType: org[0].taxIdType ?? null,
+            taxIdValue: org[0].taxIdValue ?? null,
+          }}
         />
       </div>
     </div>
