@@ -87,6 +87,7 @@ export const projectNav: NavConfig = {
       icon: Bot,
       items: [],
       children: [
+        { label: "Installed", icon: Bot, segment: "agents" },
         { label: "Tasks", icon: ClipboardList, segment: "~/agents/tasks" },
         { label: "Usage", icon: BarChart3, segment: "~/agents/usage" },
       ],
