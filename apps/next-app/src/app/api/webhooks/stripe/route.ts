@@ -5,6 +5,10 @@ import {
   trackServerEvent,
 } from "@/lib/analytics/server";
 import {
+  syncOrgBillingFromSubscription,
+  syncOrgBillingOnSubscriptionDeleted,
+} from "@/lib/billing/sync-from-stripe";
+import {
   activatePendingOrganization,
   cancelPendingOrganization,
 } from "@/lib/stripe/checkout";
@@ -174,6 +178,8 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
     await updateOrganizationStatus(org[0].id, ORG_STATUS.ACTIVE);
   }
 
+  await syncOrgBillingFromSubscription(org[0].id, subscription);
+
   console.log(`[Webhook] Subscription created for workspace ${org[0].id}`);
 }
 
@@ -243,6 +249,8 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
       });
     }
   }
+
+  await syncOrgBillingFromSubscription(org[0].id, subscription);
 }
 
 /**
@@ -325,6 +333,8 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   // Note: We don't automatically downgrade to readonly here
   // The trial-expiration cron job handles setting readonly status
   // This allows for grace periods and proper handling
+
+  await syncOrgBillingOnSubscriptionDeleted(org[0].id, subscription);
 
   console.log(`[Webhook] Subscription cancelled for workspace ${org[0].id}`);
 }
