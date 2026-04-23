@@ -303,6 +303,26 @@ export const planTier = pgTable("plan_tier", {
     .notNull(),
 });
 
+// Personal API tokens for the user account (account-scoped, not org-scoped).
+// Used for hitting the public API and the MCP server.
+export const accountApiToken = pgTable("account_api_token", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  // sha256 hex of the full plaintext token (cet_<random>)
+  tokenHash: text("token_hash").notNull().unique(),
+  // First chars of the plaintext for display (e.g., "cet_abcd")
+  tokenPrefix: text("token_prefix").notNull(),
+  // Currently only "full" is supported. Stored as text for forward compat.
+  scope: text("scope").notNull().default("full"),
+  expiresAt: timestamp("expires_at"),
+  lastUsedAt: timestamp("last_used_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  revokedAt: timestamp("revoked_at"),
+});
+
 // App settings (for configurable values like enterprise contact link)
 export const appSettings = pgTable("app_settings", {
   id: text("id").primaryKey(),
@@ -329,6 +349,8 @@ export type OrgBilling = typeof orgBilling.$inferSelect;
 export type NewOrgBilling = typeof orgBilling.$inferInsert;
 export type PlanTier = typeof planTier.$inferSelect;
 export type NewPlanTier = typeof planTier.$inferInsert;
+export type AccountApiToken = typeof accountApiToken.$inferSelect;
+export type NewAccountApiToken = typeof accountApiToken.$inferInsert;
 
 // ============================================================================
 // Referral System
