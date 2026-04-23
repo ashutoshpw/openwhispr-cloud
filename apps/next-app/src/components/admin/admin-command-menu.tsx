@@ -1,12 +1,13 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
   CommandDialog,
   CommandEmpty,
+  CommandFooter,
   CommandGroup,
   CommandInput,
   CommandItem,
+  CommandKbd,
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
@@ -95,59 +96,62 @@ export function AdminCommandMenu() {
 
   return (
     <>
-      <Button
-        variant="outline"
-        size="sm"
+      <button
+        type="button"
         onClick={() => setOpen(true)}
-        className="relative gap-2 text-muted-foreground"
-        title="Search (Cmd+K)"
+        className="flex h-8 w-full max-w-[260px] items-center gap-2 rounded-md border border-neutral-200/70 bg-white/60 px-2.5 text-sm text-muted-foreground transition-colors hover:bg-white hover:text-foreground dark:border-neutral-800 dark:bg-neutral-900/40 dark:hover:bg-neutral-900 dark:hover:text-foreground"
+        title="Search admin (⌘K)"
       >
-        <Search className="h-4 w-4" />
-        <span className="hidden sm:inline-flex">Search...</span>
-        <kbd className="pointer-events-none hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
-          <span className="text-xs">Cmd</span>K
-        </kbd>
-      </Button>
+        <Search className="h-3.5 w-3.5 shrink-0" />
+        <span className="flex-1 text-left">Search admin...</span>
+        <span className="flex shrink-0 items-center gap-0.5">
+          <CommandKbd>⌘</CommandKbd>
+          <CommandKbd>K</CommandKbd>
+        </span>
+      </button>
 
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Search admin commands..." />
+        <CommandInput
+          placeholder="Search admin commands..."
+          rightSlot={<CommandKbd>esc</CommandKbd>}
+        />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
 
           {/* Quick Navigation */}
           <CommandGroup heading="Navigation">
             <CommandItem onSelect={() => handleNavigation("/adminx/dashboard")}>
-              <LayoutDashboard className="mr-2 h-4 w-4" />
+              <LayoutDashboard />
               <span>Dashboard</span>
             </CommandItem>
             <CommandItem onSelect={() => handleNavigation("/adminx/users")}>
-              <Users className="mr-2 h-4 w-4" />
+              <Users />
               <span>Users</span>
             </CommandItem>
             <CommandItem
               onSelect={() => handleNavigation("/adminx/organizations")}
             >
-              <Building2 className="mr-2 h-4 w-4" />
+              <Building2 />
               <span>Organizations</span>
             </CommandItem>
             <CommandItem onSelect={() => handleNavigation("/adminx/projects")}>
-              <FolderKanban className="mr-2 h-4 w-4" />
+              <FolderKanban />
               <span>Projects</span>
             </CommandItem>
             <CommandItem onSelect={() => handleNavigation("/adminx/members")}>
-              <UserCog className="mr-2 h-4 w-4" />
+              <UserCog />
               <span>Members</span>
             </CommandItem>
             <CommandItem onSelect={() => handleNavigation("/adminx/payments")}>
-              <CreditCard className="mr-2 h-4 w-4" />
+              <CreditCard />
               <span>Payments</span>
             </CommandItem>
             <CommandItem onSelect={() => handleNavigation("/adminx/sessions")}>
-              <Activity className="mr-2 h-4 w-4" />
+              <Activity />
               <span>Sessions</span>
             </CommandItem>
             <CommandItem onSelect={() => handleNavigation("/adminx/settings")}>
-              <Settings className="mr-2 h-4 w-4" />
+              <Settings />
               <span>Settings</span>
             </CommandItem>
           </CommandGroup>
@@ -155,29 +159,29 @@ export function AdminCommandMenu() {
           <CommandSeparator />
 
           {/* Stripe Management */}
-          <CommandGroup heading="Stripe Management">
+          <CommandGroup heading="Stripe">
             <CommandItem
               onSelect={() => handleNavigation("/adminx/stripe/products")}
             >
-              <Package className="mr-2 h-4 w-4" />
+              <Package />
               <span>Products</span>
             </CommandItem>
             <CommandItem
               onSelect={() => handleNavigation("/adminx/stripe/prices")}
             >
-              <DollarSign className="mr-2 h-4 w-4" />
+              <DollarSign />
               <span>Prices</span>
             </CommandItem>
             <CommandItem
               onSelect={() => handleNavigation("/adminx/stripe/coupons")}
             >
-              <Ticket className="mr-2 h-4 w-4" />
+              <Ticket />
               <span>Coupons</span>
             </CommandItem>
             <CommandItem
               onSelect={() => handleNavigation("/adminx/stripe/promo-codes")}
             >
-              <Tag className="mr-2 h-4 w-4" />
+              <Tag />
               <span>Promo Codes</span>
             </CommandItem>
           </CommandGroup>
@@ -189,36 +193,36 @@ export function AdminCommandMenu() {
             <CommandItem
               onSelect={() => handleNavigation("/adminx/stripe/products/new")}
             >
-              <Package className="mr-2 h-4 w-4" />
-              <span>Create New Product</span>
+              <Package />
+              <span>Create new product</span>
             </CommandItem>
             <CommandItem
               onSelect={() => handleNavigation("/adminx/stripe/coupons/new")}
             >
-              <Ticket className="mr-2 h-4 w-4" />
-              <span>Create New Coupon</span>
+              <Ticket />
+              <span>Create new coupon</span>
             </CommandItem>
             <CommandItem
               onSelect={() =>
                 handleNavigation("/adminx/stripe/promo-codes/new")
               }
             >
-              <Tag className="mr-2 h-4 w-4" />
-              <span>Create New Promo Code</span>
+              <Tag />
+              <span>Create new promo code</span>
             </CommandItem>
           </CommandGroup>
 
           <CommandSeparator />
 
-          {/* Go To Dashboard */}
+          {/* Switch Context */}
           <CommandGroup heading="Switch Context">
             <CommandItem onSelect={() => handleNavigation("/dashboard")}>
-              <Home className="mr-2 h-4 w-4" />
-              <span>Go to User Dashboard</span>
+              <Home />
+              <span>Go to user dashboard</span>
             </CommandItem>
             <CommandItem onSelect={() => handleNavigation("/")}>
-              <Home className="mr-2 h-4 w-4" />
-              <span>Go to Home</span>
+              <Home />
+              <span>Go to home</span>
             </CommandItem>
           </CommandGroup>
 
@@ -227,15 +231,15 @@ export function AdminCommandMenu() {
           {/* Theme */}
           <CommandGroup heading="Theme">
             <CommandItem onSelect={() => handleTheme("light")}>
-              <Sun className="mr-2 h-4 w-4" />
+              <Sun />
               <span>Light</span>
             </CommandItem>
             <CommandItem onSelect={() => handleTheme("dark")}>
-              <Moon className="mr-2 h-4 w-4" />
+              <Moon />
               <span>Dark</span>
             </CommandItem>
             <CommandItem onSelect={() => handleTheme("system")}>
-              <Monitor className="mr-2 h-4 w-4" />
+              <Monitor />
               <span>System</span>
             </CommandItem>
           </CommandGroup>
@@ -247,15 +251,16 @@ export function AdminCommandMenu() {
             <CommandItem
               onSelect={() => handleNavigation("/auth/user-profile")}
             >
-              <User className="mr-2 h-4 w-4" />
+              <User />
               <span>Profile</span>
             </CommandItem>
             <CommandItem onSelect={handleSignOut}>
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Sign Out</span>
+              <LogOut />
+              <span>Sign out</span>
             </CommandItem>
           </CommandGroup>
         </CommandList>
+        <CommandFooter />
       </CommandDialog>
     </>
   );

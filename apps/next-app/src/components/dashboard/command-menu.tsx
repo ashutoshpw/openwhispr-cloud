@@ -1,12 +1,13 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
   CommandDialog,
   CommandEmpty,
+  CommandFooter,
   CommandGroup,
   CommandInput,
   CommandItem,
+  CommandKbd,
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
@@ -160,38 +161,45 @@ export function CommandMenu() {
 
   return (
     <>
-      <Button
-        variant="outline"
-        size="icon"
+      <button
+        type="button"
         onClick={() => setOpen(true)}
-        className="relative"
+        className="flex h-8 w-full max-w-[220px] items-center gap-2 rounded-md border border-neutral-200/70 bg-white/60 px-2.5 text-sm text-muted-foreground transition-colors hover:bg-white hover:text-foreground dark:border-neutral-800 dark:bg-neutral-900/40 dark:hover:bg-neutral-900 dark:hover:text-foreground"
         title="Search (⌘K)"
       >
-        <Search className="h-[1.2rem] w-[1.2rem]" />
+        <Search className="h-3.5 w-3.5 shrink-0" />
+        <span className="flex-1 text-left">Search...</span>
+        <span className="flex shrink-0 items-center gap-0.5">
+          <CommandKbd>⌘</CommandKbd>
+          <CommandKbd>K</CommandKbd>
+        </span>
         <span className="sr-only">Open command menu</span>
-      </Button>
+      </button>
 
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Type a command or search..." />
+        <CommandInput
+          placeholder="Type a command or search..."
+          rightSlot={<CommandKbd>esc</CommandKbd>}
+        />
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
 
           {/* Navigation */}
           <CommandGroup heading="Navigation">
             <CommandItem onSelect={() => handleNavigation("/dashboard")}>
-              <Home className="mr-2 h-4 w-4" />
+              <Home />
               <span>Home</span>
             </CommandItem>
             <CommandItem
               onSelect={() => handleNavigation("/dashboard/finance")}
             >
-              <Wallet className="mr-2 h-4 w-4" />
+              <Wallet />
               <span>Finance</span>
             </CommandItem>
             <CommandItem
               onSelect={() => handleNavigation("/dashboard/settings")}
             >
-              <Settings className="mr-2 h-4 w-4" />
+              <Settings />
               <span>Settings</span>
             </CommandItem>
           </CommandGroup>
@@ -205,18 +213,20 @@ export function CommandMenu() {
                 key={workspace.id}
                 onSelect={() => handleSwitchWorkspace(workspace)}
               >
-                <Building2 className="mr-2 h-4 w-4" />
-                <span>{workspace.name}</span>
+                <div className="flex h-4 w-4 shrink-0 items-center justify-center rounded-sm bg-violet-500 text-[9px] font-medium text-white">
+                  {workspace.name.slice(0, 1).toUpperCase()}
+                </div>
+                <span className="flex-1 truncate">{workspace.name}</span>
                 {activeWorkspace?.id === workspace.id && (
-                  <span className="ml-auto text-xs text-muted-foreground">
+                  <span className="ml-auto text-[11px] text-muted-foreground">
                     Active
                   </span>
                 )}
               </CommandItem>
             ))}
             <CommandItem onSelect={() => handleNavigation("/workspace/new")}>
-              <Building2 className="mr-2 h-4 w-4" />
-              <span>Create New Workspace</span>
+              <Building2 />
+              <span>Create new workspace</span>
             </CommandItem>
           </CommandGroup>
 
@@ -225,15 +235,15 @@ export function CommandMenu() {
           {/* Theme */}
           <CommandGroup heading="Theme">
             <CommandItem onSelect={() => handleTheme("light")}>
-              <Sun className="mr-2 h-4 w-4" />
+              <Sun />
               <span>Light</span>
             </CommandItem>
             <CommandItem onSelect={() => handleTheme("dark")}>
-              <Moon className="mr-2 h-4 w-4" />
+              <Moon />
               <span>Dark</span>
             </CommandItem>
             <CommandItem onSelect={() => handleTheme("system")}>
-              <Monitor className="mr-2 h-4 w-4" />
+              <Monitor />
               <span>System</span>
             </CommandItem>
           </CommandGroup>
@@ -245,15 +255,16 @@ export function CommandMenu() {
             <CommandItem
               onSelect={() => handleNavigation("/auth/user-profile")}
             >
-              <User className="mr-2 h-4 w-4" />
+              <User />
               <span>Profile</span>
             </CommandItem>
             <CommandItem onSelect={handleSignOut}>
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Sign Out</span>
+              <LogOut />
+              <span>Sign out</span>
             </CommandItem>
           </CommandGroup>
         </CommandList>
+        <CommandFooter />
       </CommandDialog>
     </>
   );
