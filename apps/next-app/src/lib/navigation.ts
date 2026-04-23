@@ -9,6 +9,7 @@ import {
   Plug,
   Settings,
   SlidersHorizontal,
+  Sparkles,
   Users,
 } from "lucide-react";
 
@@ -62,6 +63,11 @@ export const workspaceNav: NavConfig = {
         { label: "General", icon: SlidersHorizontal, segment: "~/settings" },
         { label: "Members", icon: Users, segment: "~/settings/members" },
         { label: "Billing", icon: CreditCard, segment: "~/settings/billing" },
+        {
+          label: "AI Provider",
+          icon: Sparkles,
+          segment: "~/settings/ai-provider",
+        },
       ],
     },
   ],

@@ -74,3 +74,20 @@ export const agentInstallation = pgTable(
 
 export type AgentInstallation = typeof agentInstallation.$inferSelect;
 export type NewAgentInstallation = typeof agentInstallation.$inferInsert;
+
+export const orgAiProvider = pgTable("org_ai_provider", {
+  organizationId: text("organization_id")
+    .primaryKey()
+    .references(() => organization.id, { onDelete: "cascade" }),
+  baseUrl: text("base_url"),
+  apiKeyEncrypted: text("api_key_encrypted"),
+  defaultModel: text("default_model"),
+  updatedBy: text("updated_by"),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
+});
+
+export type OrgAiProvider = typeof orgAiProvider.$inferSelect;
+export type NewOrgAiProvider = typeof orgAiProvider.$inferInsert;

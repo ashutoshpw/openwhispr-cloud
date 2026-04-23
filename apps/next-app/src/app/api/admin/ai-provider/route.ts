@@ -3,6 +3,10 @@ import {
   encryptOpenAIApiKey,
   getOpenAIConfigMasked,
 } from "@/lib/ai-provider";
+import {
+  type AiProviderChangeFields,
+  logAdminAiProviderChange,
+} from "@/lib/ai-provider-audit";
 import { getSiteAdminStatus } from "@/lib/auth-utils";
 import { auth } from "@repo/auth/server";
 import { db, eq } from "@repo/database";
@@ -67,6 +71,8 @@ export async function POST(request: Request) {
     defaultModel?: string | null;
   };
 
+  const changes: AiProviderChangeFields = {};
+
   if (baseUrl !== undefined) {
     if (baseUrl?.trim()) {
       await upsert(
@@ -74,8 +80,10 @@ export async function POST(request: Request) {
         baseUrl.trim(),
         session.user.id,
       );
+      changes.baseUrl = "set";
     } else {
       await removeKey(OPENAI_SETTING_KEYS.BASE_URL);
+      changes.baseUrl = "cleared";
     }
   }
 
@@ -86,19 +94,23 @@ export async function POST(request: Request) {
         defaultModel.trim(),
         session.user.id,
       );
+      changes.defaultModel = "set";
     } else {
       await removeKey(OPENAI_SETTING_KEYS.DEFAULT_MODEL);
+      changes.defaultModel = "cleared";
     }
   }
 
-  // apiKey: only update when a non-empty value is supplied; encrypt it.
   if (typeof apiKey === "string" && apiKey.trim()) {
     await upsert(
       OPENAI_SETTING_KEYS.API_KEY,
       encryptOpenAIApiKey(apiKey.trim()),
       session.user.id,
     );
+    changes.apiKey = "set";
   }
+
+  await logAdminAiProviderChange(session.user.id, changes);
 
   const config = await getOpenAIConfigMasked();
   return NextResponse.json(config);
@@ -110,6 +122,7 @@ export async function DELETE() {
     return NextResponse.json({ error: guard.error }, { status: guard.status });
   }
   await removeKey(OPENAI_SETTING_KEYS.API_KEY);
+  await logAdminAiProviderChange(guard.session.user.id, { apiKey: "cleared" });
   const config = await getOpenAIConfigMasked();
   return NextResponse.json(config);
 }
