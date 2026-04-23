@@ -79,7 +79,7 @@ export default function SignInPage() {
 
   return (
     <PageWrapper>
-      <div className="flex min-w-screen justify-center my-20">
+      <div className="flex w-full justify-center my-20">
         <Card className="w-[400px]">
           <CardHeader>
             <CardTitle>Sign In</CardTitle>
