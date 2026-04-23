@@ -6,14 +6,14 @@
 import "server-only";
 
 import { db } from "@repo/database";
-import * as schema from "@repo/database/schema";
 import { eq } from "@repo/database";
+import * as schema from "@repo/database/schema";
+import bcrypt from "bcryptjs";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import { organization, oidcProvider } from "better-auth/plugins";
 import { toNextJsHandler } from "better-auth/next-js";
-import bcrypt from "bcryptjs";
+import { oidcProvider, organization } from "better-auth/plugins";
 
 import type { UnifiedSession, UnifiedUser } from "./types";
 
@@ -151,15 +151,33 @@ class BetterAuthServer {
           },
         },
       },
-      ...(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID &&
-        process.env.GOOGLE_CLIENT_SECRET && {
-          socialProviders: {
-            google: {
-              clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-              clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      ...((process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID &&
+        process.env.GOOGLE_CLIENT_SECRET) ||
+      (process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID &&
+        process.env.GITHUB_CLIENT_SECRET)
+        ? {
+            socialProviders: {
+              ...(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID &&
+              process.env.GOOGLE_CLIENT_SECRET
+                ? {
+                    google: {
+                      clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+                      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+                    },
+                  }
+                : {}),
+              ...(process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID &&
+              process.env.GITHUB_CLIENT_SECRET
+                ? {
+                    github: {
+                      clientId: process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID,
+                      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+                    },
+                  }
+                : {}),
             },
-          },
-        }),
+          }
+        : {}),
       session: {
         cookieCache: {
           enabled: true,
