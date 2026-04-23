@@ -12,6 +12,7 @@ import * as schema from "@repo/database/schema";
 import bcrypt from "bcryptjs";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { APIError } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
 import { toNextJsHandler } from "better-auth/next-js";
 import { oidcProvider, organization, twoFactor } from "better-auth/plugins";
@@ -113,6 +114,28 @@ class BetterAuthServer {
       }),
       secret: config.secret,
       baseURL: config.baseURL,
+      databaseHooks: {
+        session: {
+          create: {
+            before: async (sessionData) => {
+              const userId = (sessionData as { userId?: string })?.userId;
+              if (!userId) return;
+              const [row] = await db()
+                .select({ archivedAt: schema.user.archivedAt })
+                .from(schema.user)
+                .where(eq(schema.user.id, userId))
+                .limit(1);
+              if (row?.archivedAt) {
+                throw new APIError("UNAUTHORIZED", {
+                  code: "ACCOUNT_ARCHIVED",
+                  message:
+                    "This account has been suspended. Reach out to support if you think this is an error.",
+                });
+              }
+            },
+          },
+        },
+      },
       emailAndPassword: {
         enabled: true,
         requireEmailVerification: false,
@@ -208,6 +231,15 @@ class BetterAuthServer {
   async getSession(headers: Headers): Promise<UnifiedSession | null> {
     const session = await this.authInstance.api.getSession({ headers });
     if (!session) return null;
+    const userId = session.user?.id;
+    if (userId) {
+      const [row] = await db()
+        .select({ archivedAt: schema.user.archivedAt })
+        .from(schema.user)
+        .where(eq(schema.user.id, userId))
+        .limit(1);
+      if (row?.archivedAt) return null;
+    }
     return mapBetterAuthSession(session);
   }
 

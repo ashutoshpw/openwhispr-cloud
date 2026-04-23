@@ -28,12 +28,21 @@ export default function SignInPage() {
   const [isPasskeyLoading, setIsPasskeyLoading] = useState(false);
   const [stage, setStage] = useState<Stage>("credentials");
   const [code, setCode] = useState("");
+  const [accountError, setAccountError] = useState<string | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo =
     searchParams.get("redirect") ||
     searchParams.get("callbackURL") ||
     "/dashboard";
+
+  useEffect(() => {
+    if (searchParams.get("error") === "account_archived") {
+      setAccountError(
+        "This account has been suspended. Reach out to support if you think this is an error.",
+      );
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (
@@ -81,9 +90,19 @@ export default function SignInPage() {
 
   const handlePasskeySignIn = async () => {
     setIsPasskeyLoading(true);
+    setAccountError(null);
     try {
       const result = await passkey.signIn();
       if (result?.error) {
+        if (
+          (result.error as { code?: string }).code === "ACCOUNT_ARCHIVED" ||
+          /account has been suspended/i.test(result.error.message ?? "")
+        ) {
+          setAccountError(
+            "This account has been suspended. Reach out to support if you think this is an error.",
+          );
+          return;
+        }
         toast.error(result.error.message ?? "Passkey sign-in failed.");
         return;
       }
@@ -102,6 +121,7 @@ export default function SignInPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setAccountError(null);
 
     try {
       const { data, error, twoFactorRedirect } = await signIn.email({
@@ -110,6 +130,15 @@ export default function SignInPage() {
       });
 
       if (error) {
+        if (
+          (error as { code?: string }).code === "ACCOUNT_ARCHIVED" ||
+          /account has been suspended/i.test(error.message ?? "")
+        ) {
+          setAccountError(
+            "This account has been suspended. Reach out to support if you think this is an error.",
+          );
+          return;
+        }
         toast.error(
           error.message || "Failed to sign in. Please check your credentials.",
         );
@@ -178,6 +207,14 @@ export default function SignInPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {accountError && stage === "credentials" && (
+              <div
+                role="alert"
+                className="mb-4 rounded-md border border-destructive/50 bg-destructive/5 p-3 text-sm text-destructive"
+              >
+                {accountError}
+              </div>
+            )}
             {stage === "credentials" ? (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
