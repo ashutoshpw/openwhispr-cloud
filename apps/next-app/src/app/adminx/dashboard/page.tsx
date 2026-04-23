@@ -2,6 +2,8 @@ import { StatsCards } from "@/components/admin/StatsCards";
 import { db } from "@repo/database";
 import { gt, sql } from "@repo/database";
 import { organization, payments, session, user } from "@repo/database/schema";
+import { Suspense } from "react";
+import { DashboardCharts } from "./(components)/DashboardCharts";
 
 async function getStats() {
   try {
@@ -56,6 +58,9 @@ export default async function AdminDashboard() {
         totalPayments={stats.totalPayments}
         activeSessions={stats.activeSessions}
       />
+      <Suspense fallback={null}>
+        <DashboardCharts />
+      </Suspense>
     </div>
   );
 }
