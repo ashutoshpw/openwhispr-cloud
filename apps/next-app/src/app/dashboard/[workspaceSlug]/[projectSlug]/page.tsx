@@ -1,7 +1,14 @@
+import { RevenueChart } from "@/components/analytics/RevenueChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChartComponent } from "../../(components)/BarChart";
 
-export default async function ProjectPage() {
+interface PageProps {
+  params: Promise<{ workspaceSlug: string; projectSlug: string }>;
+}
+
+export default async function ProjectPage({ params }: PageProps) {
+  const { workspaceSlug } = await params;
+  const endpoint = `/api/organizations/${workspaceSlug}/analytics/series/revenue`;
+
   return (
     <div className="flex justify-start items-center flex-wrap px-4 pt-4 gap-4">
       <Card className="w-[20rem]">
@@ -28,14 +35,14 @@ export default async function ProjectPage() {
           </p>
         </CardContent>
       </Card>
-      <Card className="w-full">
-        <CardHeader>
-          <CardTitle>Overview</CardTitle>
-        </CardHeader>
-        <CardContent className="pl-2">
-          <BarChartComponent />
-        </CardContent>
-      </Card>
+      <div className="w-full">
+        <RevenueChart
+          endpoint={endpoint}
+          range="30d"
+          title="Revenue"
+          description="Last 30 days"
+        />
+      </div>
     </div>
   );
 }
