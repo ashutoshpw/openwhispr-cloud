@@ -145,15 +145,19 @@ export function NavBar() {
         </div>
       )}
       <div className="max-[825px]:hidden flex items-center gap-3">
-        <Link
-          href={session?.user ? "/dashboard" : "/auth/sign-in"}
-          className="max-[825px]:hidden"
-        >
-          <Button size="sm" className="cursor-pointer">
-            {session?.user ? "Dashboard" : "Get Started"}
-          </Button>
-        </Link>
-        {session?.user && <Profile />}
+        {mounted ? (
+          <Link
+            href={session?.user ? "/dashboard" : "/auth/sign-in"}
+            className="max-[825px]:hidden"
+          >
+            <Button size="sm" className="cursor-pointer">
+              {session?.user ? "Dashboard" : "Get Started"}
+            </Button>
+          </Link>
+        ) : (
+          <div className="h-8 w-24" aria-hidden />
+        )}
+        {mounted && session?.user && <Profile />}
         <ModeToggle />
       </div>
     </div>
