@@ -43,8 +43,13 @@ const components: { title: string; href: string; description: string }[] = [
   },
 ];
 
-export function NavBar() {
+type NavBarUser = { id: string; name: string | null; image: string | null };
+
+export function NavBar({
+  initialUser = null,
+}: { initialUser?: NavBarUser | null }) {
   const { data: session } = useSession();
+  const user = session?.user ?? initialUser;
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
@@ -87,13 +92,13 @@ export function NavBar() {
                 </SheetClose>
                 <SheetClose asChild>
                   <Link
-                    href={session?.user ? "/dashboard" : "/auth/sign-in"}
+                    href={user ? "/dashboard" : "/auth/sign-in"}
                     legacyBehavior
                     passHref
                     className="cursor-pointer"
                   >
                     <Button variant="outline" className="cursor-pointer">
-                      {session?.user ? "Dashboard" : "Get Started"}
+                      {user ? "Dashboard" : "Get Started"}
                     </Button>
                   </Link>
                 </SheetClose>
@@ -145,19 +150,15 @@ export function NavBar() {
         </div>
       )}
       <div className="max-[825px]:hidden flex items-center gap-3">
-        {mounted ? (
-          <Link
-            href={session?.user ? "/dashboard" : "/auth/sign-in"}
-            className="max-[825px]:hidden"
-          >
-            <Button size="sm" className="cursor-pointer">
-              {session?.user ? "Dashboard" : "Get Started"}
-            </Button>
-          </Link>
-        ) : (
-          <div className="h-8 w-24" aria-hidden />
-        )}
-        {mounted && session?.user && <Profile />}
+        <Link
+          href={user ? "/dashboard" : "/auth/sign-in"}
+          className="max-[825px]:hidden"
+        >
+          <Button size="sm" className="cursor-pointer">
+            {user ? "Dashboard" : "Get Started"}
+          </Button>
+        </Link>
+        {mounted && user && <Profile />}
         <ModeToggle />
       </div>
     </div>
