@@ -1,5 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 import {
+  CreditCard,
   HomeIcon,
   KeyRound,
   LifeBuoy,
@@ -34,7 +35,10 @@ export const accountNav: AccountNavConfig = {
   main: [
     {
       title: "",
-      items: [{ label: "Overview", icon: HomeIcon, href: "/account" }],
+      items: [
+        { label: "Overview", icon: HomeIcon, href: "/account" },
+        { label: "Billing", icon: CreditCard, href: "/account/billing" },
+      ],
     },
     {
       id: "support",
