@@ -52,8 +52,8 @@ export default function AdminTopNav({ children }: { children: ReactNode }) {
   ];
 
   return (
-    <div className="flex flex-col">
-      <header className="flex h-14 lg:h-[55px] items-center gap-4 border-b px-6">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-4 border-b bg-background px-6 lg:h-[55px]">
         <Sheet>
           <SheetTrigger className="min-[1024px]:hidden p-2 transition">
             <HamburgerMenuIcon />

@@ -11,27 +11,19 @@ import {
   CommandList,
   CommandSeparator,
 } from "@/components/ui/command";
+import { adminxNav } from "@/lib/adminx-navigation";
 import { signOut } from "@repo/auth/client";
 import {
-  Activity,
-  Building2,
-  CreditCard,
-  DollarSign,
-  FolderKanban,
   Home,
-  LayoutDashboard,
   LogOut,
   Monitor,
   Moon,
   Package,
   Search,
-  Settings,
   Sun,
   Tag,
   Ticket,
   User,
-  UserCog,
-  Users,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
@@ -118,75 +110,31 @@ export function AdminCommandMenu() {
         <CommandList>
           <CommandEmpty>No results found.</CommandEmpty>
 
-          {/* Quick Navigation */}
-          <CommandGroup heading="Navigation">
-            <CommandItem onSelect={() => handleNavigation("/adminx/dashboard")}>
-              <LayoutDashboard />
-              <span>Dashboard</span>
-            </CommandItem>
-            <CommandItem onSelect={() => handleNavigation("/adminx/users")}>
-              <Users />
-              <span>Users</span>
-            </CommandItem>
-            <CommandItem
-              onSelect={() => handleNavigation("/adminx/organizations")}
-            >
-              <Building2 />
-              <span>Organizations</span>
-            </CommandItem>
-            <CommandItem onSelect={() => handleNavigation("/adminx/projects")}>
-              <FolderKanban />
-              <span>Projects</span>
-            </CommandItem>
-            <CommandItem onSelect={() => handleNavigation("/adminx/members")}>
-              <UserCog />
-              <span>Members</span>
-            </CommandItem>
-            <CommandItem onSelect={() => handleNavigation("/adminx/payments")}>
-              <CreditCard />
-              <span>Payments</span>
-            </CommandItem>
-            <CommandItem onSelect={() => handleNavigation("/adminx/sessions")}>
-              <Activity />
-              <span>Sessions</span>
-            </CommandItem>
-            <CommandItem onSelect={() => handleNavigation("/adminx/settings")}>
-              <Settings />
-              <span>Settings</span>
-            </CommandItem>
-          </CommandGroup>
-
-          <CommandSeparator />
-
-          {/* Stripe Management */}
-          <CommandGroup heading="Stripe">
-            <CommandItem
-              onSelect={() => handleNavigation("/adminx/stripe/products")}
-            >
-              <Package />
-              <span>Products</span>
-            </CommandItem>
-            <CommandItem
-              onSelect={() => handleNavigation("/adminx/stripe/prices")}
-            >
-              <DollarSign />
-              <span>Prices</span>
-            </CommandItem>
-            <CommandItem
-              onSelect={() => handleNavigation("/adminx/stripe/coupons")}
-            >
-              <Ticket />
-              <span>Coupons</span>
-            </CommandItem>
-            <CommandItem
-              onSelect={() => handleNavigation("/adminx/stripe/promo-codes")}
-            >
-              <Tag />
-              <span>Promo Codes</span>
-            </CommandItem>
-          </CommandGroup>
-
-          <CommandSeparator />
+          {/* Navigation — derived from sidebar config */}
+          {adminxNav.main.map((section, idx) => {
+            const items = [...section.items, ...(section.children ?? [])];
+            if (items.length === 0) return null;
+            const heading = section.title || "Navigation";
+            return (
+              <div key={section.id ?? `${heading}-${idx}`}>
+                <CommandGroup heading={heading}>
+                  {items.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <CommandItem
+                        key={item.href}
+                        onSelect={() => handleNavigation(item.href)}
+                      >
+                        <Icon />
+                        <span>{item.label}</span>
+                      </CommandItem>
+                    );
+                  })}
+                </CommandGroup>
+                <CommandSeparator />
+              </div>
+            );
+          })}
 
           {/* Quick Actions */}
           <CommandGroup heading="Quick Actions">
