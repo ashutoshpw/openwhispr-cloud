@@ -17,6 +17,10 @@ const Command = React.forwardRef<
     ref={ref}
     className={cn(
       "flex h-full w-full flex-col overflow-hidden rounded-xl bg-popover text-popover-foreground",
+      "[&_[cmdk-group-heading]]:px-2.5 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:pb-1",
+      "[&_[cmdk-group-heading]]:text-[10px] [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:tracking-wider [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:uppercase",
+      "[&_[cmdk-group]]:px-1.5",
+      "[&_[cmdk-input-wrapper]_svg]:h-4 [&_[cmdk-input-wrapper]_svg]:w-4",
       className,
     )}
     {...props}
@@ -48,16 +52,7 @@ const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
           )}
         >
           <DialogTitle className="sr-only">Command Menu</DialogTitle>
-          <Command
-            className={cn(
-              "[&_[cmdk-group-heading]]:px-2.5 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:pb-1",
-              "[&_[cmdk-group-heading]]:text-[10px] [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:tracking-wider [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:uppercase",
-              "[&_[cmdk-group]]:px-1.5",
-              "[&_[cmdk-input-wrapper]_svg]:h-4 [&_[cmdk-input-wrapper]_svg]:w-4",
-            )}
-          >
-            {children}
-          </Command>
+          <Command>{children}</Command>
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </Dialog>
