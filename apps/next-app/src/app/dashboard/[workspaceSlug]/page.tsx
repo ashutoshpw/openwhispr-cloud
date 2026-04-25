@@ -52,10 +52,15 @@ export default async function WorkspacePage({ params }: PageProps) {
     .where(eq(project.organizationId, org.id))
     .orderBy(desc(project.updatedAt));
 
+  const canManageMembers =
+    memberRecord.role === "owner" || memberRecord.role === "admin";
+
   return (
     <ProjectsOverview
       workspaceSlug={workspaceSlug}
       orgName={org.name}
+      organizationId={org.id}
+      canManageMembers={canManageMembers}
       projects={projects.map((p) => ({
         id: p.id,
         name: p.name,

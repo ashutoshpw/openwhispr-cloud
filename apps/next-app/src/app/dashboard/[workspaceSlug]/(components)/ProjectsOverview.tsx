@@ -14,12 +14,16 @@ const VIEW_STORAGE_KEY = "projects:view";
 interface ProjectsOverviewProps {
   workspaceSlug: string;
   orgName: string;
+  organizationId: string;
+  canManageMembers: boolean;
   projects: ProjectCardProject[];
 }
 
 export function ProjectsOverview({
   workspaceSlug,
   orgName,
+  organizationId,
+  canManageMembers,
   projects,
 }: ProjectsOverviewProps) {
   const [search, setSearch] = useState("");
@@ -59,6 +63,8 @@ export function ProjectsOverview({
         </h1>
         <ProjectsToolbar
           workspaceSlug={workspaceSlug}
+          organizationId={organizationId}
+          canManageMembers={canManageMembers}
           search={search}
           onSearchChange={setSearch}
           view={view}
