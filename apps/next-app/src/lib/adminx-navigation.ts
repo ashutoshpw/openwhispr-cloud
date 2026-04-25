@@ -5,6 +5,7 @@ import {
   Building2,
   CreditCard,
   DollarSign,
+  Filter,
   FolderKanban,
   KeyRound,
   Layers,
@@ -147,6 +148,12 @@ export const adminxNav: AdminNavConfig = {
       children: [
         { label: "Members", icon: UserCog, href: "/adminx/members" },
         { label: "Sessions", icon: Activity, href: "/adminx/sessions" },
+        { label: "Traffic", icon: LineChart, href: "/adminx/analytics" },
+        {
+          label: "Funnels",
+          icon: Filter,
+          href: "/adminx/analytics/funnels",
+        },
         { label: "Integrations", icon: Plug, href: "/adminx/integrations" },
         {
           label: "AI Provider",
