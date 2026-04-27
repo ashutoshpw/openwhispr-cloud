@@ -36,7 +36,7 @@ jobs:
         uses: W3Dev/vercel-deploy@main
         with:
           vercel_token: ${{ secrets.VERCEL_TOKEN }}
-          vercel_org_id: 'team_XlKdoQLCLOaHFIGh0cZ5SJuv'
+          vercel_org_id: 'team_M1i3qUTW4i3A6mETy54E1Fy8'
           vercel_project_id: 'prj_YLF5HawHAOzh4oKqS8wmxoBZ9hU5'
           vercel_project_name: 'nexvio-ai'
           package_manager: 'bun'
