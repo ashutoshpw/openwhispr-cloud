@@ -1,12 +1,12 @@
 import { docsSource } from "@/lib/source";
-import type { TOCItemType } from "fumadocs-core/toc";
-import defaultMdxComponents from "fumadocs-ui/mdx";
+import type { TOCItemType } from "@repo/fumadocs";
 import {
   DocsBody,
   DocsDescription,
   DocsPage,
   DocsTitle,
-} from "fumadocs-ui/page";
+  defaultMdxComponents,
+} from "@repo/fumadocs/components";
 import type { MDXContent } from "mdx/types";
 import { notFound } from "next/navigation";
 

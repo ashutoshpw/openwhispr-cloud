@@ -6,9 +6,16 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./components": "./src/components/index.ts"
+    "./components": "./src/components/index.ts",
+    "./source": "./src/source.ts",
+    "./config": "./src/config.ts",
+    "./next-config": "./src/next-config.mjs"
   },
-  "dependencies": {},
+  "dependencies": {
+    "fumadocs-core": "^16.7.7",
+    "fumadocs-mdx": "^14.2.11",
+    "fumadocs-ui": "^16.7.7"
+  },
   "devDependencies": {
     "typescript": "latest"
   }

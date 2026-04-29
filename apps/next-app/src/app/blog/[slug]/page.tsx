@@ -1,5 +1,5 @@
 import { blog } from "@/lib/source";
-import defaultMdxComponents from "fumadocs-ui/mdx";
+import { defaultMdxComponents } from "@repo/fumadocs/components";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 
