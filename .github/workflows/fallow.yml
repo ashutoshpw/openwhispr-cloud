@@ -3,7 +3,7 @@ on: [push, pull_request]
 
 jobs:
   fallow:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
 
