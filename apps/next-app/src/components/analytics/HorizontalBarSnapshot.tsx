@@ -5,7 +5,7 @@ import {
   formatCount,
   useAnalytics,
 } from "@/components/analytics/use-analytics";
-import type { SnapshotItem } from "@/lib/admin/analytics";
+import type { SnapshotItem } from "@repo/analytics";
 
 interface Props {
   endpoint: string;

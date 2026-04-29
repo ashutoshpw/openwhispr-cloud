@@ -1,9 +1,9 @@
-import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
 import {
+  ANALYTICS_EVENTS,
   identifyServerUser,
   setServerUserProperties,
   trackServerEvent,
-} from "@/lib/analytics/server";
+} from "@repo/analytics";
 import {
   AUDIT_ACTIONS,
   ORG_STATUS,

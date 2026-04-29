@@ -1,6 +1,7 @@
 import { db } from "@repo/database";
 import { sql } from "@repo/database";
 import { planTier as planTierTable } from "@repo/database/schema";
+import type { PricingTier } from "../types";
 import { stripe } from "./client";
 
 /**
@@ -317,21 +318,7 @@ export async function getStripePromotionCode(promoCodeId: string) {
 }
 
 // Types for pricing display
-export interface PricingTier {
-  id: string;
-  name: string;
-  description: string;
-  monthlyPrice: number | null;
-  yearlyPrice: number | null;
-  monthlyPriceId: string | null;
-  yearlyPriceId: string | null;
-  features: string[];
-  popular: boolean;
-  exclusive: boolean;
-  displayOrder: number;
-  isContactPricing: boolean;
-  actionLabel: string;
-}
+export type { PricingTier } from "../types";
 
 // Default fallback pricing tiers when Stripe is not configured
 const DEFAULT_PRICING_TIERS: PricingTier[] = [

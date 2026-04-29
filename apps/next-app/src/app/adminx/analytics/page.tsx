@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { assertPosthogConfigured } from "@/lib/analytics/posthog-query";
+import { assertPosthogConfigured } from "@repo/analytics/posthog-query";
 import { asc, db } from "@repo/database";
 import { analyticsFunnel } from "@repo/database";
 import { AlertTriangle } from "lucide-react";

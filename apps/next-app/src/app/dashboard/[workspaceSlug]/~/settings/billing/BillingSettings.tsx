@@ -12,9 +12,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
-import { useTrackEvent } from "@/lib/analytics/hooks";
-import type { PricingTier } from "@repo/billing/stripe/queries";
+import { ANALYTICS_EVENTS } from "@repo/analytics/client";
+import { useTrackEvent } from "@repo/analytics/client";
+import type { PricingTier } from "@repo/billing/types";
 import type {
   BillingSubscriptionResponse,
   BillingUsageResponse,

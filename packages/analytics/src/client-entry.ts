@@ -1,8 +1,6 @@
-// ============================================================================
-// PostHog Analytics - Main Exports
-// ============================================================================
+// @repo/analytics/client — browser-safe exports only (no node:fs)
 
-// Event definitions and types
+// Events
 export {
   ANALYTICS_EVENTS,
   type AnalyticsEvent,
@@ -22,7 +20,7 @@ export {
   type OrganizationMemberInvitedProperties,
 } from "./events";
 
-// Client-side functions (use in client components)
+// Client-side functions
 export {
   trackEvent,
   identifyUser,
@@ -41,7 +39,7 @@ export {
   isPostHogReady,
 } from "./client";
 
-// React hooks (use in client components)
+// React hooks
 export {
   useTrackEvent,
   useIdentify,
@@ -54,19 +52,5 @@ export {
   useAnalytics,
 } from "./hooks";
 
-// Provider component
+// Provider
 export { PostHogProvider, posthog } from "./posthog-provider";
-
-// Server-side functions (use in server components/API routes)
-export {
-  trackServerEvent,
-  identifyServerUser,
-  setServerUserProperties,
-  setServerUserPropertiesOnce,
-  aliasServerUser,
-  getServerFeatureFlag,
-  isServerFeatureEnabled,
-  getServerAllFlags,
-  shutdownPostHog,
-  trackServerEventWithContext,
-} from "./server";

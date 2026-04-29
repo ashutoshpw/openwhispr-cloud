@@ -1,4 +1,5 @@
 bun run check:max-lines
 bun run check:staged-types
 bun run check:no-middleware
+bun run check:banned-deps
 bunx lint-staged

@@ -7,7 +7,7 @@ import {
   formatTick,
   useAnalytics,
 } from "@/components/analytics/use-analytics";
-import type { SeriesResult } from "@/lib/admin/analytics";
+import type { SeriesResult } from "@repo/analytics";
 import {
   Line,
   LineChart,

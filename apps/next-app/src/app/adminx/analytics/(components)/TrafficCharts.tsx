@@ -7,7 +7,7 @@ import { HorizontalBarSnapshot } from "@/components/analytics/HorizontalBarSnaps
 import { LineSeriesChart } from "@/components/analytics/LineSeriesChart";
 import { TrafficKpiCards } from "@/components/analytics/TrafficKpiCards";
 import { Button } from "@/components/ui/button";
-import { parseRange } from "@/lib/admin/analytics-range";
+import { parseRange } from "@repo/analytics/admin-range";
 import { Settings2 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";

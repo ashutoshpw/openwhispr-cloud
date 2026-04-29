@@ -7,7 +7,7 @@ import { LineSeriesChart } from "@/components/analytics/LineSeriesChart";
 import { RevenueChart } from "@/components/analytics/RevenueChart";
 import { SignupsChart } from "@/components/analytics/SignupsChart";
 import { TopOrgsChart } from "@/components/analytics/TopOrgsChart";
-import { parseRange } from "@/lib/admin/analytics-range";
+import { parseRange } from "@repo/analytics/admin-range";
 import { useSearchParams } from "next/navigation";
 
 const SERIES = "/api/admin/analytics/series";

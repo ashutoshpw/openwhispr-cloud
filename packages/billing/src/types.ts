@@ -169,6 +169,23 @@ export interface StripeSubscription {
   };
 }
 
+// Pricing tier for the billing page UI
+export interface PricingTier {
+  id: string;
+  name: string;
+  description: string;
+  monthlyPrice: number | null;
+  yearlyPrice: number | null;
+  monthlyPriceId: string | null;
+  yearlyPriceId: string | null;
+  features: string[];
+  popular: boolean;
+  exclusive: boolean;
+  displayOrder: number;
+  isContactPricing: boolean;
+  actionLabel: string;
+}
+
 // Stripe product from stripe schema query
 export interface StripeProduct {
   id: string;

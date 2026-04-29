@@ -5,8 +5,8 @@ import {
   getSignupsSeries,
   getWorkspacesSeries,
 } from "@/lib/admin/analytics";
-import { parseRange } from "@/lib/admin/analytics-range";
 import { getSiteAdminStatus } from "@/lib/auth-utils";
+import { parseRange } from "@repo/analytics/admin-range";
 import { auth } from "@repo/auth/server";
 import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";

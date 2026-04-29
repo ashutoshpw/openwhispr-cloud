@@ -4,8 +4,8 @@ import {
   getSessionsSeries,
   getSignupsSeries,
 } from "@/lib/admin/analytics";
-import { parseRange } from "@/lib/admin/analytics-range";
 import { requireOrganizationMembership } from "@/lib/auth/require-membership";
+import { parseRange } from "@repo/analytics/admin-range";
 import { type NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";

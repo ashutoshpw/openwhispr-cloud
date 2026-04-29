@@ -39,6 +39,7 @@
     "check:max-lines": "bun run scripts/check-max-lines.ts",
     "check:staged-types": "bun run scripts/check-staged-types.ts",
     "check:no-middleware": "bun run scripts/check-no-middleware.ts",
+    "check:banned-deps": "bun run scripts/check-banned-deps.ts",
     "prepare": "husky"
   },
   "devDependencies": {

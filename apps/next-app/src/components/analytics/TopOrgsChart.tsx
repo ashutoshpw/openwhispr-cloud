@@ -2,7 +2,7 @@
 
 import { ChartCard } from "@/components/analytics/ChartCard";
 import { formatUsd, useAnalytics } from "@/components/analytics/use-analytics";
-import type { TopOrgItem } from "@/lib/admin/analytics";
+import type { TopOrgItem } from "@repo/analytics";
 import Link from "next/link";
 
 interface Props {

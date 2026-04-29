@@ -1,8 +1,8 @@
 import "server-only";
 
-import type { SeriesResult, SnapshotItem } from "@/lib/admin/analytics";
-import { type RangeKey, rangeDays } from "@/lib/admin/analytics-range";
 import type { AnalyticsFunnel, AnalyticsFunnelStep } from "@repo/database";
+import { type RangeKey, rangeDays } from "./admin-range";
+import type { SeriesResult, SnapshotItem } from "./types";
 
 const DEFAULT_HOST = "https://app.posthog.com";
 
@@ -44,8 +44,6 @@ interface PostHogFunnelStepResult {
   name?: string;
   custom_name?: string | null;
   count: number;
-  // PostHog returns a normalized 0-1 conversion rate for some shapes; for
-  // others it's per-step counts only. We compute conversion ourselves.
 }
 
 interface PostHogFunnelResponse {
@@ -93,10 +91,6 @@ async function runHogQL<Row extends Record<string, unknown>>(
   });
 }
 
-// ---------------------------------------------------------------------------
-// Date helpers
-// ---------------------------------------------------------------------------
-
 export interface QueryRange {
   fromIso: string;
   toIso: string;
@@ -125,10 +119,6 @@ export function buildQueryRange(range: RangeKey): QueryRange {
     bucket,
   };
 }
-
-// ---------------------------------------------------------------------------
-// Series — pageviews timeseries
-// ---------------------------------------------------------------------------
 
 export async function getPageviewsSeries(
   range: RangeKey,
@@ -179,7 +169,6 @@ export async function getPageviewsSeries(
 function toDateKey(value: unknown): string {
   if (value instanceof Date) return value.toISOString().slice(0, 10);
   const s = String(value);
-  // PostHog returns ISO strings or "YYYY-MM-DD HH:mm:ss"
   return s.slice(0, 10);
 }
 
@@ -187,7 +176,6 @@ function densifySeries(
   points: { date: string; value: number }[],
   r: QueryRange,
 ): { date: string; value: number }[] {
-  // Use a Map for O(1) lookup; fill missing buckets with 0 so charts don't gap.
   const map = new Map(points.map((p) => [p.date, p.value]));
   const out: { date: string; value: number }[] = [];
   const start = new Date(r.fromIso);
@@ -199,10 +187,6 @@ function densifySeries(
   }
   return out;
 }
-
-// ---------------------------------------------------------------------------
-// KPIs (totals + previous period)
-// ---------------------------------------------------------------------------
 
 export interface TrafficKpis {
   pageviews: { current: number; previous: number };
@@ -252,18 +236,10 @@ async function kpiQuery(from: string, to: string) {
   };
 }
 
-// ---------------------------------------------------------------------------
-// Snapshots (donut / horizontal bar)
-// ---------------------------------------------------------------------------
-
-interface SnapshotResult {
+function toSnapshot(rows: { label: unknown; value: unknown }[]): {
   items: SnapshotItem[];
   total: number;
-}
-
-function toSnapshot(
-  rows: { label: unknown; value: unknown }[],
-): SnapshotResult {
+} {
   const items: SnapshotItem[] = rows
     .map((r) => ({
       label: String(r.label ?? "(unknown)"),
@@ -274,14 +250,9 @@ function toSnapshot(
   return { items, total };
 }
 
-/**
- * Channel attribution from the first pageview per session. Categorizes each
- * session into Direct / Organic Search / Paid Search / Social / Email /
- * Referral / Other based on UTM and referring domain.
- */
 export async function getChannelBreakdown(
   range: RangeKey,
-): Promise<SnapshotResult> {
+): Promise<{ items: SnapshotItem[]; total: number }> {
   const r = buildQueryRange(range);
   const rows = await runHogQL<{ label: string; value: number }>(
     `
@@ -320,7 +291,7 @@ export async function getChannelBreakdown(
 export async function getTopReferringDomains(
   range: RangeKey,
   limit = 10,
-): Promise<SnapshotResult> {
+): Promise<{ items: SnapshotItem[]; total: number }> {
   const r = buildQueryRange(range);
   const rows = await runHogQL<{ label: string; value: number }>(
     `
@@ -345,7 +316,7 @@ export async function getTopReferringDomains(
 export async function getTopUtmCampaigns(
   range: RangeKey,
   limit = 10,
-): Promise<SnapshotResult> {
+): Promise<{ items: SnapshotItem[]; total: number }> {
   const r = buildQueryRange(range);
   const rows = await runHogQL<{ label: string; value: number }>(
     `
@@ -369,7 +340,7 @@ export async function getTopUtmCampaigns(
 export async function getUtmSourceMediumMatrix(
   range: RangeKey,
   limit = 10,
-): Promise<SnapshotResult> {
+): Promise<{ items: SnapshotItem[]; total: number }> {
   const r = buildQueryRange(range);
   const rows = await runHogQL<{ label: string; value: number }>(
     `
@@ -392,7 +363,7 @@ export async function getUtmSourceMediumMatrix(
 export async function getTopLandingPages(
   range: RangeKey,
   limit = 10,
-): Promise<SnapshotResult> {
+): Promise<{ items: SnapshotItem[]; total: number }> {
   const r = buildQueryRange(range);
   const rows = await runHogQL<{ label: string; value: number }>(
     `
@@ -420,7 +391,7 @@ export async function getTopLandingPages(
 
 export async function getDeviceBreakdown(
   range: RangeKey,
-): Promise<SnapshotResult> {
+): Promise<{ items: SnapshotItem[]; total: number }> {
   const r = buildQueryRange(range);
   const rows = await runHogQL<{ label: string; value: number }>(
     `
@@ -441,7 +412,7 @@ export async function getDeviceBreakdown(
 export async function getTopCountries(
   range: RangeKey,
   limit = 10,
-): Promise<SnapshotResult> {
+): Promise<{ items: SnapshotItem[]; total: number }> {
   const r = buildQueryRange(range);
   const rows = await runHogQL<{ label: string; value: number }>(
     `
@@ -460,21 +431,17 @@ export async function getTopCountries(
   return toSnapshot(rows);
 }
 
-// ---------------------------------------------------------------------------
-// Page-flow funnel
-// ---------------------------------------------------------------------------
-
 export interface FunnelStepResult {
   label: string;
   count: number;
-  conversionFromPrev: number; // 0..1
-  conversionFromStart: number; // 0..1
-  dropoff: number; // 0..1
+  conversionFromPrev: number;
+  conversionFromStart: number;
+  dropoff: number;
 }
 
 export interface FunnelComputed {
   steps: FunnelStepResult[];
-  overall: number; // last/first
+  overall: number;
 }
 
 export async function getPageFlowFunnel(

@@ -1,5 +1,8 @@
-import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
-import { identifyServerUser, trackServerEvent } from "@/lib/analytics/server";
+import {
+  ANALYTICS_EVENTS,
+  identifyServerUser,
+  trackServerEvent,
+} from "@repo/analytics";
 import { baseServer } from "@repo/auth/server";
 import { NextResponse } from "next/server";
 

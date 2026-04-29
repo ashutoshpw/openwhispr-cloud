@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { RANGE_OPTIONS, type RangeKey } from "@/lib/admin/analytics-range";
+import { RANGE_OPTIONS, type RangeKey } from "@repo/analytics/admin-range";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 

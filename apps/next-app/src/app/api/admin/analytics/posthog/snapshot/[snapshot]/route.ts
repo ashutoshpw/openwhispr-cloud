@@ -1,4 +1,5 @@
-import { parseRange } from "@/lib/admin/analytics-range";
+import { getSiteAdminStatus } from "@/lib/auth-utils";
+import { parseRange } from "@repo/analytics/admin-range";
 import {
   assertPosthogConfigured,
   getChannelBreakdown,
@@ -8,8 +9,7 @@ import {
   getTopReferringDomains,
   getTopUtmCampaigns,
   getUtmSourceMediumMatrix,
-} from "@/lib/analytics/posthog-query";
-import { getSiteAdminStatus } from "@/lib/auth-utils";
+} from "@repo/analytics/posthog-query";
 import { auth } from "@repo/auth/server";
 import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
