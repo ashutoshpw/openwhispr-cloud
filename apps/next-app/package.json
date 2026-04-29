@@ -12,9 +12,6 @@
     "format:check": "biome format ."
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^3.0.71",
-    "@ai-sdk/google": "^3.0.64",
-    "@ai-sdk/openai": "^3.0.53",
     "@hookform/resolvers": "^3.3.4",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -45,7 +42,6 @@
     "@upstash/redis": "^1.24.2",
     "@vercel/analytics": "^1.2.2",
     "@vercel/blob": "^2.3.3",
-    "ai": "^6.0.168",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
