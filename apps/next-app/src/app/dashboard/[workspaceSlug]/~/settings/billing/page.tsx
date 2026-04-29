@@ -1,4 +1,3 @@
-import { getPricingTiers } from "@/lib/stripe/queries";
 import { auth } from "@repo/auth/server";
 import {
   APP_SETTINGS_KEYS,
@@ -13,6 +12,7 @@ import {
   isFreeTier,
   isOrganizationInTrial,
 } from "@repo/billing";
+import { getPricingTiers } from "@repo/billing/stripe/queries";
 import type {
   BillingSubscriptionResponse,
   BillingUsageResponse,

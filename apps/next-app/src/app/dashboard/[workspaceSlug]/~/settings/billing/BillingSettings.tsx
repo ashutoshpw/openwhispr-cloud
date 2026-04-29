@@ -14,7 +14,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { ANALYTICS_EVENTS } from "@/lib/analytics/events";
 import { useTrackEvent } from "@/lib/analytics/hooks";
-import type { PricingTier } from "@/lib/stripe/queries";
+import type { PricingTier } from "@repo/billing/stripe/queries";
 import type {
   BillingSubscriptionResponse,
   BillingUsageResponse,

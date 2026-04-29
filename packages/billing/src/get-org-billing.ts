@@ -1,5 +1,3 @@
-import "server-only";
-
 import { db, eq } from "@repo/database";
 import { orgBilling, planTier } from "@repo/database/schema";
 import type { OrgBilling, PlanTier } from "@repo/database/schema";

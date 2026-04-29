@@ -2,7 +2,7 @@
 // import Link from "next/link";
 // import { Plus } from "lucide-react";
 import { PriceTable } from "@/components/admin/stripe/PriceTable";
-import { getStripePrices } from "@/lib/stripe/queries";
+import { getStripePrices } from "@repo/billing/stripe/queries";
 
 type PriceTableRows = Parameters<typeof PriceTable>[0]["prices"];
 

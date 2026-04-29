@@ -10,8 +10,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { PricingTier } from "@/lib/stripe/queries";
 import { cn } from "@/lib/utils";
+import type { PricingTier } from "@repo/billing/stripe/queries";
 import { CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 

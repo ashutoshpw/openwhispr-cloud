@@ -1,5 +1,5 @@
 import { PlanFeaturesManager } from "@/components/admin/billing";
-import { getStripeProducts } from "@/lib/stripe/queries";
+import { getStripeProducts } from "@repo/billing/stripe/queries";
 
 interface Product {
   id: string;

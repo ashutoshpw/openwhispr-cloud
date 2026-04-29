@@ -1,8 +1,8 @@
-import { ORG_STATUS, TRIAL_DURATION_DAYS } from "@repo/billing/constants";
-import type { CheckoutMetadata, CheckoutResult } from "@repo/billing/types";
 import { db } from "@repo/database";
 import { eq } from "@repo/database";
 import { member, organization, project } from "@repo/database/schema";
+import { ORG_STATUS, TRIAL_DURATION_DAYS } from "../constants";
+import type { CheckoutResult } from "../types";
 import { stripe } from "./client";
 import { getOrCreateStripeCustomer } from "./customer";
 

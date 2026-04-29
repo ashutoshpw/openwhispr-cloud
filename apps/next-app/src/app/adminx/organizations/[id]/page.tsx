@@ -4,7 +4,7 @@ import { OrgBillingForm } from "@/components/admin/billing/org-billing-form";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getOrgBilling } from "@/lib/billing/get-org-billing";
+import { getOrgBilling } from "@repo/billing/get-org-billing";
 import { db } from "@repo/database";
 import { eq } from "@repo/database";
 import { organization, planTier, project } from "@repo/database/schema";

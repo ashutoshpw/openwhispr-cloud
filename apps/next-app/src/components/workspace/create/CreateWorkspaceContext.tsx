@@ -1,6 +1,6 @@
 "use client";
 
-import type { PricingTier } from "@/lib/stripe/queries";
+import type { PricingTier } from "@repo/billing/stripe/queries";
 import {
   type ReactNode,
   createContext,

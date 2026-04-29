@@ -6,10 +6,10 @@ import {
   useCreateProduct,
   useUpdateProduct,
 } from "@/hooks/stripe/useProducts";
+import type { Stripe } from "@repo/billing/stripe/client";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import type Stripe from "stripe";
 import { type MetadataEntry, ProductFormView } from "./ProductFormView";
 
 interface ProductFormProps {

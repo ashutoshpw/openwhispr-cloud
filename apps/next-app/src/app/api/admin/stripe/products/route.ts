@@ -1,7 +1,7 @@
 import { getSiteAdminStatus } from "@/lib/auth-utils";
 import { getErrorMessage } from "@/lib/error-utils";
-import { stripe } from "@/lib/stripe/client";
 import { auth } from "@repo/auth/server";
+import { stripe } from "@repo/billing/stripe/client";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";

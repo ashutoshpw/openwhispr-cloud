@@ -1,5 +1,5 @@
-import { stripe } from "@/lib/stripe/client";
 import { auth } from "@repo/auth/server";
+import { stripe } from "@repo/billing/stripe/client";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 

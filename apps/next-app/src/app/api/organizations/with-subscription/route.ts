@@ -1,6 +1,6 @@
-import { stripe } from "@/lib/stripe/client";
 import { auth, getBetterAuthServer } from "@repo/auth/server";
 import { ORG_STATUS, TRIAL_DURATION_DAYS } from "@repo/billing/constants";
+import { stripe } from "@repo/billing/stripe/client";
 import { db, eq } from "@repo/database";
 import { orgBilling, organization } from "@repo/database/schema";
 import { headers } from "next/headers";

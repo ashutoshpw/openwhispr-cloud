@@ -1,12 +1,12 @@
-import {
-  createUpgradeCheckout,
-  createWorkspaceCheckout,
-} from "@/lib/stripe/checkout";
 import { auth } from "@repo/auth/server";
 import {
   type BillingMiddlewareResult,
   checkBillingPermission,
 } from "@repo/billing";
+import {
+  createUpgradeCheckout,
+  createWorkspaceCheckout,
+} from "@repo/billing/stripe/checkout";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 

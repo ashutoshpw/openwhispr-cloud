@@ -1,7 +1,7 @@
 "use client";
 
-import type { PricingTier } from "@/lib/stripe/queries";
 import * as Dialog from "@radix-ui/react-dialog";
+import type { PricingTier } from "@repo/billing/stripe/queries";
 import { Elements } from "@stripe/react-stripe-js";
 import { type Stripe, loadStripe } from "@stripe/stripe-js";
 import { X } from "lucide-react";

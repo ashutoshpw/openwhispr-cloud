@@ -1,8 +1,8 @@
+import { auth } from "@repo/auth/server";
 import {
   getOrgBilling,
   getPlanTierDisplay,
-} from "@/lib/billing/get-org-billing";
-import { auth } from "@repo/auth/server";
+} from "@repo/billing/get-org-billing";
 import { and, db, eq } from "@repo/database";
 import { member, organization } from "@repo/database/schema";
 import { headers } from "next/headers";

@@ -1,4 +1,4 @@
-import { getPricingTiers } from "@/lib/stripe/queries";
+import { getPricingTiers } from "@repo/billing/stripe/queries";
 import { PricingDisplay } from "./PricingDisplay";
 
 export default async function Pricing() {

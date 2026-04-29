@@ -1,5 +1,5 @@
 import { PriceForm } from "@/components/admin/stripe/PriceForm";
-import { getStripeProduct } from "@/lib/stripe/queries";
+import { getStripeProduct } from "@repo/billing/stripe/queries";
 import { notFound } from "next/navigation";
 
 export default async function NewPricePage({

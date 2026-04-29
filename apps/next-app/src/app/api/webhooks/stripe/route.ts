@@ -5,29 +5,29 @@ import {
   trackServerEvent,
 } from "@/lib/analytics/server";
 import {
-  syncOrgBillingFromSubscription,
-  syncOrgBillingOnPaymentFailed,
-  syncOrgBillingOnPaymentSucceeded,
-  syncOrgBillingOnSubscriptionDeleted,
-} from "@/lib/billing/sync-from-stripe";
-import {
-  activatePendingOrganization,
-  cancelPendingOrganization,
-} from "@/lib/stripe/checkout";
-import { stripe } from "@/lib/stripe/client";
-import { stripeSync } from "@/lib/stripe/sync";
-import {
   AUDIT_ACTIONS,
   ORG_STATUS,
   logBillingEvent,
   updateOrganizationStatus,
 } from "@repo/billing";
+import {
+  activatePendingOrganization,
+  cancelPendingOrganization,
+} from "@repo/billing/stripe/checkout";
+import { stripe } from "@repo/billing/stripe/client";
+import type { Stripe } from "@repo/billing/stripe/client";
+import { stripeSync } from "@repo/billing/stripe/sync";
+import {
+  syncOrgBillingFromSubscription,
+  syncOrgBillingOnPaymentFailed,
+  syncOrgBillingOnPaymentSucceeded,
+  syncOrgBillingOnSubscriptionDeleted,
+} from "@repo/billing/sync-from-stripe";
 import { db } from "@repo/database";
 import { eq } from "@repo/database";
 import { organization, user } from "@repo/database/schema";
 import { revalidatePath } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
-import type Stripe from "stripe";
 
 /**
  * Handle checkout.session.completed event

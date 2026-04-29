@@ -26,3 +26,5 @@ export type StripeCoupon = Stripe.Coupon;
 export type StripePromotionCode = Stripe.PromotionCode;
 export type StripeCustomer = Stripe.Customer;
 export type StripePaymentIntent = Stripe.PaymentIntent;
+export type Product = Stripe.Product;
+export type { Stripe };

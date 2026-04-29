@@ -2,7 +2,7 @@ import { ActionsMenu } from "@/components/admin/stripe/ActionsMenu";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getStripePromotionCode } from "@/lib/stripe/queries";
+import { getStripePromotionCode } from "@repo/billing/stripe/queries";
 import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";

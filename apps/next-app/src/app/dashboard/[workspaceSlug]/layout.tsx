@@ -1,8 +1,8 @@
 import { SidebarProvider } from "@/components/dashboard/sidebar-context";
 import { CreateWorkspaceProvider } from "@/components/workspace/create/CreateWorkspaceContext";
-import { getPricingTiers } from "@/lib/stripe/queries";
 import { auth } from "@repo/auth/server";
 import { canUserCreateFreeWorkspace } from "@repo/billing";
+import { getPricingTiers } from "@repo/billing/stripe/queries";
 import { headers } from "next/headers";
 import type { ReactNode } from "react";
 import DashboardSideBar from "../(components)/DashboardSideBar";

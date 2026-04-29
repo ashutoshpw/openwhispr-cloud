@@ -44,7 +44,7 @@ async function tableExists(
   try {
     const result = await db().execute(
       sql`SELECT EXISTS (
-        SELECT FROM information_schema.tables 
+        SELECT FROM information_schema.tables
         WHERE table_schema = ${schema} AND table_name = ${tableName}
       )`,
     );

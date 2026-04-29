@@ -10,7 +10,7 @@ import { requireSession } from "@/lib/auth/require-membership";
 import {
   getOrgBilling,
   getPlanTierDisplay,
-} from "@/lib/billing/get-org-billing";
+} from "@repo/billing/get-org-billing";
 import { db, eq } from "@repo/database";
 import { member, organization } from "@repo/database/schema";
 import { ArrowRight } from "lucide-react";

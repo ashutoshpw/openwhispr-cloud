@@ -1,8 +1,6 @@
-import "server-only";
-
 import { db, eq } from "@repo/database";
 import { orgBilling } from "@repo/database/schema";
-import type Stripe from "stripe";
+import type { Stripe } from "./stripe/client";
 
 import { getOrgBilling } from "./get-org-billing";
 

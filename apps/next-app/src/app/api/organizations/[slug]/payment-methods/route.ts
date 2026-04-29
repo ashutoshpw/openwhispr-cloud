@@ -1,5 +1,5 @@
-import { stripe } from "@/lib/stripe/client";
 import { auth } from "@repo/auth/server";
+import { stripe } from "@repo/billing/stripe/client";
 import { and, db, eq } from "@repo/database";
 import { member, organization } from "@repo/database/schema";
 import { headers } from "next/headers";

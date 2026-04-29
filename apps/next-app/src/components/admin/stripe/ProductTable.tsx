@@ -3,7 +3,7 @@
 import { ActionsMenu } from "@/components/admin/stripe/ActionsMenu";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import type { Product } from "@/lib/stripe/types";
+import type { Product } from "@repo/billing/stripe/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 

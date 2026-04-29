@@ -3,14 +3,14 @@ import { PriceList } from "@/components/admin/stripe/PriceList";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Stripe } from "@repo/billing/stripe/client";
 import {
   getStripePricesForProduct,
   getStripeProduct,
-} from "@/lib/stripe/queries";
+} from "@repo/billing/stripe/queries";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import type Stripe from "stripe";
 
 function isStripeProduct(product: unknown): product is Stripe.Product {
   return (
