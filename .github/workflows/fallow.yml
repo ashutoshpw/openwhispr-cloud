@@ -4,6 +4,9 @@ on: [push, pull_request]
 jobs:
   fallow:
     runs-on: self-hosted
+    permissions:
+      contents: read
+      security-events: write
     env:
       NPM_CONFIG_PREFIX: ~/.npm-global
     steps:
