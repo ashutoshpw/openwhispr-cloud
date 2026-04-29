@@ -6,6 +6,12 @@ import { SidebarUserMenu } from "@/components/dashboard/sidebar-user-menu";
 import { WorkspaceSwitcher } from "@/components/dashboard/workspace-switcher";
 import { Separator } from "@/components/ui/separator";
 import {
+  SidebarDrillDownButton,
+  SidebarGroupLabel,
+  SidebarNavLink,
+  resolveMostSpecificActiveHref,
+} from "@/components/ui/sidebar-nav";
+import {
   type NavConfig,
   type NavItem,
   type NavSection,
@@ -14,10 +20,14 @@ import {
   workspaceNav,
 } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 import { useParams, usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
+
+function isItemActive(pathname: string, href: string, segment: string) {
+  if (!segment) return pathname === href;
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 function SidebarNavItem({
   item,
@@ -29,44 +39,13 @@ function SidebarNavItem({
   active: boolean;
 }) {
   return (
-    <Link
-      className={cn(
-        "flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-50",
-        active &&
-          "bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-50",
-      )}
+    <SidebarNavLink
       href={href}
-    >
-      <item.icon className="h-4 w-4 shrink-0" />
-      {item.label}
-    </Link>
+      label={item.label}
+      icon={item.icon}
+      active={active}
+    />
   );
-}
-
-function DrillDownRow({
-  section,
-  onClick,
-}: {
-  section: NavSection;
-  onClick: () => void;
-}) {
-  const Icon = section.icon;
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-50"
-    >
-      {Icon && <Icon className="h-4 w-4 shrink-0" />}
-      <span className="flex-1 text-left">{section.title}</span>
-      <ChevronRight className="h-3.5 w-3.5" />
-    </button>
-  );
-}
-
-function isItemActive(pathname: string, href: string, segment: string) {
-  if (!segment) return pathname === href;
-  return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 function SidebarSection({
@@ -82,12 +61,12 @@ function SidebarSection({
   pathname: string;
   onDrillDown: (id: string) => void;
 }) {
-  // Drill-down section (has an id and children)
   if (section.id && section.children && section.children.length > 0) {
     return (
       <div className="mb-1">
-        <DrillDownRow
-          section={section}
+        <SidebarDrillDownButton
+          title={section.title}
+          icon={section.icon}
           onClick={() => section.id && onDrillDown(section.id)}
         />
       </div>
@@ -96,11 +75,7 @@ function SidebarSection({
 
   return (
     <div className="mb-1">
-      {section.title && (
-        <div className="px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
-          {section.title}
-        </div>
-      )}
+      {section.title && <SidebarGroupLabel title={section.title} />}
       {section.items.map((item) => {
         const href = buildHref(workspaceSlug, projectSlug, item.segment);
         return (
@@ -130,8 +105,6 @@ export default function DashboardSideBar() {
     [config.main, activeMenuId],
   );
 
-  // Auto-open the drill-down whose children match the current route.
-  // Reset the user-dismissed flag when the route changes so we can re-open.
   const userDismissedRef = useRef(false);
   const prevPathnameRef = useRef(pathname);
 
@@ -243,16 +216,10 @@ export default function DashboardSideBar() {
                         ),
                       }),
                     );
-                    const matches = childHrefs.filter(
-                      ({ href }) =>
-                        pathname === href || pathname.startsWith(`${href}/`),
+                    const activeHref = resolveMostSpecificActiveHref(
+                      pathname,
+                      childHrefs.map((c) => c.href),
                     );
-                    const activeHref =
-                      matches.length > 0
-                        ? matches.reduce((a, b) =>
-                            b.href.length > a.href.length ? b : a,
-                          ).href
-                        : null;
                     return childHrefs.map(({ item, href }) => (
                       <SidebarNavItem
                         key={item.segment}
