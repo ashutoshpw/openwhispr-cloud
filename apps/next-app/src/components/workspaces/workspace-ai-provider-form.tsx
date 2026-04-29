@@ -1,9 +1,14 @@
 "use client";
 
+import {
+  AiProviderApiKeyField,
+  AiProviderBaseUrlField,
+  AiProviderDefaultModelField,
+  type AiProviderTestResult,
+  AiProviderTestResultPanel,
+} from "@/components/shared/ai-provider-form-fields";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -17,21 +22,6 @@ type Initial = {
   hasOrgOverride: boolean;
 };
 
-type TestResult =
-  | {
-      ok: true;
-      url: string;
-      modelCount: number | null;
-      source: "org" | "global";
-    }
-  | {
-      ok: false;
-      error: string;
-      url?: string;
-      status?: number;
-      source?: "org" | "global";
-    };
-
 interface Props {
   organizationId: string;
   initial: Initial;
@@ -42,11 +32,15 @@ export function WorkspaceAiProviderForm({ organizationId, initial }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [clearing, setClearing] = useState(false);
   const [testing, setTesting] = useState(false);
-  const [testResult, setTestResult] = useState<TestResult | null>(null);
+  const [testResult, setTestResult] = useState<AiProviderTestResult | null>(
+    null,
+  );
 
   const [baseUrl, setBaseUrl] = useState(initial.baseUrl ?? "");
   const [apiKey, setApiKey] = useState("");
   const [defaultModel, setDefaultModel] = useState(initial.defaultModel ?? "");
+
+  const orgApiUrl = `/api/organizations/${organizationId}/ai-provider`;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -57,14 +51,11 @@ export function WorkspaceAiProviderForm({ organizationId, initial }: Props) {
         defaultModel: defaultModel.trim() || null,
       };
       if (apiKey.trim()) body.apiKey = apiKey.trim();
-      const res = await fetch(
-        `/api/organizations/${organizationId}/ai-provider`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        },
-      );
+      const res = await fetch(orgApiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
       const payload = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(payload?.error ?? "Save failed");
       toast.success("Workspace AI provider saved");
@@ -80,14 +71,11 @@ export function WorkspaceAiProviderForm({ organizationId, initial }: Props) {
   async function handleClearKey() {
     setClearing(true);
     try {
-      const res = await fetch(
-        `/api/organizations/${organizationId}/ai-provider`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ clearApiKey: true }),
-        },
-      );
+      const res = await fetch(orgApiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clearApiKey: true }),
+      });
       const payload = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(payload?.error ?? "Failed to clear key");
       toast.success("Workspace API key cleared");
@@ -109,10 +97,7 @@ export function WorkspaceAiProviderForm({ organizationId, initial }: Props) {
     }
     setClearing(true);
     try {
-      const res = await fetch(
-        `/api/organizations/${organizationId}/ai-provider`,
-        { method: "DELETE" },
-      );
+      const res = await fetch(orgApiUrl, { method: "DELETE" });
       const payload = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(payload?.error ?? "Failed to reset");
       toast.success("Overrides removed");
@@ -128,10 +113,7 @@ export function WorkspaceAiProviderForm({ organizationId, initial }: Props) {
     setTesting(true);
     setTestResult(null);
     try {
-      const res = await fetch(
-        `/api/organizations/${organizationId}/ai-provider`,
-        { method: "PUT" },
-      );
+      const res = await fetch(orgApiUrl, { method: "PUT" });
       const raw = (await res.json().catch(() => ({}))) as Record<
         string,
         unknown
@@ -141,7 +123,7 @@ export function WorkspaceAiProviderForm({ organizationId, initial }: Props) {
           typeof raw.error === "string" ? raw.error : "Test failed",
         );
       }
-      const payload = raw as unknown as TestResult;
+      const payload = raw as unknown as AiProviderTestResult;
       setTestResult(payload);
       if (payload.ok) toast.success("Connection OK");
       else toast.error(payload.error || "Connection failed");
@@ -165,54 +147,30 @@ export function WorkspaceAiProviderForm({ organizationId, initial }: Props) {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="grid gap-4">
-          <div className="grid gap-1.5">
-            <Label htmlFor="baseUrl">Base URL</Label>
-            <Input
-              id="baseUrl"
-              value={baseUrl}
-              onChange={(e) => setBaseUrl(e.target.value)}
-              placeholder="Leave blank to use platform default"
-            />
-          </div>
-
-          <div className="grid gap-1.5">
-            <Label htmlFor="apiKey">API key</Label>
-            <Input
-              id="apiKey"
-              type="password"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              placeholder={keyPlaceholder}
-              autoComplete="off"
-            />
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-xs text-muted-foreground">
-                {initial.hasApiKey
-                  ? "Stored encrypted. Leave blank to keep the current key."
-                  : "Not set — agents will use the platform-wide key."}
-              </p>
-              {initial.hasApiKey && (
-                <button
-                  type="button"
-                  onClick={handleClearKey}
-                  disabled={clearing}
-                  className="text-xs text-destructive hover:underline"
-                >
-                  {clearing ? "Clearing…" : "Clear workspace key"}
-                </button>
-              )}
-            </div>
-          </div>
-
-          <div className="grid gap-1.5">
-            <Label htmlFor="defaultModel">Default model</Label>
-            <Input
-              id="defaultModel"
-              value={defaultModel}
-              onChange={(e) => setDefaultModel(e.target.value)}
-              placeholder="Leave blank to use platform default"
-            />
-          </div>
+          <AiProviderBaseUrlField
+            value={baseUrl}
+            onChange={setBaseUrl}
+            placeholder="Leave blank to use platform default"
+          />
+          <AiProviderApiKeyField
+            value={apiKey}
+            onChange={setApiKey}
+            placeholder={keyPlaceholder}
+            hasApiKey={initial.hasApiKey}
+            storedHint={
+              initial.hasApiKey
+                ? "Stored encrypted. Leave blank to keep the current key."
+                : "Not set — agents will use the platform-wide key."
+            }
+            clearLabel="Clear workspace key"
+            clearing={clearing}
+            onClear={handleClearKey}
+          />
+          <AiProviderDefaultModelField
+            value={defaultModel}
+            onChange={setDefaultModel}
+            placeholder="Leave blank to use platform default"
+          />
 
           <div className="flex items-center gap-2">
             <Button type="submit" disabled={submitting}>
@@ -241,42 +199,7 @@ export function WorkspaceAiProviderForm({ organizationId, initial }: Props) {
             )}
           </div>
 
-          {testResult && (
-            <div
-              className={
-                testResult.ok
-                  ? "rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-900 dark:border-green-900 dark:bg-green-950/40 dark:text-green-200"
-                  : "rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive"
-              }
-            >
-              {testResult.ok ? (
-                <>
-                  <div className="font-medium">
-                    Connection OK
-                    <span className="ml-1 text-xs opacity-70">
-                      (using {testResult.source} config)
-                    </span>
-                  </div>
-                  <div className="text-xs opacity-80">
-                    {testResult.url}
-                    {testResult.modelCount !== null
-                      ? ` · ${testResult.modelCount} models returned`
-                      : ""}
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="font-medium">
-                    Connection failed
-                    {testResult.status ? ` (HTTP ${testResult.status})` : ""}
-                  </div>
-                  <div className="break-words text-xs opacity-80">
-                    {testResult.error}
-                  </div>
-                </>
-              )}
-            </div>
-          )}
+          {testResult && <AiProviderTestResultPanel result={testResult} />}
         </form>
       </CardContent>
     </Card>
