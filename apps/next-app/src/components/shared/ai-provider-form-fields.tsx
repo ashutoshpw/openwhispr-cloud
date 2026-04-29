@@ -4,10 +4,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 
-/**
- * Shared field components for the admin and workspace AI provider forms.
- * Both forms configure baseUrl / apiKey / defaultModel with identical UI.
- */
+export type AiProviderTestResult =
+  | { ok: true; url: string; modelCount: number | null; source?: string }
+  | {
+      ok: false;
+      error: string;
+      url?: string;
+      status?: number;
+      source?: string;
+    };
 
 export function AiProviderBaseUrlField({
   value,
@@ -106,21 +111,9 @@ export function AiProviderDefaultModelField({
   );
 }
 
-export type AiProviderTestResult =
-  | { ok: true; url: string; modelCount: number | null; source?: string }
-  | {
-      ok: false;
-      error: string;
-      url?: string;
-      status?: number;
-      source?: string;
-    };
-
 export function AiProviderTestResultPanel({
   result,
-}: {
-  result: AiProviderTestResult;
-}) {
+}: { result: AiProviderTestResult }) {
   return (
     <div
       className={
@@ -149,38 +142,12 @@ export function AiProviderTestResultPanel({
       ) : (
         <>
           <div className="font-medium">
-            Connection failed
-            {result.status ? ` (HTTP ${result.status})` : ""}
+            Connection failed{result.status ? ` (HTTP ${result.status})` : ""}
           </div>
           <div className="break-words text-xs opacity-80">{result.error}</div>
           {result.url && <div className="text-xs opacity-60">{result.url}</div>}
         </>
       )}
     </div>
-  );
-}
-
-export function TestConnectionButton({
-  testing,
-  disabled,
-  onClick,
-  title,
-}: {
-  testing: boolean;
-  disabled?: boolean;
-  onClick: () => void;
-  title?: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled || testing}
-      title={title}
-      className="inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm font-medium shadow-xs transition-colors hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
-    >
-      {testing && <Loader2 className="h-4 w-4 animate-spin" />}
-      Test connection
-    </button>
   );
 }

@@ -24,20 +24,12 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
 
-/**
- * Shared field and action components used by AgentForm and IntegrationForm.
- * Both forms manage slug/name/description/category/status/iconUrl/docsUrl/
- * isSystemManaged/configSchema/metadata with identical UI.
- */
-
 export const RESOURCE_STATUSES = [
   "active",
   "beta",
   "deprecated",
   "hidden",
 ] as const;
-
-// ── Field components ────────────────────────────────────────────────────────
 
 export function SlugField({
   value,
@@ -73,10 +65,7 @@ export function SlugField({
 export function NameField({
   value,
   onChange,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-}) {
+}: { value: string; onChange: (v: string) => void }) {
   return (
     <div className="grid gap-1.5">
       <Label htmlFor="name">Name</Label>
@@ -93,10 +82,7 @@ export function NameField({
 export function DescriptionField({
   value,
   onChange,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-}) {
+}: { value: string; onChange: (v: string) => void }) {
   return (
     <div className="grid gap-1.5">
       <Label htmlFor="description">Description</Label>
@@ -140,7 +126,6 @@ export function CategoryStatusRow({
           </SelectContent>
         </Select>
       </div>
-
       <div className="grid gap-1.5">
         <Label htmlFor="status">Status</Label>
         <Select value={status} onValueChange={onStatusChange}>
@@ -243,8 +228,6 @@ export function JsonTextareaField({
   );
 }
 
-// ── Form action bar ─────────────────────────────────────────────────────────
-
 export function ResourceFormActions({
   mode,
   submitting,
@@ -268,7 +251,6 @@ export function ResourceFormActions({
         {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         {mode === "create" ? "Create" : "Save changes"}
       </Button>
-
       {mode === "edit" && (
         <AlertDialog>
           <AlertDialogTrigger asChild>
@@ -301,9 +283,6 @@ export function ResourceFormActions({
   );
 }
 
-// ── Utilities ───────────────────────────────────────────────────────────────
-
-/** Parses a JSON textarea value; throws with fieldName in the error message. */
 export function parseJsonField(text: string, fieldName: string): unknown {
   if (!text.trim()) return null;
   try {

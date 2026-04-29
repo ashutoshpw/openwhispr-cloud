@@ -5,12 +5,6 @@ import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 import type { ComponentType } from "react";
 
-/**
- * Shared sidebar primitives used by AdminSidebar, DashboardSideBar, and
- * AccountSidebar. All three implement the same two-pane drill-down pattern
- * with identical nav-link and drill-down-button UI.
- */
-
 export function SidebarNavLink({
   href,
   label,
@@ -67,14 +61,13 @@ export function SidebarGroupLabel({ title }: { title: string }) {
   );
 }
 
-/** Picks the most-specific active href from a list of candidate hrefs. */
 export function resolveMostSpecificActiveHref(
   pathname: string,
   hrefs: string[],
 ): string | null {
   const matches = hrefs.filter(
-    (href) => pathname === href || pathname.startsWith(`${href}/`),
+    (h) => pathname === h || pathname.startsWith(`${h}/`),
   );
-  if (matches.length === 0) return null;
+  if (!matches.length) return null;
   return matches.reduce((a, b) => (b.length > a.length ? b : a));
 }
