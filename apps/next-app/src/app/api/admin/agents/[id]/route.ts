@@ -1,4 +1,8 @@
-import { isSiteAdmin } from "@/lib/auth-utils";
+import {
+  parseBody,
+  pickAllowedFields,
+  requireSiteAdmin,
+} from "@/app/api/admin/_lib/resource-crud";
 import { agent, db, eq } from "@repo/database";
 import { NextResponse } from "next/server";
 
@@ -7,9 +11,8 @@ interface RouteParams {
 }
 
 export async function GET(_req: Request, { params }: RouteParams) {
-  if (!(await isSiteAdmin())) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+  const deny = await requireSiteAdmin();
+  if (deny) return deny;
   const { id } = await params;
   const [row] = await db()
     .select()
@@ -21,14 +24,12 @@ export async function GET(_req: Request, { params }: RouteParams) {
 }
 
 export async function PATCH(request: Request, { params }: RouteParams) {
-  if (!(await isSiteAdmin())) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+  const deny = await requireSiteAdmin();
+  if (deny) return deny;
   const { id } = await params;
-  const body = await request.json().catch(() => null);
-  if (!body || typeof body !== "object") {
-    return NextResponse.json({ error: "Invalid body" }, { status: 400 });
-  }
+  const bodyOrError = await parseBody(request);
+  if (bodyOrError instanceof NextResponse) return bodyOrError;
+
   const allowed = [
     "name",
     "description",
@@ -43,16 +44,11 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     "configSchema",
     "metadata",
   ] as const;
-  const update: Record<string, unknown> = {};
-  for (const key of allowed) {
-    if (key in body) {
-      const value = (body as Record<string, unknown>)[key];
-      if (key === "temperature" && typeof value === "number") {
-        update[key] = String(value);
-      } else {
-        update[key] = value;
-      }
-    }
+
+  const update = pickAllowedFields(bodyOrError, allowed);
+  // temperature is stored as string in the DB
+  if ("temperature" in update && typeof update.temperature === "number") {
+    update.temperature = String(update.temperature);
   }
   if (Object.keys(update).length === 0) {
     return NextResponse.json({ error: "No updatable fields" }, { status: 400 });
@@ -67,9 +63,8 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 }
 
 export async function DELETE(_req: Request, { params }: RouteParams) {
-  if (!(await isSiteAdmin())) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+  const deny = await requireSiteAdmin();
+  if (deny) return deny;
   const { id } = await params;
   await db().delete(agent).where(eq(agent.id, id));
   return NextResponse.json({ success: true });

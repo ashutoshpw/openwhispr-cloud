@@ -1,34 +1,21 @@
 "use client";
 
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { Loader2 } from "lucide-react";
+  CategoryStatusRow,
+  DescriptionField,
+  IconDocsUrlRow,
+  JsonTextareaField,
+  NameField,
+  ResourceFormActions,
+  SlugField,
+  SystemManagedCheckbox,
+  parseJsonField,
+} from "@/components/adminx/resource-form-fields";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
 const CATEGORIES = ["email", "crm", "analytics", "tools", "other"] as const;
-const STATUSES = ["active", "beta", "deprecated", "hidden"] as const;
 
 export type IntegrationFormInitial = {
   id?: string;
@@ -78,20 +65,8 @@ export function IntegrationForm({ mode, initial, installCount = 0 }: Props) {
     e.preventDefault();
     setSubmitting(true);
     try {
-      let configSchema: unknown = null;
-      let metadata: unknown = null;
-      try {
-        configSchema = configSchemaText.trim()
-          ? JSON.parse(configSchemaText)
-          : null;
-      } catch {
-        throw new Error("configSchema must be valid JSON");
-      }
-      try {
-        metadata = metadataText.trim() ? JSON.parse(metadataText) : null;
-      } catch {
-        throw new Error("metadata must be valid JSON");
-      }
+      const configSchema = parseJsonField(configSchemaText, "configSchema");
+      const metadata = parseJsonField(metadataText, "metadata");
 
       const body = {
         ...(mode === "create" ? { slug } : {}),
@@ -116,15 +91,10 @@ export function IntegrationForm({ mode, initial, installCount = 0 }: Props) {
         body: JSON.stringify(body),
       });
       const payload = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(payload?.error ?? "Save failed");
-      }
+      if (!res.ok) throw new Error(payload?.error ?? "Save failed");
       toast.success(mode === "create" ? "Integration created" : "Saved");
-      if (mode === "create") {
-        router.push(`/adminx/integrations/${payload.id}`);
-      } else {
-        router.refresh();
-      }
+      if (mode === "create") router.push(`/adminx/integrations/${payload.id}`);
+      else router.refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Save failed");
     } finally {
@@ -153,169 +123,59 @@ export function IntegrationForm({ mode, initial, installCount = 0 }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="grid gap-4">
-      <div className="grid gap-1.5">
-        <Label htmlFor="slug">Slug</Label>
-        <Input
-          id="slug"
-          value={slug}
-          onChange={(e) => setSlug(e.target.value)}
-          disabled={mode === "edit"}
-          required
-          pattern="[a-z0-9-]+"
-          placeholder="custom-mcp-server"
-        />
-        <p className="text-xs text-muted-foreground">
-          Lowercase letters, numbers, and dashes. Cannot be changed after
-          creation.
-        </p>
-      </div>
-
-      <div className="grid gap-1.5">
-        <Label htmlFor="name">Name</Label>
-        <Input
-          id="name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-      </div>
-
-      <div className="grid gap-1.5">
-        <Label htmlFor="description">Description</Label>
-        <Textarea
-          id="description"
-          value={description ?? ""}
-          onChange={(e) => setDescription(e.target.value)}
-          rows={2}
-        />
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="grid gap-1.5">
-          <Label htmlFor="category">Category</Label>
-          <Select value={category} onValueChange={setCategory}>
-            <SelectTrigger id="category">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {CATEGORIES.map((c) => (
-                <SelectItem key={c} value={c}>
-                  {c}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="grid gap-1.5">
-          <Label htmlFor="status">Status</Label>
-          <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger id="status">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {STATUSES.map((s) => (
-                <SelectItem key={s} value={s}>
-                  {s}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="grid gap-1.5">
-          <Label htmlFor="iconUrl">Icon URL</Label>
-          <Input
-            id="iconUrl"
-            value={iconUrl ?? ""}
-            onChange={(e) => setIconUrl(e.target.value)}
-            placeholder="https://…"
-          />
-        </div>
-        <div className="grid gap-1.5">
-          <Label htmlFor="docsUrl">Docs URL</Label>
-          <Input
-            id="docsUrl"
-            value={docsUrl ?? ""}
-            onChange={(e) => setDocsUrl(e.target.value)}
-            placeholder="https://…"
-          />
-        </div>
-      </div>
-
-      <label className="flex items-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          checked={isSystemManaged}
-          onChange={(e) => setIsSystemManaged(e.target.checked)}
-        />
-        System managed (cannot be uninstalled by users)
-      </label>
-
-      <div className="grid gap-1.5">
-        <Label htmlFor="configSchema">Config schema (JSON)</Label>
-        <Textarea
-          id="configSchema"
-          value={configSchemaText}
-          onChange={(e) => setConfigSchemaText(e.target.value)}
-          rows={10}
-          className="font-mono text-xs"
-        />
-      </div>
-
-      <div className="grid gap-1.5">
-        <Label htmlFor="metadata">Metadata (JSON)</Label>
-        <Textarea
-          id="metadata"
-          value={metadataText}
-          onChange={(e) => setMetadataText(e.target.value)}
-          rows={6}
-          className="font-mono text-xs"
-        />
-      </div>
-
-      <div className="flex items-center justify-between gap-3">
-        <Button type="submit" disabled={submitting}>
-          {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {mode === "create" ? "Create" : "Save changes"}
-        </Button>
-
-        {mode === "edit" && (
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button
-                type="button"
-                variant="destructive"
-                disabled={installCount > 0 || deleting}
-              >
-                {deleting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Delete
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete this integration?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  {installCount > 0
-                    ? `Cannot delete: ${installCount} installation(s) exist.`
-                    : "This action cannot be undone."}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  disabled={installCount > 0}
-                  onClick={handleDelete}
-                >
-                  Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
-      </div>
+      <SlugField
+        value={slug}
+        onChange={setSlug}
+        disabled={mode === "edit"}
+        placeholder="custom-mcp-server"
+      />
+      <NameField value={name} onChange={setName} />
+      <DescriptionField value={description ?? ""} onChange={setDescription} />
+      <CategoryStatusRow
+        categories={CATEGORIES}
+        category={category}
+        onCategoryChange={setCategory}
+        status={status}
+        onStatusChange={setStatus}
+      />
+      <IconDocsUrlRow
+        iconUrl={iconUrl ?? ""}
+        onIconUrlChange={setIconUrl}
+        docsUrl={docsUrl ?? ""}
+        onDocsUrlChange={setDocsUrl}
+      />
+      <SystemManagedCheckbox
+        checked={isSystemManaged}
+        onChange={setIsSystemManaged}
+        label="System managed (cannot be uninstalled by users)"
+      />
+      <JsonTextareaField
+        id="configSchema"
+        label="Config schema (JSON)"
+        value={configSchemaText}
+        onChange={setConfigSchemaText}
+        rows={10}
+      />
+      <JsonTextareaField
+        id="metadata"
+        label="Metadata (JSON)"
+        value={metadataText}
+        onChange={setMetadataText}
+        rows={6}
+      />
+      <ResourceFormActions
+        mode={mode}
+        submitting={submitting}
+        deleting={deleting}
+        deleteDisabled={installCount > 0}
+        deleteTitle="Delete this integration?"
+        deleteDescription={
+          installCount > 0
+            ? `Cannot delete: ${installCount} installation(s) exist.`
+            : "This action cannot be undone."
+        }
+        onDelete={handleDelete}
+      />
     </form>
   );
 }

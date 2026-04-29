@@ -1,24 +1,28 @@
-import { isSiteAdmin } from "@/lib/auth-utils";
+import {
+  normaliseStatus,
+  parseBody,
+  requireSiteAdmin,
+  validateResourceFields,
+} from "@/app/api/admin/_lib/resource-crud";
 import { agent, db } from "@repo/database";
 import { nanoid } from "nanoid";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  if (!(await isSiteAdmin())) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
+  const deny = await requireSiteAdmin();
+  if (deny) return deny;
   const rows = await db().select().from(agent);
   return NextResponse.json(rows);
 }
 
 export async function POST(request: Request) {
-  if (!(await isSiteAdmin())) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-  const body = await request.json().catch(() => null);
-  if (!body || typeof body !== "object") {
-    return NextResponse.json({ error: "Invalid body" }, { status: 400 });
-  }
+  const deny = await requireSiteAdmin();
+  if (deny) return deny;
+  const bodyOrError = await parseBody(request);
+  if (bodyOrError instanceof NextResponse) return bodyOrError;
+  const validationError = validateResourceFields(bodyOrError);
+  if (validationError) return validationError;
+
   const {
     slug,
     name,
@@ -33,42 +37,20 @@ export async function POST(request: Request) {
     temperature,
     configSchema,
     metadata,
-  } = body as Record<string, unknown>;
-
-  if (typeof slug !== "string" || !/^[a-z0-9-]+$/.test(slug)) {
-    return NextResponse.json(
-      { error: "slug must be lowercase alphanumeric with dashes" },
-      { status: 400 },
-    );
-  }
-  if (typeof name !== "string" || !name) {
-    return NextResponse.json({ error: "name is required" }, { status: 400 });
-  }
-  if (typeof category !== "string" || !category) {
-    return NextResponse.json(
-      { error: "category is required" },
-      { status: 400 },
-    );
-  }
+  } = bodyOrError;
 
   try {
     const [row] = await db()
       .insert(agent)
       .values({
         id: nanoid(),
-        slug,
-        name,
+        slug: slug as string,
+        name: name as string,
         description: typeof description === "string" ? description : null,
-        category,
+        category: category as string,
         iconUrl: typeof iconUrl === "string" ? iconUrl : null,
         docsUrl: typeof docsUrl === "string" ? docsUrl : null,
-        status:
-          status === "beta" ||
-          status === "deprecated" ||
-          status === "hidden" ||
-          status === "active"
-            ? status
-            : "active",
+        status: normaliseStatus(status),
         isSystemManaged: Boolean(isSystemManaged),
         systemPrompt: typeof systemPrompt === "string" ? systemPrompt : null,
         model: typeof model === "string" && model ? model : null,
