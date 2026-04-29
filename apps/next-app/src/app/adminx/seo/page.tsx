@@ -1,12 +1,12 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ensureSeoAccess } from "@/lib/seo-guard";
 import {
   findKeywordsWithStaleSnapshots,
   listKeywords,
-} from "@/lib/dal/seo/keywords";
-import { countPagesByStatus } from "@/lib/dal/seo/pages";
-import { getLatestSnapshotsWithDelta } from "@/lib/dal/seo/snapshots";
-import { ensureSeoAccess } from "@/lib/seo-guard";
+} from "@repo/database/dal/seo";
+import { countPagesByStatus } from "@repo/database/dal/seo";
+import { getLatestSnapshotsWithDelta } from "@repo/database/dal/seo";
 import { formatDistanceToNow } from "date-fns";
 import type { Metadata } from "next";
 import Link from "next/link";

@@ -6,7 +6,8 @@
   "packageManager": "bun@1.2.0",
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "turbo run dev --filter=@repo/next-app",
+    "dev:all": "turbo run dev",
     "build": "turbo run build",
     "start": "turbo run start",
     "lint": "turbo run lint",

@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { listCompetitors } from "@/lib/dal/seo/competitors";
 import { ensureSeoAccess } from "@/lib/seo-guard";
+import { listCompetitors } from "@repo/database/dal/seo";
 import { formatDistanceToNow } from "date-fns";
 import type { Metadata } from "next";
 import Link from "next/link";

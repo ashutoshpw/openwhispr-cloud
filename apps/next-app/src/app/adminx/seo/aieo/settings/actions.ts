@@ -1,7 +1,7 @@
 "use server";
 
-import { type AieoSettingKey, setSetting } from "@/lib/aieo/settings/store";
 import { ensureSeoAccess } from "@/lib/seo-guard";
+import { type AieoSettingKey, setSetting } from "@repo/durable-exec";
 import { revalidatePath } from "next/cache";
 
 export interface ActionResult {

@@ -1,16 +1,13 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getSetting } from "@/lib/aieo/settings/store";
-import { listEngines } from "@/lib/dal/seo/engines";
-import {
-  getShareOfVoice,
-  getWeeklySpendCents,
-} from "@/lib/dal/seo/prompt-snapshots";
+import { ensureSeoAccess } from "@/lib/seo-guard";
+import { listEngines } from "@repo/database/dal/seo";
+import { getShareOfVoice, getWeeklySpendCents } from "@repo/database/dal/seo";
 import {
   findPromptsWithStaleSnapshots,
   listPrompts,
-} from "@/lib/dal/seo/prompts";
-import { ensureSeoAccess } from "@/lib/seo-guard";
+} from "@repo/database/dal/seo";
+import { getSetting } from "@repo/durable-exec";
 import type { Metadata } from "next";
 import Link from "next/link";
 

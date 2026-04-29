@@ -1,8 +1,8 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getKeywordById } from "@/lib/dal/seo/keywords";
-import { listSnapshotsForKeyword } from "@/lib/dal/seo/snapshots";
 import { ensureSeoAccess } from "@/lib/seo-guard";
+import { getKeywordById } from "@repo/database/dal/seo";
+import { listSnapshotsForKeyword } from "@repo/database/dal/seo";
 import { format } from "date-fns";
 import { ExternalLink } from "lucide-react";
 import type { Metadata } from "next";

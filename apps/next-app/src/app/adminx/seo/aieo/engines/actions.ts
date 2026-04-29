@@ -1,7 +1,7 @@
 "use server";
 
-import { setEngineActive, setEngineModelId } from "@/lib/dal/seo/engines";
 import { ensureSeoAccess } from "@/lib/seo-guard";
+import { setEngineActive, setEngineModelId } from "@repo/database/dal/seo";
 import { revalidatePath } from "next/cache";
 
 export interface ActionResult {

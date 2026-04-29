@@ -6,7 +6,8 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./schema": "./src/schema.ts"
+    "./schema": "./src/schema.ts",
+    "./dal/seo": "./src/dal/seo/index.ts"
   },
   "scripts": {
     "db:generate": "drizzle-kit generate",

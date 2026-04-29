@@ -1,31 +1,17 @@
-import { inngest } from "@/lib/inngest/client";
-import { seoAioSnapshotFunction } from "@/lib/inngest/functions/seo/aio-snapshot";
-import { seoCompetitorRollupFunction } from "@/lib/inngest/functions/seo/competitor-rollup";
-import { seoGscSyncFunction } from "@/lib/inngest/functions/seo/gsc-sync";
-import { seoPosthogReferrerRollupFunction } from "@/lib/inngest/functions/seo/posthog-referrer-rollup";
-import { seoPromptSnapshotFunction } from "@/lib/inngest/functions/seo/prompt-snapshot";
-import { seoRankSnapshotFunction } from "@/lib/inngest/functions/seo/rank-snapshot";
-import { seoSecretValidationFunction } from "@/lib/inngest/functions/seo/secret-validation";
+import { allFunctions, inngest } from "@repo/durable-exec";
 import { serve } from "inngest/next";
-import type { NextRequest } from "next/server";
 
-type InngestHandler = (req: NextRequest) => Promise<Response>;
+type Handler = (req: Request) => Promise<Response>;
 
 const handler = serve({
   client: inngest,
-  functions: [
-    seoRankSnapshotFunction,
-    seoGscSyncFunction,
-    seoPromptSnapshotFunction,
-    seoAioSnapshotFunction,
-    seoSecretValidationFunction,
-    seoCompetitorRollupFunction,
-    seoPosthogReferrerRollupFunction,
-  ],
+  functions: allFunctions,
 }) as unknown as {
-  GET: InngestHandler;
-  POST: InngestHandler;
-  PUT: InngestHandler;
+  GET: Handler;
+  POST: Handler;
+  PUT: Handler;
 };
 
-export const { GET, POST, PUT } = handler;
+export const GET = (req: Request) => handler.GET(req);
+export const POST = (req: Request) => handler.POST(req);
+export const PUT = (req: Request) => handler.PUT(req);

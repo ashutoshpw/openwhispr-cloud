@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { listEngines } from "@/lib/dal/seo/engines";
 import { ensureSeoAccess } from "@/lib/seo-guard";
+import { listEngines } from "@repo/database/dal/seo";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { EngineRow } from "./EngineRow";

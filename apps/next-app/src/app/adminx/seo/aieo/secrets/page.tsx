@@ -1,10 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  type AieoSecretKey,
-  listMaskedSecrets,
-} from "@/lib/aieo/secrets/store";
 import { ensureSeoAccess } from "@/lib/seo-guard";
+import { type AieoSecretKey, listMaskedSecrets } from "@repo/durable-exec";
 import { formatDistanceToNow } from "date-fns";
 import type { Metadata } from "next";
 import Link from "next/link";

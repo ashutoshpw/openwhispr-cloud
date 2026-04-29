@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { listPrompts } from "@/lib/dal/seo/prompts";
 import { ensureSeoAccess } from "@/lib/seo-guard";
+import { listPrompts } from "@repo/database/dal/seo";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AddPromptForm } from "./AddPromptForm";

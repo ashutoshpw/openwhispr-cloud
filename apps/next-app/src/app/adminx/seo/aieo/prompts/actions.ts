@@ -1,12 +1,12 @@
 "use server";
 
+import { ensureSeoAccess } from "@/lib/seo-guard";
 import {
   archivePrompt,
   createPrompt,
   updatePrompt,
-} from "@/lib/dal/seo/prompts";
-import { inngest } from "@/lib/inngest/client";
-import { ensureSeoAccess } from "@/lib/seo-guard";
+} from "@repo/database/dal/seo";
+import { inngest } from "@repo/durable-exec";
 import { revalidatePath } from "next/cache";
 
 export interface ActionResult {

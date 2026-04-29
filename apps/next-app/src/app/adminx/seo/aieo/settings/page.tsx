@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { listSettings } from "@/lib/aieo/settings/store";
 import { ensureSeoAccess } from "@/lib/seo-guard";
+import { listSettings } from "@repo/durable-exec";
 import { formatDistanceToNow } from "date-fns";
 import type { Metadata } from "next";
 import Link from "next/link";

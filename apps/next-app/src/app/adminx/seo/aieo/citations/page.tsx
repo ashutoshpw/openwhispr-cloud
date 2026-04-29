@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { listCitationSnapshots } from "@/lib/dal/seo/prompt-snapshots";
 import { ensureSeoAccess } from "@/lib/seo-guard";
+import { listCitationSnapshots } from "@repo/database/dal/seo";
 import type { Metadata } from "next";
 import Link from "next/link";
 

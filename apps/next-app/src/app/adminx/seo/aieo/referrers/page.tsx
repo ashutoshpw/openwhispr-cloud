@@ -1,8 +1,8 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getBotCrawlTotals } from "@/lib/dal/seo/bot-hits";
-import { getReferrerTotals } from "@/lib/dal/seo/referrers";
 import { ensureSeoAccess } from "@/lib/seo-guard";
+import { getBotCrawlTotals } from "@repo/database/dal/seo";
+import { getReferrerTotals } from "@repo/database/dal/seo";
 import type { Metadata } from "next";
 import Link from "next/link";
 

@@ -6,7 +6,7 @@
  * Body: { date: string, userAgent: string, path: string, hits?: number }
  */
 
-import { upsertBotHit } from "@/lib/dal/seo/bot-hits";
+import { upsertBotHit } from "@repo/database/dal/seo";
 import type { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest): Promise<Response> {
