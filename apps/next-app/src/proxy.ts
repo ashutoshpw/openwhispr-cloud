@@ -1,3 +1,8 @@
+import {
+  createLinkHeader,
+  isMarkdownRequest,
+  isPublicMarkdownPath,
+} from "@/lib/agent-discovery";
 /**
  * Proxy for Better Auth
  *
@@ -134,6 +139,22 @@ export async function proxy(request: NextRequest) {
     });
   }
 
+  if (
+    request.method === "GET" &&
+    isMarkdownRequest(request) &&
+    isPublicMarkdownPath(pathname)
+  ) {
+    const response = NextResponse.rewrite(
+      new URL(
+        `/__agent_markdown?pathname=${encodeURIComponent(pathname)}`,
+        request.url,
+      ),
+    );
+    addCorsHeaders(response);
+    response.headers.set("Link", createLinkHeader(pathname));
+    return response;
+  }
+
   // Protected routes: dashboard, user-profile, onboarding
   if (
     pathname.startsWith("/dashboard") ||
@@ -205,6 +226,7 @@ export async function proxy(request: NextRequest) {
   // Default response with CORS headers
   const response = NextResponse.next();
   addCorsHeaders(response);
+  response.headers.set("Link", createLinkHeader(pathname));
   return response;
 }
 

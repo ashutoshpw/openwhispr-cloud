@@ -1,3 +1,4 @@
+import { absoluteUrl } from "@/lib/site-config";
 import { docsSource } from "@/lib/source";
 import type { TOCItemType } from "@repo/fumadocs";
 import {
@@ -54,5 +55,8 @@ export async function generateMetadata(props: {
   return {
     title: data.title,
     description: data.description,
+    alternates: {
+      canonical: absoluteUrl(`/docs/${params.slug?.join("/") ?? ""}`),
+    },
   };
 }

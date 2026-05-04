@@ -93,11 +93,20 @@ function getAuthConfig() {
   const baseURL =
     process.env.BETTER_AUTH_URL ||
     process.env.NEXT_PUBLIC_APP_URL ||
-    "http://localhost:3000";
+    (process.env.VERCEL_ENV === "production"
+      ? process.env.VERCEL_PROJECT_PRODUCTION_URL
+      : process.env.VERCEL_BRANCH_URL || process.env.VERCEL_URL);
   const secret =
     process.env.BETTER_AUTH_SECRET || "development-secret-change-me";
 
-  return { baseURL, secret };
+  return {
+    baseURL: baseURL
+      ? baseURL.startsWith("http")
+        ? baseURL
+        : `https://${baseURL}`
+      : "http://localhost:3000",
+    secret,
+  };
 }
 
 class BetterAuthServer {

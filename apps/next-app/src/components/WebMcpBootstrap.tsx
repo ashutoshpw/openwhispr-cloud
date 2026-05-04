@@ -1,0 +1,51 @@
+"use client";
+
+import Script from "next/script";
+
+export function WebMcpBootstrap() {
+  return (
+    <Script id="webmcp-bootstrap" strategy="afterInteractive">
+      {`
+        (function () {
+          const modelContext = navigator.modelContext;
+          if (!modelContext || typeof modelContext.provideContext !== 'function') {
+            return;
+          }
+
+          modelContext.provideContext({
+            tools: [
+              {
+                name: 'search_docs',
+                description: 'Navigate to the public documentation for this starter template.',
+                inputSchema: {
+                  type: 'object',
+                  properties: {
+                    path: {
+                      type: 'string',
+                      description: 'Optional docs path to open, such as /docs/getting-started.'
+                    }
+                  }
+                },
+                execute: async (input) => {
+                  const path = typeof input?.path === 'string' && input.path.startsWith('/docs')
+                    ? input.path
+                    : '/docs';
+                  return { url: path };
+                }
+              },
+              {
+                name: 'open_blog',
+                description: 'Open the public blog index for this starter template.',
+                inputSchema: {
+                  type: 'object',
+                  properties: {}
+                },
+                execute: async () => ({ url: '/blog' })
+              }
+            ]
+          });
+        })();
+      `}
+    </Script>
+  );
+}

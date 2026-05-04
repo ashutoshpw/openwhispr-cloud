@@ -1,8 +1,10 @@
 import { baseURL } from "@/../baseUrl";
 import Provider from "@/app/provider";
 import { NextChatSDKBootstrap } from "@/components/NextChatSDKBootstrap";
+import { WebMcpBootstrap } from "@/components/WebMcpBootstrap";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { absoluteUrl } from "@/lib/site-config";
 import { PostHogProvider } from "@repo/analytics";
 import { Analytics } from "@repo/analytics/vercel";
 import { GeistSans } from "geist/font/sans";
@@ -12,6 +14,10 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Nextjs 16 Starter Template",
   description: "Build your next SAAS product",
+  metadataBase: new URL(absoluteUrl("/")),
+  alternates: {
+    canonical: "/",
+  },
 };
 
 export default function RootLayout({
@@ -23,6 +29,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <NextChatSDKBootstrap baseUrl={baseURL} />
+        <WebMcpBootstrap />
       </head>
       <body className={GeistSans.className} suppressHydrationWarning>
         <PostHogProvider>

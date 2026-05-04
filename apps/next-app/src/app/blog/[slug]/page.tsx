@@ -1,3 +1,4 @@
+import { absoluteUrl } from "@/lib/site-config";
 import { blog } from "@/lib/source";
 import { defaultMdxComponents } from "@repo/fumadocs/components";
 import Image from "next/image";
@@ -74,5 +75,8 @@ export async function generateMetadata(props: {
   return {
     title: post.title,
     description: post.excerpt,
+    alternates: {
+      canonical: absoluteUrl(`/blog/${params.slug}`),
+    },
   };
 }

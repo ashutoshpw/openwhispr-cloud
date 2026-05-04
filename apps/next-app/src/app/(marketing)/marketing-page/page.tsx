@@ -5,7 +5,7 @@ import Link from "next/link";
 import React from "react";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://starter.rasmic.xyz"),
+  metadataBase: new URL("https://nextjs-starter-kit-app.vercel.app"),
   keywords: [""],
   title: "Marketing page",
   openGraph: {

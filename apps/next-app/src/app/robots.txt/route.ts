@@ -3,7 +3,10 @@
  */
 
 export async function GET(): Promise<Response> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://example.com";
+  const baseUrl =
+    process.env.BETTER_AUTH_URL ??
+    process.env.NEXT_PUBLIC_APP_URL ??
+    "https://nextjs-starter-kit-app.vercel.app";
 
   const body = `# AI crawlers — explicitly allowed for GEO/AIEO indexing
 User-agent: GPTBot
@@ -45,6 +48,7 @@ Disallow: /auth
 
 Host: ${baseUrl}
 Sitemap: ${baseUrl}/sitemap.xml
+Content-Signal: ai-train=no, search=yes, ai-input=no
 `;
 
   return new Response(body, {
