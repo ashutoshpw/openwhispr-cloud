@@ -7,6 +7,7 @@
  * auth provider to configure. Run `bun run init-auth` first if not done.
  */
 
+import { execFileSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
 import { copyFileSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -62,6 +63,54 @@ function maskValue(value: string, isSecret = false): string {
 function printUpdateWarning(key: string, oldValue: string, isSecret = false) {
   const masked = maskValue(oldValue, isSecret);
   console.log(`  ${colors.yellow}Current value: ${masked}${colors.reset}`);
+}
+
+function syncDevPort(appUrl: string): boolean {
+  try {
+    const url = new URL(appUrl);
+    if (!["localhost", "127.0.0.1"].includes(url.hostname)) return false;
+    const port = url.port || (url.protocol === "https:" ? "443" : "80");
+
+    const pkgPath = resolve(process.cwd(), "apps/next-app/package.json");
+    if (!existsSync(pkgPath)) return false;
+
+    const pkg = JSON.parse(readFileSync(pkgPath, "utf-8"));
+    const currentDev: string = pkg?.scripts?.dev ?? "";
+    const updated = currentDev.replace(/-p\s+\d+/, `-p ${port}`);
+
+    if (updated === currentDev) return false;
+
+    pkg.scripts.dev = updated;
+    writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`, "utf-8");
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function restoreRootDevScript(): boolean {
+  try {
+    const pkgPath = resolve(process.cwd(), "package.json");
+    if (!existsSync(pkgPath)) return false;
+
+    const pkg = JSON.parse(readFileSync(pkgPath, "utf-8"));
+    const devScript = "turbo run dev --filter=@repo/next-app";
+    if (pkg?.scripts?.dev === devScript) return false;
+
+    pkg.scripts.dev = devScript;
+    writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`, "utf-8");
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function commitAndTag(): void {
+  execFileSync("git", ["add", "-A"], { stdio: "inherit" });
+  execFileSync("git", ["commit", "-m", "chore: initial setup complete"], {
+    stdio: "inherit",
+  });
+  execFileSync("git", ["tag", "v0-setup-done"], { stdio: "inherit" });
 }
 
 function generateEnvContent(variables: EnvVariable[]): string {
@@ -366,10 +415,37 @@ async function main() {
   const content = generateEnvContent(newVariables);
   writeFileSync(envPath, content, "utf-8");
 
+  const portSynced = syncDevPort(appUrl);
+  const devRestored = restoreRootDevScript();
+
   console.log("");
   console.log(
     `${colors.green}${colors.bold}  ✅ Successfully wrote .env.local${colors.reset}`,
   );
+  if (portSynced) {
+    console.log(
+      `${colors.green}${colors.bold}  ✅ Updated apps/next-app/package.json dev port to match APP_URL${colors.reset}`,
+    );
+  }
+  if (devRestored) {
+    console.log(
+      `${colors.green}${colors.bold}  ✅ Restored root dev script${colors.reset}`,
+    );
+
+    console.log("");
+    const shouldCommit = await confirm({
+      message: "Commit all changes and tag as v0-setup-done?",
+      default: true,
+    });
+
+    if (shouldCommit) {
+      commitAndTag();
+      console.log("");
+      console.log(
+        `${colors.green}${colors.bold}  ✅ Committed and tagged as v0-setup-done${colors.reset}`,
+      );
+    }
+  }
   console.log("");
   console.log(`${colors.bold}  Next steps:${colors.reset}`);
   console.log(
@@ -383,14 +459,12 @@ async function main() {
   );
   console.log("");
   console.log(`${colors.bold}  Available routes:${colors.reset}`);
+  console.log(`    ${colors.dim}${appUrl}${colors.reset}          - Home page`);
   console.log(
-    `    ${colors.dim}http://localhost:8801${colors.reset}          - Home page`,
+    `    ${colors.dim}${appUrl}/dashboard${colors.reset} - User dashboard`,
   );
   console.log(
-    `    ${colors.dim}http://localhost:8801/dashboard${colors.reset} - User dashboard`,
-  );
-  console.log(
-    `    ${colors.dim}http://localhost:8801/adminx${colors.reset}    - Admin portal (requires site-admin role)`,
+    `    ${colors.dim}${appUrl}/adminx${colors.reset}    - Admin portal (requires site-admin role)`,
   );
   console.log("");
 }

@@ -6,7 +6,7 @@
   "packageManager": "bun@1.2.0",
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
-    "dev": "turbo run dev --filter=@repo/next-app",
+    "dev": "bun run scripts/dev-guard.ts",
     "dev:all": "turbo run dev",
     "build": "turbo run build",
     "start": "turbo run start",
