@@ -5,6 +5,10 @@ export * from "./schema-analytics";
 export * from "./schema-seo";
 export { db } from "./client";
 
+// DAL helpers
+export { getAdminStats } from "./dal/admin";
+export type { AdminStats } from "./dal/admin";
+
 // Re-export drizzle-orm operators for convenience
 export {
   eq,

@@ -34,6 +34,7 @@
     "@repo/durable-exec": "workspace:*",
     "@repo/fumadocs": "workspace:*",
     "@repo/mcp-server": "workspace:*",
+    "@repo/mcp-chatgpt": "workspace:*",
     "@stripe/stripe-js": "^3.4.0",
     "@tailwindcss/postcss": "^4.2.2",
     "@tanstack/react-query": "^4.35.3",

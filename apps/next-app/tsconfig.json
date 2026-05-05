@@ -31,6 +31,8 @@
       "@repo/fumadocs/*": ["../../packages/fumadocs/src/*"],
       "@repo/mcp-server": ["../../packages/mcp-server/src"],
       "@repo/mcp-server/*": ["../../packages/mcp-server/src/*"],
+      "@repo/mcp-chatgpt": ["../../packages/mcp-chatgpt/src"],
+      "@repo/mcp-chatgpt/*": ["../../packages/mcp-chatgpt/src/*"],
       "@repo/durable-exec": ["../../packages/durable-exec/src"],
       "@repo/durable-exec/*": ["../../packages/durable-exec/src/*"]
     }

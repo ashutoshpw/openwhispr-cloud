@@ -1,3 +1,4 @@
+import { registerMcpTool, wrapToolHandler } from "@repo/mcp-chatgpt";
 import { z } from "zod";
 import type { ContentWidget, McpServer, WidgetConfig } from "./types";
 
@@ -21,6 +22,9 @@ function widgetMeta(widget: ContentWidget) {
  *
  * Registers a content widget resource and a tool for displaying the
  * homepage content with a user's name via the Skybridge protocol.
+ *
+ * Tool annotations are injected automatically from the central
+ * MCP_TOOL_METADATA registry in @repo/mcp-chatgpt.
  */
 export async function registerWidgetTools(
   server: McpServer,
@@ -67,10 +71,10 @@ export async function registerWidgetTools(
     }),
   );
 
-  server.registerTool(
-    contentWidget.id,
+  registerMcpTool(
+    server,
+    "show_content",
     {
-      title: contentWidget.title,
       description:
         "Fetch and display the homepage content with the name of the user",
       inputSchema: {
@@ -80,11 +84,11 @@ export async function registerWidgetTools(
       },
       _meta: widgetMeta(contentWidget),
     },
-    async ({ name }) => {
+    wrapToolHandler("show_content", async ({ name }: { name: string }) => {
       return {
         content: [
           {
-            type: "text",
+            type: "text" as const,
             text: name,
           },
         ],
@@ -94,6 +98,6 @@ export async function registerWidgetTools(
         },
         _meta: widgetMeta(contentWidget),
       };
-    },
+    }),
   );
 }

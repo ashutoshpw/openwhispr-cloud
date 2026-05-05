@@ -1,35 +1,11 @@
 import { StatsCards } from "@/components/admin/StatsCards";
-import { db } from "@repo/database";
-import { gt, sql } from "@repo/database";
-import { organization, payments, session, user } from "@repo/database/schema";
+import { getAdminStats } from "@repo/database";
 import { Suspense } from "react";
 import { DashboardCharts } from "./(components)/DashboardCharts";
 
 async function getStats() {
   try {
-    const [totalUsers] = await db()
-      .select({ count: sql<number>`count(*)` })
-      .from(user);
-
-    const [totalOrganizations] = await db()
-      .select({ count: sql<number>`count(*)` })
-      .from(organization);
-
-    const [totalPayments] = await db()
-      .select({ count: sql<number>`count(*)` })
-      .from(payments);
-
-    const activeSessions = await db()
-      .select()
-      .from(session)
-      .where(gt(session.expiresAt, new Date()));
-
-    return {
-      totalUsers: Number(totalUsers.count),
-      totalOrganizations: Number(totalOrganizations.count),
-      totalPayments: Number(totalPayments.count),
-      activeSessions: activeSessions.length,
-    };
+    return await getAdminStats();
   } catch (error) {
     console.error("Error fetching stats:", error);
     return {

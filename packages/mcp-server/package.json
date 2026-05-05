@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@repo/database": "workspace:*",
+    "@repo/mcp-chatgpt": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.22.0",
     "mcp-handler": "^1.0.3",
     "zod": "^3.23.5"

@@ -1,7 +1,29 @@
-import { db, eq, sql } from "@repo/database";
+import { db, eq, getAdminStats, gt, sql } from "@repo/database";
 import { organization, payments, session, user } from "@repo/database/schema";
+import { registerMcpTool, wrapToolHandler } from "@repo/mcp-chatgpt";
 import { z } from "zod";
 import type { McpServer, RequireAdmin } from "./types";
+
+// ─── Response helpers ──────────────────────────────────────────────────────
+
+function mcpText(data: unknown) {
+  return {
+    content: [{ type: "text" as const, text: JSON.stringify(data, null, 2) }],
+  };
+}
+
+function mcpError(err: unknown) {
+  return {
+    content: [
+      {
+        type: "text" as const,
+        text: `Error: ${err instanceof Error ? err.message : "Unknown error"}`,
+      },
+    ],
+  };
+}
+
+// ─── Tool registration ─────────────────────────────────────────────────────
 
 /**
  * Register all admin MCP tools on the given server instance.
@@ -9,395 +31,240 @@ import type { McpServer, RequireAdmin } from "./types";
  * Each tool calls `requireAdmin` before executing to verify the caller
  * has admin privileges. The auth check is injected because it depends on
  * the Next.js request context (`headers()`), which is unavailable here.
+ *
+ * Tool annotations are injected automatically from the central
+ * MCP_TOOL_METADATA registry in @repo/mcp-chatgpt.
  */
 export function registerAdminTools(
   server: McpServer,
   requireAdmin: RequireAdmin,
 ): void {
-  server.tool(
+  registerMcpTool(
+    server,
     "get_admin_stats",
-    "Get comprehensive statistics about users, organizations, payments, and active sessions",
-    {},
-    async () => {
+    {
+      description:
+        "Get comprehensive statistics about users, organizations, payments, and active sessions",
+      inputSchema: {},
+    },
+    wrapToolHandler("get_admin_stats", async () => {
       try {
         await requireAdmin();
-
-        const [totalUsers] = await db()
-          .select({ count: sql<number>`count(*)` })
-          .from(user);
-
-        const [totalOrganizations] = await db()
-          .select({ count: sql<number>`count(*)` })
-          .from(organization);
-
-        const [totalPayments] = await db()
-          .select({ count: sql<number>`count(*)` })
-          .from(payments);
-
-        const activeSessions = await db()
-          .select()
-          .from(session)
-          .where(sql`${session.expiresAt} > NOW()`);
-
-        return {
-          content: [
-            {
-              type: "text",
-              text: JSON.stringify(
-                {
-                  totalUsers: Number(totalUsers.count),
-                  totalOrganizations: Number(totalOrganizations.count),
-                  totalPayments: Number(totalPayments.count),
-                  activeSessions: activeSessions.length,
-                },
-                null,
-                2,
-              ),
-            },
-          ],
-        };
-      } catch (error) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
-            },
-          ],
-        };
+        return mcpText(await getAdminStats());
+      } catch (err) {
+        return mcpError(err);
       }
-    },
+    }),
   );
 
-  server.tool(
+  registerMcpTool(
+    server,
     "get_user_by_email",
-    "Get user information by email address",
     {
-      email: z.string().email(),
+      description: "Get user information by email address",
+      inputSchema: { email: z.string().email() },
     },
-    async ({ email }) => {
-      try {
-        await requireAdmin();
-
-        const [foundUser] = await db()
-          .select()
-          .from(user)
-          .where(eq(user.email, email))
-          .limit(1);
-
-        if (!foundUser) {
-          return {
-            content: [
-              {
-                type: "text",
-                text: `User with email ${email} not found`,
-              },
-            ],
-          };
+    wrapToolHandler(
+      "get_user_by_email",
+      async ({ email }: { email: string }) => {
+        try {
+          await requireAdmin();
+          const [found] = await db()
+            .select()
+            .from(user)
+            .where(eq(user.email, email))
+            .limit(1);
+          return found
+            ? mcpText(found)
+            : mcpText(`User with email ${email} not found`);
+        } catch (err) {
+          return mcpError(err);
         }
-
-        return {
-          content: [
-            {
-              type: "text",
-              text: JSON.stringify(foundUser, null, 2),
-            },
-          ],
-        };
-      } catch (error) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
-            },
-          ],
-        };
-      }
-    },
+      },
+    ),
   );
 
-  server.tool(
+  registerMcpTool(
+    server,
     "get_user_by_id",
-    "Get user information by user ID",
     {
-      userId: z.string(),
+      description: "Get user information by user ID",
+      inputSchema: { userId: z.string() },
     },
-    async ({ userId }) => {
-      try {
-        await requireAdmin();
-
-        const [foundUser] = await db()
-          .select()
-          .from(user)
-          .where(eq(user.id, userId))
-          .limit(1);
-
-        if (!foundUser) {
-          return {
-            content: [
-              {
-                type: "text",
-                text: `User with ID ${userId} not found`,
-              },
-            ],
-          };
+    wrapToolHandler(
+      "get_user_by_id",
+      async ({ userId }: { userId: string }) => {
+        try {
+          await requireAdmin();
+          const [found] = await db()
+            .select()
+            .from(user)
+            .where(eq(user.id, userId))
+            .limit(1);
+          return found
+            ? mcpText(found)
+            : mcpText(`User with ID ${userId} not found`);
+        } catch (err) {
+          return mcpError(err);
         }
-
-        return {
-          content: [
-            {
-              type: "text",
-              text: JSON.stringify(foundUser, null, 2),
-            },
-          ],
-        };
-      } catch (error) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
-            },
-          ],
-        };
-      }
-    },
+      },
+    ),
   );
 
-  server.tool(
+  registerMcpTool(
+    server,
     "list_users",
-    "List all users with optional limit",
     {
-      limit: z.number().int().min(1).max(100).optional(),
+      description: "List all users with optional limit",
+      inputSchema: { limit: z.number().int().min(1).max(100).optional() },
     },
-    async ({ limit = 50 }) => {
-      try {
-        await requireAdmin();
-
-        const users = await db()
-          .select()
-          .from(user)
-          .orderBy(user.createdAt)
-          .limit(limit);
-
-        return {
-          content: [
-            {
-              type: "text",
-              text: JSON.stringify(users, null, 2),
-            },
-          ],
-        };
-      } catch (error) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
-            },
-          ],
-        };
-      }
-    },
-  );
-
-  server.tool(
-    "list_organizations",
-    "List all organizations with optional limit",
-    {
-      limit: z.number().int().min(1).max(100).optional(),
-    },
-    async ({ limit = 50 }) => {
-      try {
-        await requireAdmin();
-
-        const organizations = await db()
-          .select()
-          .from(organization)
-          .orderBy(organization.createdAt)
-          .limit(limit);
-
-        return {
-          content: [
-            {
-              type: "text",
-              text: JSON.stringify(organizations, null, 2),
-            },
-          ],
-        };
-      } catch (error) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
-            },
-          ],
-        };
-      }
-    },
-  );
-
-  server.tool(
-    "get_payment_records",
-    "Get payment records with optional limit",
-    {
-      limit: z.number().int().min(1).max(100).optional(),
-    },
-    async ({ limit = 50 }) => {
-      try {
-        await requireAdmin();
-
-        const paymentRecords = await db()
-          .select()
-          .from(payments)
-          .orderBy(payments.created_time)
-          .limit(limit);
-
-        return {
-          content: [
-            {
-              type: "text",
-              text: JSON.stringify(paymentRecords, null, 2),
-            },
-          ],
-        };
-      } catch (error) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
-            },
-          ],
-        };
-      }
-    },
-  );
-
-  server.tool(
-    "get_payments_by_email",
-    "Get payment records for a specific email address",
-    {
-      email: z.string().email(),
-      limit: z.number().int().min(1).max(100).optional(),
-    },
-    async ({ email, limit = 50 }) => {
-      try {
-        await requireAdmin();
-
-        const paymentRecords = await db()
-          .select()
-          .from(payments)
-          .where(eq(payments.email, email))
-          .orderBy(payments.created_time)
-          .limit(limit);
-
-        return {
-          content: [
-            {
-              type: "text",
-              text: JSON.stringify(paymentRecords, null, 2),
-            },
-          ],
-        };
-      } catch (error) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
-            },
-          ],
-        };
-      }
-    },
-  );
-
-  server.tool(
-    "get_active_sessions",
-    "Get all active user sessions",
-    {
-      limit: z.number().int().min(1).max(100).optional(),
-    },
-    async ({ limit = 50 }) => {
-      try {
-        await requireAdmin();
-
-        const activeSessions = await db()
-          .select()
-          .from(session)
-          .where(sql`${session.expiresAt} > NOW()`)
-          .orderBy(session.createdAt)
-          .limit(limit);
-
-        return {
-          content: [
-            {
-              type: "text",
-              text: JSON.stringify(activeSessions, null, 2),
-            },
-          ],
-        };
-      } catch (error) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
-            },
-          ],
-        };
-      }
-    },
-  );
-
-  server.tool(
-    "get_organization_by_id",
-    "Get organization information by organization ID",
-    {
-      organizationId: z.string(),
-    },
-    async ({ organizationId }) => {
-      try {
-        await requireAdmin();
-
-        const [foundOrg] = await db()
-          .select()
-          .from(organization)
-          .where(eq(organization.id, organizationId))
-          .limit(1);
-
-        if (!foundOrg) {
-          return {
-            content: [
-              {
-                type: "text",
-                text: `Organization with ID ${organizationId} not found`,
-              },
-            ],
-          };
+    wrapToolHandler(
+      "list_users",
+      async ({ limit = 50 }: { limit?: number }) => {
+        try {
+          await requireAdmin();
+          const rows = await db()
+            .select()
+            .from(user)
+            .orderBy(user.createdAt)
+            .limit(limit);
+          return mcpText(rows);
+        } catch (err) {
+          return mcpError(err);
         }
+      },
+    ),
+  );
 
-        return {
-          content: [
-            {
-              type: "text",
-              text: JSON.stringify(foundOrg, null, 2),
-            },
-          ],
-        };
-      } catch (error) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
-            },
-          ],
-        };
-      }
+  registerMcpTool(
+    server,
+    "list_organizations",
+    {
+      description: "List all organizations with optional limit",
+      inputSchema: { limit: z.number().int().min(1).max(100).optional() },
     },
+    wrapToolHandler(
+      "list_organizations",
+      async ({ limit = 50 }: { limit?: number }) => {
+        try {
+          await requireAdmin();
+          const rows = await db()
+            .select()
+            .from(organization)
+            .orderBy(organization.createdAt)
+            .limit(limit);
+          return mcpText(rows);
+        } catch (err) {
+          return mcpError(err);
+        }
+      },
+    ),
+  );
+
+  registerMcpTool(
+    server,
+    "get_payment_records",
+    {
+      description: "Get payment records with optional limit",
+      inputSchema: { limit: z.number().int().min(1).max(100).optional() },
+    },
+    wrapToolHandler(
+      "get_payment_records",
+      async ({ limit = 50 }: { limit?: number }) => {
+        try {
+          await requireAdmin();
+          const rows = await db()
+            .select()
+            .from(payments)
+            .orderBy(payments.created_time)
+            .limit(limit);
+          return mcpText(rows);
+        } catch (err) {
+          return mcpError(err);
+        }
+      },
+    ),
+  );
+
+  registerMcpTool(
+    server,
+    "get_payments_by_email",
+    {
+      description: "Get payment records for a specific email address",
+      inputSchema: {
+        email: z.string().email(),
+        limit: z.number().int().min(1).max(100).optional(),
+      },
+    },
+    wrapToolHandler(
+      "get_payments_by_email",
+      async ({ email, limit = 50 }: { email: string; limit?: number }) => {
+        try {
+          await requireAdmin();
+          const rows = await db()
+            .select()
+            .from(payments)
+            .where(eq(payments.email, email))
+            .orderBy(payments.created_time)
+            .limit(limit);
+          return mcpText(rows);
+        } catch (err) {
+          return mcpError(err);
+        }
+      },
+    ),
+  );
+
+  registerMcpTool(
+    server,
+    "get_active_sessions",
+    {
+      description: "Get all active user sessions",
+      inputSchema: { limit: z.number().int().min(1).max(100).optional() },
+    },
+    wrapToolHandler(
+      "get_active_sessions",
+      async ({ limit = 50 }: { limit?: number }) => {
+        try {
+          await requireAdmin();
+          const rows = await db()
+            .select()
+            .from(session)
+            .where(gt(session.expiresAt, new Date()))
+            .orderBy(session.createdAt)
+            .limit(limit);
+          return mcpText(rows);
+        } catch (err) {
+          return mcpError(err);
+        }
+      },
+    ),
+  );
+
+  registerMcpTool(
+    server,
+    "get_organization_by_id",
+    {
+      description: "Get organization information by organization ID",
+      inputSchema: { organizationId: z.string() },
+    },
+    wrapToolHandler(
+      "get_organization_by_id",
+      async ({ organizationId }: { organizationId: string }) => {
+        try {
+          await requireAdmin();
+          const [found] = await db()
+            .select()
+            .from(organization)
+            .where(eq(organization.id, organizationId))
+            .limit(1);
+          return found
+            ? mcpText(found)
+            : mcpText(`Organization with ID ${organizationId} not found`);
+        } catch (err) {
+          return mcpError(err);
+        }
+      },
+    ),
   );
 }

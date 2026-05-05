@@ -4,7 +4,9 @@
     "outDir": "./dist",
     "paths": {
       "@repo/database": ["../database/src"],
-      "@repo/database/*": ["../database/src/*"]
+      "@repo/database/*": ["../database/src/*"],
+      "@repo/mcp-chatgpt": ["../mcp-chatgpt/src"],
+      "@repo/mcp-chatgpt/*": ["../mcp-chatgpt/src/*"]
     }
   },
   "include": ["src/**/*.ts"],

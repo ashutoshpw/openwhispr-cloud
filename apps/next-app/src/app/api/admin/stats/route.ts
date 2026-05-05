@@ -1,8 +1,6 @@
 import { getSiteAdminStatus } from "@/lib/auth-utils";
 import { auth } from "@repo/auth/server";
-import { db } from "@repo/database";
-import { gt, sql } from "@repo/database";
-import { organization, payments, session, user } from "@repo/database/schema";
+import { getAdminStats } from "@repo/database";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -21,29 +19,8 @@ export async function GET() {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const [totalUsers] = await db()
-      .select({ count: sql<number>`count(*)` })
-      .from(user);
-
-    const [totalOrganizations] = await db()
-      .select({ count: sql<number>`count(*)` })
-      .from(organization);
-
-    const [totalPayments] = await db()
-      .select({ count: sql<number>`count(*)` })
-      .from(payments);
-
-    const activeSessions = await db()
-      .select()
-      .from(session)
-      .where(gt(session.expiresAt, new Date()));
-
-    return NextResponse.json({
-      totalUsers: Number(totalUsers.count),
-      totalOrganizations: Number(totalOrganizations.count),
-      totalPayments: Number(totalPayments.count),
-      activeSessions: activeSessions.length,
-    });
+    const stats = await getAdminStats();
+    return NextResponse.json(stats);
   } catch (error) {
     console.error("Error fetching stats:", error);
     return NextResponse.json(

@@ -44,6 +44,7 @@
         "@repo/database": "workspace:*",
         "@repo/durable-exec": "workspace:*",
         "@repo/fumadocs": "workspace:*",
+        "@repo/mcp-chatgpt": "workspace:*",
         "@repo/mcp-server": "workspace:*",
         "@stripe/stripe-js": "^3.4.0",
         "@tailwindcss/postcss": "^4.2.2",
@@ -193,12 +194,24 @@
         "typescript": "latest",
       },
     },
+    "packages/mcp-chatgpt": {
+      "name": "@repo/mcp-chatgpt",
+      "version": "0.0.0",
+      "dependencies": {
+        "@modelcontextprotocol/sdk": "^1.22.0",
+      },
+      "devDependencies": {
+        "@types/node": "^22.0.0",
+        "typescript": "latest",
+      },
+    },
     "packages/mcp-server": {
       "name": "@repo/mcp-server",
       "version": "0.0.0",
       "dependencies": {
         "@modelcontextprotocol/sdk": "^1.22.0",
         "@repo/database": "workspace:*",
+        "@repo/mcp-chatgpt": "workspace:*",
         "mcp-handler": "^1.0.3",
         "zod": "^3.23.5",
       },
@@ -786,6 +799,8 @@
     "@repo/durable-exec": ["@repo/durable-exec@workspace:packages/durable-exec"],
 
     "@repo/fumadocs": ["@repo/fumadocs@workspace:packages/fumadocs"],
+
+    "@repo/mcp-chatgpt": ["@repo/mcp-chatgpt@workspace:packages/mcp-chatgpt"],
 
     "@repo/mcp-server": ["@repo/mcp-server@workspace:packages/mcp-server"],
 
@@ -2446,6 +2461,10 @@
     "@repo/durable-exec/typescript": ["typescript@6.0.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw=="],
 
     "@repo/fumadocs/typescript": ["typescript@6.0.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw=="],
+
+    "@repo/mcp-chatgpt/@types/node": ["@types/node@22.19.8", "", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-ebO/Yl+EAvVe8DnMfi+iaAyIqYdK0q/q0y0rw82INWEKJOBe6b/P3YWE8NW7oOlF/nXFNrHwhARrN/hdgDkraA=="],
+
+    "@repo/mcp-chatgpt/typescript": ["typescript@6.0.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw=="],
 
     "@repo/mcp-server/@types/node": ["@types/node@22.19.8", "", { "dependencies": { "undici-types": "~6.21.0" } }, "sha512-ebO/Yl+EAvVe8DnMfi+iaAyIqYdK0q/q0y0rw82INWEKJOBe6b/P3YWE8NW7oOlF/nXFNrHwhARrN/hdgDkraA=="],
 
