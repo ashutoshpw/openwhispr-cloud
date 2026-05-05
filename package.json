@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "bun run scripts/dev-guard.ts",
     "dev:all": "turbo run dev",
+    "dev:ws": "turbo run dev",
     "build": "turbo run build",
     "start": "turbo run start",
     "lint": "turbo run lint",

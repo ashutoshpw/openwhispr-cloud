@@ -9,7 +9,7 @@
     "./next": "./src/next.ts"
   },
   "scripts": {
-    "dev": "inngest-cli dev -u http://localhost:8801/api/inngest --port 8288"
+    "dev": "bunx inngest-cli dev -u http://localhost:8801/api/inngest --port 8288"
   },
   "dependencies": {
     "@repo/database": "workspace:*",
