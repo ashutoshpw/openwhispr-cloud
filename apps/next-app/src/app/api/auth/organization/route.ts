@@ -1,5 +1,7 @@
 import { getBetterAuthServer } from "@repo/auth/server";
 import { auth } from "@repo/auth/server";
+import { db, eq } from "@repo/database";
+import { referrals } from "@repo/database/schema";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -67,6 +69,22 @@ export async function POST(request: Request) {
       body: { name, slug },
       headers: await headers(),
     });
+
+    // F3: Link referral record to the newly created organization (non-fatal)
+    const newOrgId: string | undefined =
+      result && typeof result === "object" && "id" in result
+        ? (result as { id: string }).id
+        : undefined;
+    if (newOrgId && session.user?.id) {
+      try {
+        await db()
+          .update(referrals)
+          .set({ refereeOrganizationId: newOrgId })
+          .where(eq(referrals.refereeId, session.user.id));
+      } catch (err) {
+        console.error("[onboarding] Failed to link referral org:", err);
+      }
+    }
 
     return createSuccessResponse(result);
   } catch (error) {

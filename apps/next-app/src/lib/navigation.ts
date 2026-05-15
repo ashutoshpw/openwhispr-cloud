@@ -5,6 +5,7 @@ import {
   ClipboardList,
   CreditCard,
   Folder,
+  Gift,
   HomeIcon,
   Plug,
   Settings,
@@ -42,6 +43,7 @@ export const workspaceNav: NavConfig = {
       items: [
         { label: "Home", icon: HomeIcon, segment: "" },
         { label: "Integrations", icon: Plug, segment: "~/integrations" },
+        { label: "Referrals", icon: Gift, segment: "~/referrals" },
       ],
     },
     {

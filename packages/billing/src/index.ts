@@ -80,3 +80,66 @@ export {
 } from "./middleware";
 export type { BillingMiddlewareResult } from "./middleware";
 export type { LogBillingEventParams } from "./audit";
+
+// Re-export pricing-plans (M3)
+export {
+  listPricingPlans,
+  getPricingPlan,
+  getPricingPlanByKey,
+  createPricingPlan,
+  updatePricingPlan,
+  deletePricingPlan,
+  reorderPricingPlans,
+  validateStripePriceId,
+} from "./pricing-plans";
+export type {
+  PricingPlan,
+  NewPricingPlan,
+  UpdatePricingPlanPatch,
+  ValidateStripePriceResult,
+} from "./pricing-plans";
+
+// Re-export referrals (M3)
+export {
+  REFERRAL_STATUS,
+  GRANT_STATUS,
+  generateReferralCodeString,
+  getReferralCodeByCode,
+  getReferralCodeForUser,
+  getOrCreateReferralCode,
+  isUserEligibleForReferralCode,
+  captureReferralIntent,
+  createReferral,
+  setRefereeOrganization,
+  transitionReferralStatus,
+  markReferralTrial,
+  setReferralRefundPeriod,
+  activateReferral,
+  cancelReferral,
+  resolveActiveReferralForCustomer,
+  getReferralStats,
+  recordCreditGrant,
+  applyCreditGrant,
+  rejectCreditGrant,
+  getReferralConfig,
+  updateReferralConfig,
+  adminListReferralCodes,
+  setReferralCodeActive,
+  adminListReferrals,
+  adminListCreditGrants,
+  getReferralMetrics,
+  activateRipeRefundPeriodReferrals,
+} from "./referrals";
+export type {
+  ReferralStatus,
+  GrantStatus,
+  CreateReferralOpts,
+  ReferralStats,
+  RecordCreditGrantOpts,
+} from "./referrals";
+export type {
+  ReferralConfig,
+  ReferralCode,
+  Referral,
+  ReferralCreditGrant,
+} from "@repo/database/schema";

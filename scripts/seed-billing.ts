@@ -1,6 +1,7 @@
 #!/usr/bin/env tsx
 /**
  * Seed default plan tiers and backfill org_billing rows for existing orgs.
+ * Also seeds referral config and pricing plan display fields.
  * Run with: bun run db:seed:billing
  *
  * Idempotent: safe to run multiple times.
@@ -9,6 +10,8 @@
 import { resolve } from "node:path";
 import { config } from "dotenv";
 import { colors } from "./lib/colors";
+import seedPricingPlans from "./seed-pricing-plans";
+import seedReferrals from "./seed-referrals";
 
 config({ path: resolve(process.cwd(), ".env.local") });
 
@@ -85,6 +88,10 @@ async function main() {
     `${colors.bold}  Summary:${colors.reset} ${tiersInserted} tier(s), ${billingInserted} org_billing row(s) inserted`,
   );
   console.log("");
+
+  // Seed referral config and pricing plan display fields
+  await seedReferrals();
+  await seedPricingPlans();
 }
 
 main().catch((error) => {

@@ -7,6 +7,7 @@ import {
   DollarSign,
   Filter,
   FolderKanban,
+  Gift,
   KeyRound,
   Layers,
   LayoutDashboard,
@@ -92,6 +93,8 @@ export const adminxNav: AdminNavConfig = {
           icon: Shield,
           href: "/adminx/billing/org-features",
         },
+        { label: "Pricing Page", icon: Package, href: "/adminx/pricing" },
+        { label: "Referrals", icon: Gift, href: "/adminx/referrals" },
       ],
     },
     {

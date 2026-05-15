@@ -4,38 +4,6 @@ import { planTier as planTierTable } from "@repo/database/schema";
 import type { PricingTier } from "../types";
 import { stripe } from "./client";
 
-/**
- * Load plan_tier rows and build a lookup keyed by both the raw key and a
- * normalized form (underscores stripped) so Stripe `metadata.plan_tier`
- * values like "tier_1" resolve to plan_tier.key "tier1".
- */
-async function loadPlanTierLookup(): Promise<
-  Map<
-    string,
-    { displayName: string; description: string | null; sortOrder: number }
-  >
-> {
-  const map = new Map<
-    string,
-    { displayName: string; description: string | null; sortOrder: number }
-  >();
-  try {
-    const rows = await db().select().from(planTierTable);
-    for (const row of rows) {
-      const entry = {
-        displayName: row.displayName,
-        description: row.description,
-        sortOrder: row.sortOrder,
-      };
-      map.set(row.key, entry);
-      map.set(row.key.replace(/_/g, ""), entry);
-    }
-  } catch (error) {
-    console.warn("Could not load plan_tier display names:", error);
-  }
-  return map;
-}
-
 const STRIPE_SCHEMA = process.env.STRIPE_SCHEMA ?? "stripe";
 
 async function tableExists(
@@ -384,127 +352,81 @@ const DEFAULT_PRICING_TIERS: PricingTier[] = [
 
 /**
  * Fetch pricing tiers for homepage display.
- * Returns products with their monthly/yearly prices, features, and display metadata.
- * Falls back to default tiers if Stripe is not configured.
+ *
+ * Reads from the admin-managed `plan_tier` table (the M3 source of truth).
+ * For each plan with a monthly/yearly Stripe price ID set, fetches the live
+ * unit amount from Stripe (preferring the synced `stripe.prices` table).
+ *
+ * Falls back to DEFAULT_PRICING_TIERS if no plans are configured.
  */
 export async function getPricingTiers(): Promise<PricingTier[]> {
   try {
-    // Fetch active products + plan_tier overrides in parallel
-    const [products, planTierLookup] = await Promise.all([
-      getStripeProducts({ active: true }),
-      loadPlanTierLookup(),
-    ]);
+    const plans = await db()
+      .select()
+      .from(planTierTable)
+      .orderBy(planTierTable.sortOrder);
 
-    if (!products || products.length === 0) {
-      console.warn("No active products found. Using default pricing tiers.");
+    const visible = plans.filter(
+      (p) =>
+        !p.hideFromPricing && (p.isPaid || p.isExclusive || p.key === "free"),
+    );
+
+    if (visible.length === 0) {
+      console.warn(
+        "No plan_tier rows configured. Using default pricing tiers.",
+      );
       return DEFAULT_PRICING_TIERS;
     }
 
-    const pricingTiers: PricingTier[] = [];
+    const tiers = await Promise.all(
+      visible.map(async (plan): Promise<PricingTier> => {
+        const [monthlyAmount, yearlyAmount] = await Promise.all([
+          plan.monthlyPriceId ? fetchPriceAmount(plan.monthlyPriceId) : null,
+          plan.yearlyPriceId ? fetchPriceAmount(plan.yearlyPriceId) : null,
+        ]);
 
-    for (const product of products) {
-      // Type the product properly
-      const productData = product as {
-        id: string;
-        name?: string;
-        description?: string;
-        metadata?: Record<string, string>;
-      };
+        const isContactPricing =
+          plan.isExclusive || (monthlyAmount === null && yearlyAmount === null);
 
-      const metadata: Record<string, string> = productData.metadata || {};
-
-      // Skip products not meant for public display
-      if (metadata.hide_from_pricing === "true") {
-        continue;
-      }
-
-      // Fetch prices for this product
-      const prices = await getStripePricesForProduct(productData.id);
-      const activePrices = Array.isArray(prices)
-        ? prices.filter((p: { active?: boolean }) => p.active !== false)
-        : [];
-
-      // Find monthly and yearly prices
-      let monthlyPrice: number | null = null;
-      let yearlyPrice: number | null = null;
-      let monthlyPriceId: string | null = null;
-      let yearlyPriceId: string | null = null;
-
-      for (const price of activePrices) {
-        const priceData = price as {
-          id: string;
-          unit_amount?: number | null;
-          recurring?: { interval?: string } | null;
-          metadata?: Record<string, string>;
+        return {
+          id: plan.id,
+          name: plan.displayName,
+          description: plan.description ?? "",
+          monthlyPrice: monthlyAmount,
+          yearlyPrice: yearlyAmount,
+          monthlyPriceId: plan.monthlyPriceId,
+          yearlyPriceId: plan.yearlyPriceId,
+          features: plan.features ?? [],
+          popular: plan.isPopular,
+          exclusive: plan.isExclusive || isContactPricing,
+          displayOrder: plan.sortOrder,
+          isContactPricing,
+          actionLabel:
+            plan.actionLabel ||
+            (isContactPricing ? "Contact Sales" : "Get Started"),
         };
+      }),
+    );
 
-        const interval = priceData.recurring?.interval;
-        const amount = priceData.unit_amount;
-
-        if (interval === "month" && amount != null) {
-          monthlyPrice = amount / 100;
-          monthlyPriceId = priceData.id;
-        } else if (interval === "year" && amount != null) {
-          yearlyPrice = amount / 100;
-          yearlyPriceId = priceData.id;
-        }
-      }
-
-      // Parse features from metadata (comma-separated or JSON array)
-      let features: string[] = [];
-      if (metadata.features) {
-        try {
-          features = JSON.parse(metadata.features);
-        } catch {
-          features = metadata.features.split(",").map((f: string) => f.trim());
-        }
-      }
-
-      // Determine if this is a contact-based pricing tier
-      const isContactPricing =
-        metadata.pricing_type === "contact" ||
-        (monthlyPrice === null && yearlyPrice === null);
-
-      const planTierKey = metadata.plan_tier;
-      const override = planTierKey
-        ? (planTierLookup.get(planTierKey) ??
-          planTierLookup.get(planTierKey.replace(/_/g, "")))
-        : undefined;
-
-      const tier: PricingTier = {
-        id: productData.id,
-        name: override?.displayName || productData.name || "Unnamed Plan",
-        description: override?.description || productData.description || "",
-        monthlyPrice,
-        yearlyPrice,
-        monthlyPriceId,
-        yearlyPriceId,
-        features,
-        popular: metadata.popular === "true",
-        exclusive: metadata.exclusive === "true" || isContactPricing,
-        displayOrder: metadata.display_order
-          ? Number.parseInt(metadata.display_order, 10)
-          : (override?.sortOrder ?? 99),
-        isContactPricing,
-        actionLabel: isContactPricing
-          ? metadata.action_label || "Contact Sales"
-          : metadata.action_label || "Get Started",
-      };
-
-      pricingTiers.push(tier);
-    }
-
-    if (pricingTiers.length === 0) {
-      console.warn("No displayable pricing tiers found. Using defaults.");
-      return DEFAULT_PRICING_TIERS;
-    }
-
-    // Sort by display order
-    pricingTiers.sort((a, b) => a.displayOrder - b.displayOrder);
-
-    return pricingTiers;
+    return tiers;
   } catch (error) {
     console.error("Error fetching pricing tiers:", error);
     return DEFAULT_PRICING_TIERS;
+  }
+}
+
+/**
+ * Best-effort fetch of a Stripe price's unit amount in major units (dollars).
+ * Returns null on any error; callers treat null as "contact pricing".
+ */
+async function fetchPriceAmount(priceId: string): Promise<number | null> {
+  try {
+    const price = await getStripePrice(priceId);
+    if (!price) return null;
+    const data = price as { unit_amount?: number | null; active?: boolean };
+    if (data.active === false) return null;
+    return data.unit_amount != null ? data.unit_amount / 100 : null;
+  } catch {
+    return null;
   }
 }

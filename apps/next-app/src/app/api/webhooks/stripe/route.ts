@@ -1,19 +1,22 @@
 import {
   ANALYTICS_EVENTS,
-  identifyServerUser,
   setServerUserProperties,
   trackServerEvent,
 } from "@repo/analytics";
 import {
   AUDIT_ACTIONS,
   ORG_STATUS,
+  applyCreditGrant,
+  cancelReferral,
+  getReferralConfig,
   logBillingEvent,
+  markReferralTrial,
+  recordCreditGrant,
+  resolveActiveReferralForCustomer,
+  setReferralRefundPeriod,
   updateOrganizationStatus,
 } from "@repo/billing";
-import {
-  activatePendingOrganization,
-  cancelPendingOrganization,
-} from "@repo/billing/stripe/checkout";
+import { cancelPendingOrganization } from "@repo/billing/stripe/checkout";
 import { stripe } from "@repo/billing/stripe/client";
 import type { Stripe } from "@repo/billing/stripe/client";
 import { stripeSync } from "@repo/billing/stripe/sync";
@@ -28,119 +31,7 @@ import { eq } from "@repo/database";
 import { organization, user } from "@repo/database/schema";
 import { revalidatePath } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
-
-/**
- * Handle checkout.session.completed event
- * Activates pending workspaces after successful checkout
- */
-async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
-  const orgId = session.metadata?.organizationId;
-  if (!orgId) {
-    console.log("[Webhook] No organizationId in checkout session metadata");
-    return;
-  }
-
-  // Activate the pending organization
-  await activatePendingOrganization(orgId);
-
-  // Determine if this is a trial or direct subscription
-  const subscription = session.subscription
-    ? await stripe.subscriptions.retrieve(session.subscription as string)
-    : null;
-
-  const isTrialing = subscription?.status === "trialing";
-  const action = isTrialing
-    ? AUDIT_ACTIONS.TRIAL_STARTED
-    : AUDIT_ACTIONS.SUBSCRIPTION_CREATED;
-
-  // Log the audit event
-  await logBillingEvent({
-    organizationId: orgId,
-    action,
-    toValue: subscription?.items?.data[0]?.price?.product as string,
-    metadata: {
-      subscriptionId: subscription?.id,
-      priceId: subscription?.items?.data[0]?.price?.id,
-      status: subscription?.status,
-      trialEnd: subscription?.trial_end,
-    },
-    performedBy: session.metadata?.userId || "system",
-  });
-
-  // Track analytics event for trial or subscription
-  const userId = session.metadata?.userId;
-  if (userId && subscription) {
-    const priceId = subscription.items?.data[0]?.price?.id;
-    const productId = subscription.items?.data[0]?.price?.product as string;
-
-    // Get user email for tracking
-    const userData = await db()
-      .select()
-      .from(user)
-      .where(eq(user.id, userId))
-      .limit(1);
-
-    const userEmail = userData[0]?.email || session.customer_email || "";
-    const userName = userData[0]?.name || "";
-
-    if (isTrialing) {
-      // Track trial started
-      const trialEndDate = subscription.trial_end
-        ? new Date(subscription.trial_end * 1000)
-        : null;
-
-      await trackServerEvent(ANALYTICS_EVENTS.USER_TRIAL_STARTED, userId, {
-        email: userEmail,
-        name: userName,
-        plan_id: productId,
-        plan_name: productId, // Product name not available here
-        trial_duration_days: trialEndDate
-          ? Math.ceil(
-              (trialEndDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24),
-            )
-          : 14,
-        trial_end_date: trialEndDate?.toISOString() || "",
-      });
-
-      // Update user properties
-      await setServerUserProperties(userId, {
-        plan_type: "trial",
-        trial_end_date: trialEndDate?.toISOString(),
-        subscription_status: "trialing",
-      });
-    } else {
-      // Track subscription created
-      const price = subscription.items?.data[0]?.price;
-      const billingPeriod =
-        price?.recurring?.interval === "year" ? "yearly" : "monthly";
-      const amount = (price?.unit_amount || 0) / 100;
-
-      await trackServerEvent(
-        ANALYTICS_EVENTS.USER_SUBSCRIPTION_CREATED,
-        userId,
-        {
-          email: userEmail,
-          name: userName,
-          plan_id: productId,
-          plan_name: productId,
-          billing_period: billingPeriod,
-          amount,
-          currency: price?.currency || "usd",
-        },
-      );
-
-      // Update user properties
-      await setServerUserProperties(userId, {
-        plan_type: "tier_1", // Approximate, would need to map product to tier
-        subscription_status: "active",
-      });
-    }
-  }
-
-  console.log(
-    `[Webhook] Activated workspace ${orgId} with ${isTrialing ? "trial" : "subscription"}`,
-  );
-}
+import { handleCheckoutCompleted } from "./_checkout-handlers";
 
 /**
  * Handle checkout.session.expired event
@@ -181,6 +72,19 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
   }
 
   await syncOrgBillingFromSubscription(org[0].id, subscription);
+
+  // Referral: if trial started, advance referral to "trial" status
+  if (subscription.status === "trialing") {
+    try {
+      const referral = await resolveActiveReferralForCustomer(customerId);
+      if (referral) {
+        await markReferralTrial(referral.id, subscription.id);
+        console.log(`[Webhook] Referral ${referral.id} advanced to trial`);
+      }
+    } catch (err) {
+      console.error("[Webhook] Referral trial hook failed:", err);
+    }
+  }
 
   console.log(`[Webhook] Subscription created for workspace ${org[0].id}`);
 }
@@ -338,6 +242,21 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 
   await syncOrgBillingOnSubscriptionDeleted(org[0].id, subscription);
 
+  // Referral: cancel any active referral
+  try {
+    const referral = await resolveActiveReferralForCustomer(customerId);
+    if (referral) {
+      await cancelReferral(
+        referral.id,
+        "subscription_deleted",
+        subscription.id,
+      );
+      console.log(`[Webhook] Referral ${referral.id} cancelled`);
+    }
+  } catch (err) {
+    console.error("[Webhook] Referral cancel hook failed:", err);
+  }
+
   console.log(`[Webhook] Subscription cancelled for workspace ${org[0].id}`);
 }
 
@@ -406,6 +325,34 @@ async function handlePaymentSucceeded(invoice: Stripe.Invoice) {
   });
 
   await syncOrgBillingOnPaymentSucceeded(org[0].id);
+
+  // Referral: on first paid invoice, advance to refund_period and create referrer credit grant
+  try {
+    const referral = await resolveActiveReferralForCustomer(customerId);
+    if (
+      referral &&
+      (referral.status === "pending" || referral.status === "trial")
+    ) {
+      await setReferralRefundPeriod(referral.id, invoice.id ?? undefined);
+      const cfg = await getReferralConfig();
+      if (cfg.enabled && cfg.referrerCreditAmount > 0) {
+        const grant = await recordCreditGrant({
+          referralId: referral.id,
+          recipientUserId: referral.referrerId,
+          recipientRole: "referrer",
+          amountCents: cfg.referrerCreditAmount,
+          currency: cfg.currency,
+          stripeInvoiceId: invoice.id ?? undefined,
+        });
+        if (grant && cfg.autoApply) {
+          await applyCreditGrant(grant.id);
+        }
+      }
+      console.log(`[Webhook] Referral ${referral.id} moved to refund_period`);
+    }
+  } catch (err) {
+    console.error("[Webhook] Referral payment hook failed:", err);
+  }
 
   // If workspace was in readonly due to payment issues, reactivate it
   if (org[0].status === ORG_STATUS.READONLY) {

@@ -7,7 +7,6 @@ import {
   serial,
   text,
   timestamp,
-  unique,
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -308,6 +307,7 @@ export const orgBilling = pgTable("org_billing", {
 
 // Billing: Plan tier registry - admin-managed display names for plan tier keys.
 // Lets admins rename "tier1" -> "Pro" without touching code.
+// Also stores public pricing-page display data (Stripe linkage, copy, features).
 export const planTier = pgTable("plan_tier", {
   id: text("id").primaryKey(),
   key: text("key").notNull().unique(), // e.g., "free", "tier1", "tier2"
@@ -315,6 +315,20 @@ export const planTier = pgTable("plan_tier", {
   description: text("description"),
   isPaid: boolean("is_paid").default(false).notNull(),
   sortOrder: integer("sort_order").default(0).notNull(),
+
+  // Pricing page display fields (M3)
+  stripeProductId: text("stripe_product_id"), // logical FK to stripe.products.id
+  monthlyPriceId: text("monthly_price_id"), // Stripe price ID
+  yearlyPriceId: text("yearly_price_id"), // Stripe price ID
+  monthlyDisplayPrice: text("monthly_display_price"), // e.g., "$24/month"
+  yearlyDisplayPrice: text("yearly_display_price"), // e.g., "$240/year"
+  costLabel: text("cost_label"), // e.g., "per user/month"
+  features: jsonb("features").$type<string[]>().default([]).notNull(),
+  isPopular: boolean("is_popular").default(false).notNull(),
+  isExclusive: boolean("is_exclusive").default(false).notNull(), // contact-pricing tier
+  actionLabel: text("action_label"), // "Get Started" / "Contact Sales"
+  hideFromPricing: boolean("hide_from_pricing").default(false).notNull(),
+
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
@@ -384,7 +398,9 @@ export const referralConfig = pgTable("referral_config", {
   referrerCreditAmount: integer("referrer_credit_amount").notNull(), // in cents
   refereeCreditAmount: integer("referee_credit_amount").notNull(), // in cents
   currency: varchar("currency", { length: 3 }).default("usd").notNull(),
-  minPlanTier: text("min_plan_tier").default("tier_1"), // minimum tier to get referral code
+  minPlanTier: text("min_plan_tier").default("tier1"), // minimum tier to get referral code
+  autoApply: boolean("auto_apply").default(false).notNull(), // auto-apply credit grants without admin approval
+  approvalWindowDays: integer("approval_window_days").default(30).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
@@ -445,103 +461,61 @@ export const referrals = pgTable(
   ],
 );
 
-// Type exports for referral tables
-export type ReferralConfig = typeof referralConfig.$inferSelect;
-export type NewReferralConfig = typeof referralConfig.$inferInsert;
-export type ReferralCode = typeof referralCodes.$inferSelect;
-export type NewReferralCode = typeof referralCodes.$inferInsert;
-export type Referral = typeof referrals.$inferSelect;
-export type NewReferral = typeof referrals.$inferInsert;
-
-// ============================================================================
-// OIDC Provider (Better Auth oidcProvider plugin)
-// ============================================================================
-
-export const oauthApplication = pgTable("oauth_application", {
+// Referral intents - staging row created when someone visits /r/[code], so the
+// post-signup hook can reconstruct the referral context from a cookie.
+export const referralIntents = pgTable("referral_intents", {
   id: text("id").primaryKey(),
-  name: text("name"),
-  icon: text("icon"),
-  metadata: text("metadata"),
-  clientId: text("client_id").unique(),
-  clientSecret: text("client_secret"),
-  redirectURLs: text("redirect_u_r_ls"),
-  type: text("type"),
-  disabled: boolean("disabled"),
-  userId: text("user_id"),
-  createdAt: timestamp("created_at"),
-  updatedAt: timestamp("updated_at"),
+  referralCode: varchar("referral_code", { length: 20 }).notNull(),
+  referrerId: text("referrer_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  status: text("status").default("pending").notNull(), // pending | claimed | expired
+  capturedAt: timestamp("captured_at").defaultNow().notNull(),
+  claimedAt: timestamp("claimed_at"),
+  claimedByUserId: text("claimed_by_user_id").references(() => user.id, {
+    onDelete: "set null",
+  }),
+  expiresAt: timestamp("expires_at"),
 });
 
-export const oauthAccessToken = pgTable("oauth_access_token", {
+// Referral lifecycle log - audit trail of every status transition on a referral.
+export const referralLifecycleLog = pgTable("referral_lifecycle_log", {
   id: text("id").primaryKey(),
-  accessToken: text("access_token").unique(),
-  refreshToken: text("refresh_token").unique(),
-  accessTokenExpiresAt: timestamp("access_token_expires_at"),
-  refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
-  clientId: text("client_id"),
-  userId: text("user_id"),
-  scopes: text("scopes"),
-  createdAt: timestamp("created_at"),
-  updatedAt: timestamp("updated_at"),
-});
-
-export const oauthConsent = pgTable("oauth_consent", {
-  id: text("id").primaryKey(),
-  clientId: text("client_id"),
-  userId: text("user_id"),
-  scopes: text("scopes"),
-  createdAt: timestamp("created_at"),
-  updatedAt: timestamp("updated_at"),
-  consentGiven: boolean("consent_given"),
-});
-
-export type OAuthApplication = typeof oauthApplication.$inferSelect;
-export type OAuthAccessToken = typeof oauthAccessToken.$inferSelect;
-export type OAuthConsent = typeof oauthConsent.$inferSelect;
-
-// ============================================================================
-// Integrations (registry + installations)
-// ============================================================================
-
-export const integration = pgTable("integration", {
-  id: text("id").primaryKey(),
-  slug: text("slug").notNull().unique(),
-  name: text("name").notNull(),
-  description: text("description"),
-  category: text("category").notNull(), // 'email', 'crm', 'analytics', 'tools', 'other'
-  iconUrl: text("icon_url"),
-  docsUrl: text("docs_url"),
-  status: text("status").notNull().default("active"), // active | beta | deprecated | hidden
-  isSystemManaged: boolean("is_system_managed").default(false).notNull(),
-  configSchema: jsonb("config_schema"), // JSON Schema for install form
-  metadata: jsonb("metadata"), // features, requirements, pricing, hidden, authType, etc
+  referralId: text("referral_id")
+    .notNull()
+    .references(() => referrals.id, { onDelete: "cascade" }),
+  fromStatus: text("from_status"),
+  toStatus: text("to_status").notNull(),
+  reason: text("reason"), // "stripe_webhook" | "admin_manual" | "cron" | etc.
+  stripeEventId: text("stripe_event_id"), // Stripe event ID for trace-back
+  metadata: jsonb("metadata"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .$onUpdate(() => new Date())
-    .notNull(),
 });
 
-export const integrationInstallation = pgTable(
-  "integration_installation",
+// Referral credit grants - idempotent ledger of credit applications.
+// Unique on (stripe_invoice_id, recipient_role) so duplicate webhook deliveries
+// can't double-credit. One referral can have multiple grants (referrer + referee).
+export const referralCreditGrants = pgTable(
+  "referral_credit_grants",
   {
     id: text("id").primaryKey(),
-    integrationId: text("integration_id")
+    referralId: text("referral_id")
       .notNull()
-      .references(() => integration.id, { onDelete: "cascade" }),
-    organizationId: text("organization_id")
+      .references(() => referrals.id, { onDelete: "cascade" }),
+    recipientUserId: text("recipient_user_id")
       .notNull()
-      .references(() => organization.id, { onDelete: "cascade" }),
-    projectId: text("project_id").references(() => project.id, {
-      onDelete: "cascade",
-    }),
-    displayName: text("display_name"),
-    configEncrypted: text("config_encrypted"),
-    configPublic: jsonb("config_public"),
-    status: text("status").notNull().default("active"), // active | error | disabled
-    lastVerifiedAt: timestamp("last_verified_at"),
-    lastError: text("last_error"),
-    isSystemManaged: boolean("is_system_managed").default(false).notNull(),
+      .references(() => user.id),
+    recipientRole: text("recipient_role").notNull(), // "referrer" | "referee"
+    amountCents: integer("amount_cents").notNull(),
+    currency: varchar("currency", { length: 3 }).notNull(),
+    stripeCustomerId: text("stripe_customer_id"), // resolved at apply time
+    stripeInvoiceId: text("stripe_invoice_id"), // null for referee signup credit
+    stripeBalanceTransactionId: text("stripe_balance_transaction_id"),
+    status: text("status").default("pending").notNull(),
+    // pending | applying | applied | failed | rejected
+    appliedAt: timestamp("applied_at"),
+    failureReason: text("failure_reason"),
+    rejectedReason: text("rejected_reason"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -549,52 +523,46 @@ export const integrationInstallation = pgTable(
       .notNull(),
   },
   (table) => [
-    unique("integration_installation_unique")
-      .on(
-        table.organizationId,
-        table.projectId,
-        table.integrationId,
-        table.displayName,
-      )
-      .nullsNotDistinct(),
-    index("integration_installation_org_idx").on(table.organizationId),
-    index("integration_installation_project_idx").on(table.projectId),
+    uniqueIndex("referral_credit_invoice_role_unique").on(
+      table.stripeInvoiceId,
+      table.recipientRole,
+    ),
+    index("referral_credit_referral_idx").on(table.referralId),
+    index("referral_credit_status_idx").on(table.status),
   ],
 );
 
-export type Integration = typeof integration.$inferSelect;
-export type NewIntegration = typeof integration.$inferInsert;
-export type IntegrationInstallation =
-  typeof integrationInstallation.$inferSelect;
-export type NewIntegrationInstallation =
-  typeof integrationInstallation.$inferInsert;
+// Type exports for referral tables
+export type ReferralConfig = typeof referralConfig.$inferSelect;
+export type NewReferralConfig = typeof referralConfig.$inferInsert;
+export type ReferralCode = typeof referralCodes.$inferSelect;
+export type NewReferralCode = typeof referralCodes.$inferInsert;
+export type Referral = typeof referrals.$inferSelect;
+export type NewReferral = typeof referrals.$inferInsert;
+export type ReferralIntent = typeof referralIntents.$inferSelect;
+export type NewReferralIntent = typeof referralIntents.$inferInsert;
+export type ReferralLifecycleLog = typeof referralLifecycleLog.$inferSelect;
+export type NewReferralLifecycleLog = typeof referralLifecycleLog.$inferInsert;
+export type ReferralCreditGrant = typeof referralCreditGrants.$inferSelect;
+export type NewReferralCreditGrant = typeof referralCreditGrants.$inferInsert;
 
-// BetterAuth two-factor plugin
-export const twoFactor = pgTable("two_factor", {
-  id: text("id").primaryKey(),
-  secret: text("secret").notNull(),
-  backupCodes: text("backup_codes").notNull(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-});
-
-// BetterAuth passkey plugin
-export const passkey = pgTable("passkey", {
-  id: text("id").primaryKey(),
-  name: text("name"),
-  publicKey: text("public_key").notNull(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  credentialID: text("credential_id").notNull(),
-  counter: integer("counter").notNull(),
-  deviceType: text("device_type").notNull(),
-  backedUp: boolean("backed_up").notNull(),
-  transports: text("transports"),
-  createdAt: timestamp("created_at").defaultNow(),
-  aaguid: text("aaguid"),
-});
-
-export type TwoFactor = typeof twoFactor.$inferSelect;
-export type Passkey = typeof passkey.$inferSelect;
+export {
+  oauthApplication,
+  oauthAccessToken,
+  oauthConsent,
+  integration,
+  integrationInstallation,
+  twoFactor,
+  passkey,
+} from "./schema-ext";
+export type {
+  OAuthApplication,
+  OAuthAccessToken,
+  OAuthConsent,
+  Integration,
+  NewIntegration,
+  IntegrationInstallation,
+  NewIntegrationInstallation,
+  TwoFactor,
+  Passkey,
+} from "./schema-ext";
