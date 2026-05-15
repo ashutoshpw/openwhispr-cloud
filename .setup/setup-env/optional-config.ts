@@ -1,6 +1,7 @@
 import { colors } from "../../scripts/lib/colors";
 import { printHeader } from "../../scripts/lib/log";
-import { confirm, input, password } from "../../scripts/lib/prompts";
+import { confirm, input, password, select } from "../../scripts/lib/prompts";
+import { teardownObjectStorage } from "./teardown-object-storage";
 import type { SetupVariableContext } from "./types";
 
 interface OptionalConfigParams extends SetupVariableContext {
@@ -135,6 +136,186 @@ export async function configureOptionalAndAdminVariables(
       });
     }
   }
+
+  // ── Object Storage ───────────────────────────────────────────────────────────
+
+  const existingStorageProvider = existingEnv.get("OBJECT_STORAGE_PROVIDER");
+  const hasExistingStorage = !!existingStorageProvider;
+
+  console.log("");
+  const configureStorage = await confirm({
+    message: `Configure object storage (file uploads)?${hasExistingStorage ? " (existing config found)" : ""}`,
+    default: hasExistingStorage,
+  });
+
+  if (configureStorage) {
+    console.log("");
+    const storageProvider = await select<string>({
+      message: "Object storage provider:",
+      choices: [
+        { value: "vercel-blob", name: "Vercel Blob (recommended)" },
+        { value: "s3", name: "Custom S3-compatible (AWS, R2, MinIO, etc.)" },
+      ],
+    });
+
+    if (storageProvider === "vercel-blob") {
+      console.log("");
+      console.log(
+        `${colors.dim}  Get your token from: ${colors.cyan}https://vercel.com/dashboard → Storage → Blob${colors.reset}`,
+      );
+      console.log("");
+
+      const existingBlobToken = existingEnv.get("BLOB_READ_WRITE_TOKEN");
+      if (existingBlobToken && isUpdating) {
+        printUpdateWarning("BLOB_READ_WRITE_TOKEN", existingBlobToken, true);
+      }
+      const blobToken = await password({
+        message: "Vercel Blob read-write token:",
+        mask: "*",
+      });
+
+      newVariables.push({
+        key: "OBJECT_STORAGE_PROVIDER",
+        value: "vercel-blob",
+        section: "Object Storage",
+      });
+      newVariables.push({
+        key: "BLOB_READ_WRITE_TOKEN",
+        value: blobToken || existingBlobToken || "",
+        section: "Object Storage",
+      });
+    } else {
+      console.log("");
+      console.log(
+        `${colors.dim}  Works with AWS S3, Cloudflare R2, MinIO, Backblaze B2, and any S3-compatible endpoint.${colors.reset}`,
+      );
+      console.log("");
+
+      const existingEndpoint = existingEnv.get("S3_ENDPOINT");
+      if (existingEndpoint && isUpdating)
+        printUpdateWarning("S3_ENDPOINT", existingEndpoint);
+      const s3Endpoint = await input({
+        message: "S3 endpoint URL (e.g. https://s3.amazonaws.com or R2 URL):",
+        default: existingEndpoint || "",
+        validate: (v) => (v.trim() ? true : "Endpoint is required"),
+      });
+
+      const existingRegion = existingEnv.get("S3_REGION");
+      if (existingRegion && isUpdating)
+        printUpdateWarning("S3_REGION", existingRegion);
+      const s3Region = await input({
+        message: "Region (e.g. us-east-1):",
+        default: existingRegion || "us-east-1",
+        validate: (v) => (v.trim() ? true : "Region is required"),
+      });
+
+      const existingAccessKey = existingEnv.get("S3_ACCESS_KEY_ID");
+      if (existingAccessKey && isUpdating)
+        printUpdateWarning("S3_ACCESS_KEY_ID", existingAccessKey, true);
+      const s3AccessKey = await input({
+        message: "Access Key ID:",
+        default: existingAccessKey || "",
+        validate: (v) => (v.trim() ? true : "Access Key ID is required"),
+      });
+
+      const existingSecretKey = existingEnv.get("S3_SECRET_ACCESS_KEY");
+      if (existingSecretKey && isUpdating)
+        printUpdateWarning("S3_SECRET_ACCESS_KEY", existingSecretKey, true);
+      const s3SecretKey = await password({
+        message: "Secret Access Key:",
+        mask: "*",
+        validate: (v) =>
+          !v || v.trim().length === 0 ? "Secret Access Key is required" : true,
+      });
+
+      const existingBucket = existingEnv.get("S3_BUCKET");
+      if (existingBucket && isUpdating)
+        printUpdateWarning("S3_BUCKET", existingBucket);
+      const s3Bucket = await input({
+        message: "Bucket name:",
+        default: existingBucket || "",
+        validate: (v) => (v.trim() ? true : "Bucket name is required"),
+      });
+
+      // Live connectivity test
+      console.log("");
+      console.log(`${colors.dim}  Verifying S3 credentials…${colors.reset}`);
+      try {
+        // Set env temporarily so validateS3Connection can read them
+        process.env.S3_ENDPOINT = s3Endpoint;
+        process.env.S3_REGION = s3Region;
+        process.env.S3_ACCESS_KEY_ID = s3AccessKey;
+        process.env.S3_SECRET_ACCESS_KEY =
+          s3SecretKey || existingSecretKey || "";
+        process.env.S3_BUCKET = s3Bucket;
+
+        const { validateS3Connection } = await import(
+          "../../packages/object-storage/src/providers/s3"
+        );
+        await validateS3Connection();
+        console.log(`${colors.green}  ✓ S3 connection verified${colors.reset}`);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.log(
+          `${colors.red}  ✗ S3 connection failed: ${msg}${colors.reset}`,
+        );
+        console.log(
+          `${colors.dim}  Check your credentials and try again. Saving anyway.${colors.reset}`,
+        );
+      }
+      console.log("");
+
+      newVariables.push({
+        key: "OBJECT_STORAGE_PROVIDER",
+        value: "s3",
+        section: "Object Storage",
+      });
+      newVariables.push({
+        key: "S3_ENDPOINT",
+        value: s3Endpoint,
+        section: "Object Storage",
+      });
+      newVariables.push({
+        key: "S3_REGION",
+        value: s3Region,
+        section: "Object Storage",
+      });
+      newVariables.push({
+        key: "S3_ACCESS_KEY_ID",
+        value: s3AccessKey,
+        section: "Object Storage",
+      });
+      newVariables.push({
+        key: "S3_SECRET_ACCESS_KEY",
+        value: s3SecretKey || existingSecretKey || "",
+        section: "Object Storage",
+      });
+      newVariables.push({
+        key: "S3_BUCKET",
+        value: s3Bucket,
+        section: "Object Storage",
+      });
+    }
+  } else if (hasExistingStorage && isUpdating) {
+    // Preserve existing object storage config when skipping
+    for (const key of [
+      "OBJECT_STORAGE_PROVIDER",
+      "BLOB_READ_WRITE_TOKEN",
+      "S3_ENDPOINT",
+      "S3_REGION",
+      "S3_ACCESS_KEY_ID",
+      "S3_SECRET_ACCESS_KEY",
+      "S3_BUCKET",
+    ]) {
+      const val = existingEnv.get(key);
+      if (val)
+        newVariables.push({ key, value: val, section: "Object Storage" });
+    }
+  } else if (!configureStorage && !isUpdating) {
+    teardownObjectStorage(process.cwd());
+  }
+
+  // ── Resend ───────────────────────────────────────────────────────────────────
 
   const existingResendApiKey = existingEnv.get("RESEND_API_KEY");
   const existingResendFromEmail = existingEnv.get("RESEND_FROM_EMAIL");

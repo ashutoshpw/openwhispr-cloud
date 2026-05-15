@@ -1,0 +1,19 @@
+{
+  "name": "@repo/object-storage",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@aws-lite/client": "^0.23.6",
+    "@aws-lite/s3": "^0.2.6",
+    "@vercel/blob": "^2.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "typescript": "latest"
+  }
+}

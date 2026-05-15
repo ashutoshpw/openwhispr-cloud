@@ -41,7 +41,7 @@
     "@tanstack/react-query-devtools": "^5.13.3",
     "@upstash/ratelimit": "^0.4.4",
     "@upstash/redis": "^1.24.2",
-    "@vercel/blob": "^2.3.3",
+    "@repo/object-storage": "workspace:*",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",

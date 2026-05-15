@@ -119,6 +119,32 @@ const BANNED_RULES: BannedRule[] = [
     reason: "Use @repo/billing instead",
     alternative: "@repo/billing",
   },
+  // Object Storage — only allowed in packages/object-storage
+  {
+    pattern: "@vercel/blob",
+    reason: "Use @repo/object-storage instead",
+    alternative: "@repo/object-storage",
+  },
+  {
+    pattern: "@aws-lite/client",
+    reason: "Use @repo/object-storage instead",
+    alternative: "@repo/object-storage",
+  },
+  {
+    pattern: "@aws-lite/*",
+    reason: "Use @repo/object-storage instead",
+    alternative: "@repo/object-storage",
+  },
+  {
+    pattern: "@aws-sdk/client-s3",
+    reason: "Use @repo/object-storage instead",
+    alternative: "@repo/object-storage",
+  },
+  {
+    pattern: "@aws-sdk/s3-*",
+    reason: "Use @repo/object-storage instead",
+    alternative: "@repo/object-storage",
+  },
 ];
 
 function getStagedFiles(): string[] {
@@ -154,8 +180,11 @@ interface Violation {
 }
 
 const stagedFiles = getStagedFiles();
-const packageJsonFiles = stagedFiles.filter((f) =>
-  /^apps\/[^/]+\/package\.json$/.test(f),
+const packageJsonFiles = stagedFiles.filter(
+  (f) =>
+    (/^apps\/[^/]+\/package\.json$/.test(f) ||
+      /^packages\/[^/]+\/package\.json$/.test(f)) &&
+    f !== "packages/object-storage/package.json",
 );
 
 const violations: Violation[] = [];
@@ -204,6 +233,9 @@ if (violations.length > 0) {
 
   console.error(
     "Add the dependency to the appropriate packages/* workspace package instead.",
+  );
+  console.error(
+    "Object storage libs (@vercel/blob, aws-lite, @aws-sdk/client-s3) belong exclusively in packages/object-storage.",
   );
   console.error("See AGENTS.md for the full list of package boundaries.\n");
 
