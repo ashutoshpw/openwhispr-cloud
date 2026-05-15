@@ -1,6 +1,6 @@
-import { colors } from "../lib/colors";
-import { printHeader } from "../lib/log";
-import { confirm, input, password } from "../lib/prompts";
+import { colors } from "../../scripts/lib/colors";
+import { printHeader } from "../../scripts/lib/log";
+import { confirm, input, password } from "../../scripts/lib/prompts";
 import type { AuthProvider, SetupVariableContext } from "./types";
 
 interface ProviderConfigParams extends SetupVariableContext {

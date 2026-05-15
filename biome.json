@@ -24,7 +24,8 @@
       "**/out/**",
       "**/drizzle/**",
       "**/.turbo/**",
-      "**/next-env.d.ts"
+      "**/next-env.d.ts",
+      ".setup/templates/**"
     ]
   }
 }

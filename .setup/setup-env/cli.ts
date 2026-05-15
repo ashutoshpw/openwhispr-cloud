@@ -1,5 +1,5 @@
+import { colors } from "../../scripts/lib/colors";
 import { AUTH_PROVIDERS, type AuthProvider } from "../auth-init/types";
-import { colors } from "../lib/colors";
 
 export interface CliFlags {
   provider?: AuthProvider;

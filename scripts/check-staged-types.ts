@@ -8,6 +8,13 @@ import ts from "typescript";
 const TYPE_EXTENSIONS = new Set([".ts", ".tsx", ".mts", ".cts"]);
 const cwd = process.cwd();
 
+const SKIP_PATH_PREFIXES = [".setup/templates/"];
+
+function isSkippedPath(filePath: string): boolean {
+  const normalized = filePath.replace(/\\/g, "/");
+  return SKIP_PATH_PREFIXES.some((prefix) => normalized.startsWith(prefix));
+}
+
 function runGitCommand(command: string): string {
   return execSync(command, { encoding: "utf8" }).trim();
 }
@@ -121,7 +128,7 @@ function checkFileGroup(tsconfigPath: string, stagedFiles: string[]): string[] {
 
 const stagedFiles = getStagedFiles();
 const stagedTypeFiles = stagedFiles.filter(
-  (file) => hasTypeExtension(file) && existsSync(file),
+  (file) => hasTypeExtension(file) && existsSync(file) && !isSkippedPath(file),
 );
 
 if (stagedTypeFiles.length === 0) {

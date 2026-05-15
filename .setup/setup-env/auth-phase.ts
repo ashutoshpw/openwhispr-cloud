@@ -1,5 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { colors } from "../../scripts/lib/colors";
+import { confirm, isAutoMode, select } from "../../scripts/lib/prompts";
 import {
   backupExistingFiles,
   copyTemplateFiles,
@@ -14,8 +16,6 @@ import {
   type LockFile as AuthLockFile,
   type AuthProvider,
 } from "../auth-init/types";
-import { colors } from "../lib/colors";
-import { confirm, isAutoMode, select } from "../lib/prompts";
 
 const ROOT_DIR = resolve(process.cwd());
 
@@ -23,7 +23,7 @@ export const AUTH_PATHS: AuthInitPaths = {
   rootDir: ROOT_DIR,
   lockFilePath: join(ROOT_DIR, ".auth-provider.lock"),
   backupDir: join(ROOT_DIR, ".auth-backup"),
-  templatesDir: join(ROOT_DIR, "templates", "auth"),
+  templatesDir: join(ROOT_DIR, ".setup", "templates", "auth"),
   providerFoldersToRemove: [
     join(ROOT_DIR, "packages", "auth", "src", "providers"),
     join(ROOT_DIR, "apps", "next-app", "src", "lib", "auth", "providers"),

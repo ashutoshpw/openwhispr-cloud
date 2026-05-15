@@ -13,15 +13,15 @@
 
 import { resolve } from "node:path";
 import { config } from "dotenv";
-import { colors } from "./lib/colors";
-import { printError, printWarning } from "./lib/log";
-import { runDatabaseMigrations } from "./stripe/migrations";
-import { createDefaultProducts } from "./stripe/products";
-import { printSummary, printWelcomeBanner } from "./stripe/summary";
-import { syncExistingData } from "./stripe/sync";
-import type { SetupResult } from "./stripe/types";
-import { verifyApiKeys } from "./stripe/verify";
-import { configureWebhook } from "./stripe/webhook";
+import { colors } from "../scripts/lib/colors";
+import { printError, printWarning } from "../scripts/lib/log";
+import { runDatabaseMigrations } from "../scripts/stripe/migrations";
+import { createDefaultProducts } from "../scripts/stripe/products";
+import { printSummary, printWelcomeBanner } from "../scripts/stripe/summary";
+import { syncExistingData } from "../scripts/stripe/sync";
+import type { SetupResult } from "../scripts/stripe/types";
+import { verifyApiKeys } from "../scripts/stripe/verify";
+import { configureWebhook } from "../scripts/stripe/webhook";
 
 config({ path: resolve(process.cwd(), ".env.local") });
 

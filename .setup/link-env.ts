@@ -10,7 +10,7 @@
 import { existsSync, lstatSync, symlinkSync, unlinkSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { colors } from "./lib/colors";
+import { colors } from "../scripts/lib/colors";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE = resolve(ROOT, ".env.local");

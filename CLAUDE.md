@@ -10,7 +10,7 @@ For the full workflow, see
 
 ## Running the dev server
 
-**Do not run `bun run dev`** — it's gated by `scripts/dev-guard.ts` and exits
+**Do not run `bun run dev`** — it's gated by `.setup/dev-guard.ts` and exits
 with "Setup required". Use one of these instead:
 
 - `bun run dev:all` — `turbo run dev` across every workspace (preferred)
@@ -40,7 +40,7 @@ Treat it as a destructive test command:
    ```
 4. Verify the dev-guard is back:
    ```bash
-   grep '"dev":' package.json   # must be "bun run scripts/dev-guard.ts"
+   grep '"dev":' package.json   # must be "bun run .setup/dev-guard.ts"
    ```
 
 `.env.local` is gitignored; setup merges into it without losing existing
@@ -48,7 +48,11 @@ values. Leave it or delete manually.
 
 ## Repo conventions
 
-- **Auth provider templates** live in `templates/auth/<provider>/`. Edit
+- **All initial-setup machinery lives in `.setup/`** (setup.ts, dev-guard,
+  templates, auth-init ops, setup-stripe/posthog/referral, link-env). It's
+  meant to be deleted by the end-user after first run; don't import from
+  `.setup/` outside `.setup/` itself.
+- **Auth provider templates** live in `.setup/templates/auth/<provider>/`. Edit
   them there — the live `packages/auth/src/providers/` folder gets deleted
   by setup for the chosen provider.
 - **Pre-commit hooks enforce**: 600-line max per code file

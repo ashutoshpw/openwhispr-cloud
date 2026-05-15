@@ -12,10 +12,16 @@
 
 import { copyFileSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { colors } from "./lib/colors";
-import { parseEnvFile } from "./lib/env";
-import { printHeader } from "./lib/log";
-import { confirm, input, isAutoMode, select, setAutoMode } from "./lib/prompts";
+import { colors } from "../scripts/lib/colors";
+import { parseEnvFile } from "../scripts/lib/env";
+import { printHeader } from "../scripts/lib/log";
+import {
+  confirm,
+  input,
+  isAutoMode,
+  select,
+  setAutoMode,
+} from "../scripts/lib/prompts";
 import { readProviderLock, runAuthPhaseIfNeeded } from "./setup-env/auth-phase";
 import {
   AUTH_PROVIDER_NAMES,

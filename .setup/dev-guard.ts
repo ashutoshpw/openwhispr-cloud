@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-import { colors } from "./lib/colors";
+import { colors } from "../scripts/lib/colors";
 
 console.log("");
 console.log(`${colors.yellow}${colors.bold}  ⚠  Setup required${colors.reset}`);

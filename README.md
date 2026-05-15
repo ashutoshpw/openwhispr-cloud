@@ -54,17 +54,22 @@ nextjs16-starter-kit/
 │       │   └── index.ts          # Exports
 │       └── drizzle.config.ts
 │
-├── scripts/                      # Root-level scripts
+├── .setup/                       # Initial-setup machinery (delete after first run)
 │   ├── setup.ts                  # Unified setup (auth provider init + .env.local)
+│   ├── setup-env/                # CLI args, auth phase, env helpers
+│   ├── auth-init/                # Template copy / package.json mutation ops
+│   ├── dev-guard.ts              # Blocks `bun run dev` until setup runs
+│   ├── setup-stripe.ts           # Stripe initial config
+│   ├── setup-posthog.ts          # PostHog initial config
+│   ├── setup-referral.ts         # Referral system initial config
+│   ├── link-env.ts               # Symlink .env.local across workspaces
+│   └── templates/                # Auth provider templates
+│       ├── auth/{better-auth,next-auth,authkit,clerk}/
+│       └── shared/
+│
+├── scripts/                      # Ongoing scripts (seed, checks, integrations)
 │   ├── seed-admin.ts             # Seed admin user
 │   └── ...
-│
-├── templates/                    # Auth provider templates
-│   └── auth/                     # Provider-specific templates
-│       ├── better-auth/
-│       ├── next-auth/
-│       ├── authkit/
-│       └── clerk/
 │
 ├── turbo.json                    # Turborepo config
 ├── package.json                  # Root workspace

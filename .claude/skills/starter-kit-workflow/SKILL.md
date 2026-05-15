@@ -3,18 +3,14 @@ name: starter-kit-workflow
 description: Development workflow for this Next.js starter kit. Use when working on the core project (features, fixes, refactors) — covers how to run the dev server without triggering the setup guard, how to test the unified `bun run setup` flow, and how to revert setup mutations so the repo stays in its pre-setup "template" state.
 metadata:
   pathPatterns:
-    - "scripts/setup.ts"
-    - "scripts/setup-env/**"
-    - "scripts/auth-init/**"
-    - "scripts/dev-guard.ts"
-    - "templates/auth/**"
+    - ".setup/**"
     - ".auth-provider.lock"
 ---
 
 # Starter-kit development workflow
 
 This repo is a **template kit**, not a deployed app. The default `bun run dev`
-intentionally fails — it routes through `scripts/dev-guard.ts` which prints
+intentionally fails — it routes through `.setup/dev-guard.ts` which prints
 "Setup required". That gate exists for end-users running the kit; **we are
 developing the kit itself**, so we work around it.
 
@@ -34,7 +30,7 @@ setup's final step rewrites the root `dev` script from the guard to
 
 ## Editing setup itself
 
-`scripts/setup.ts` is the unified entry point. It runs two phases:
+`.setup/setup.ts` is the unified entry point. It runs two phases:
 
 1. **Auth init** — if `.auth-provider.lock` is missing (or `--force`), it
    backs up `packages/auth` + `apps/next-app/src/lib/auth` to `.auth-backup/`,
@@ -50,10 +46,17 @@ bun run setup --yes --provider=better-auth
 bun run setup --help   # all flags + env-var override list
 ```
 
-The phase split lives in `scripts/setup-env/{cli,auth-phase,env-helpers}.ts`
-and `scripts/lib/prompts.ts` (auto-mode wrapper around inquirer). The hard
-600-line per-file limit (`scripts/check-max-lines.ts`) is enforced by the
-pre-commit hook — split files instead of fighting it.
+The phase split lives in `.setup/setup-env/{cli,auth-phase,env-helpers}.ts`
+and `scripts/lib/prompts.ts` (auto-mode wrapper around inquirer; stays in
+`scripts/` because it's shared with other tools). The hard 600-line per-file
+limit (`scripts/check-max-lines.ts`) is enforced by the pre-commit hook —
+split files instead of fighting it.
+
+**`.setup/` is meant to be deleted by the end-user after first run.** Don't
+import from `.setup/` outside `.setup/` itself — the folder must remain
+self-evicting. Shared helpers (`scripts/lib/`, `scripts/stripe/`,
+`scripts/posthog/`) stay in `scripts/`, and `.setup/` reaches into them via
+`../scripts/...` imports.
 
 ## Reverting a setup run
 
@@ -115,7 +118,7 @@ After either approach, verify:
 
 ```bash
 git status                 # should show only your intended changes
-grep '"dev":' package.json # must be "bun run scripts/dev-guard.ts"
+grep '"dev":' package.json # must be "bun run .setup/dev-guard.ts"
 ```
 
 If `package.json`'s `"dev"` is no longer the dev-guard, the revert was
@@ -151,7 +154,7 @@ it manually if you want a clean slate.
 - **Always use** `bun run dev:all` (or `dev:ws`) during core development.
 - **Treat `bun run setup` as a destructive test command.** Commit first,
   experiment second, reset back third.
-- **The auth provider templates** live in `templates/auth/<provider>/`. Edit
+- **The auth provider templates** live in `.setup/templates/auth/<provider>/`. Edit
   templates there, not in `packages/auth/src/providers/` (which gets deleted
   by setup for the chosen provider).
 - The pre-commit hook enforces `max-lines: 600` per file, biome formatting,

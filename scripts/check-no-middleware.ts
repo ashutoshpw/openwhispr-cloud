@@ -10,7 +10,14 @@
 
 import { execSync } from "node:child_process";
 
-const MIDDLEWARE_PATTERN = /(?:^|\/)middleware\.(ts|tsx|js|jsx|mts|cts|mjs|cjs)$/;
+const MIDDLEWARE_PATTERN =
+  /(?:^|\/)middleware\.(ts|tsx|js|jsx|mts|cts|mjs|cjs)$/;
+const SKIP_PATH_PREFIXES = [".setup/templates/"];
+
+function isSkippedPath(filePath: string): boolean {
+  const normalized = filePath.replace(/\\/g, "/");
+  return SKIP_PATH_PREFIXES.some((prefix) => normalized.startsWith(prefix));
+}
 
 function getStagedFiles(): string[] {
   const output = execSync("git diff --cached --name-only --diff-filter=ACMR", {
@@ -25,8 +32,8 @@ function getStagedFiles(): string[] {
     .filter(Boolean);
 }
 
-const violations = getStagedFiles().filter((file) =>
-  MIDDLEWARE_PATTERN.test(file),
+const violations = getStagedFiles().filter(
+  (file) => MIDDLEWARE_PATTERN.test(file) && !isSkippedPath(file),
 );
 
 if (violations.length > 0) {
@@ -38,11 +45,11 @@ if (violations.length > 0) {
     const proxy = file.replace(/middleware(\.[^.]+)$/, "proxy$1");
     console.error(`  x ${file}`);
     console.error(`    -> rename to: ${proxy}`);
-    console.error(`    -> rename exported function: middleware -> proxy`);
+    console.error("    -> rename exported function: middleware -> proxy");
   }
 
   console.error(
-    "\nNext.js 16 replaced the \"middleware\" convention with \"proxy\".",
+    '\nNext.js 16 replaced the "middleware" convention with "proxy".',
   );
   console.error(
     "See: https://nextjs.org/docs/app/guides/upgrading/version-16#middleware-to-proxy\n",

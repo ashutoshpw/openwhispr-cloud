@@ -13,17 +13,20 @@
 
 import { resolve } from "node:path";
 import { config } from "dotenv";
-import { colors } from "./lib/colors";
-import { printError } from "./lib/log";
-import { createEventActions } from "./posthog/actions";
-import { configureAppSettings, verifyCredentials } from "./posthog/credentials";
-import { printSummary, saveSetupSummary } from "./posthog/summary";
-import type { SetupResult } from "./posthog/types";
+import { colors } from "../scripts/lib/colors";
+import { printError } from "../scripts/lib/log";
+import { createEventActions } from "../scripts/posthog/actions";
+import {
+  configureAppSettings,
+  verifyCredentials,
+} from "../scripts/posthog/credentials";
+import { printSummary, saveSetupSummary } from "../scripts/posthog/summary";
+import type { SetupResult } from "../scripts/posthog/types";
 import {
   getEmailTemplateIds,
   setupEmailWorkflows,
   testIntegration,
-} from "./posthog/workflows";
+} from "../scripts/posthog/workflows";
 
 config({ path: resolve(process.cwd(), ".env.local") });
 

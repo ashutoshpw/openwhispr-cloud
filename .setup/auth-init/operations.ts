@@ -9,7 +9,10 @@ import {
   writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
-import { copyDirectoryRecursive, ensureDirectoryExists } from "../lib/fs";
+import {
+  copyDirectoryRecursive,
+  ensureDirectoryExists,
+} from "../../scripts/lib/fs";
 import type {
   AuthInitPaths,
   AuthProvider,

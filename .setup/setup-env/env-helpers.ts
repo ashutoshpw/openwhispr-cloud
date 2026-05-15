@@ -2,7 +2,7 @@ import { execFileSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
-import { colors } from "../lib/colors";
+import { colors } from "../../scripts/lib/colors";
 import type { EnvVariable } from "./types";
 
 export const SECRET_KEYS = [
