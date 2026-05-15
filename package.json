@@ -26,7 +26,6 @@
     "seed:seo:engines": "bun run scripts/seed-seo-engines.ts",
     "seed:seo:settings": "bun run scripts/seed-seo-settings.ts",
     "seed:seo:prompts": "bun run scripts/seed-seo-prompts.ts",
-    "init-auth": "bun run scripts/init-auth.ts",
     "setup": "bun run scripts/setup.ts",
     "env:link": "bun run scripts/link-env.ts",
     "setup:stripe": "bun run scripts/setup-stripe.ts",

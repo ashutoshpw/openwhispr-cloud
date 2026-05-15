@@ -55,8 +55,7 @@ nextjs16-starter-kit/
 │       └── drizzle.config.ts
 │
 ├── scripts/                      # Root-level scripts
-│   ├── init-auth.ts              # Auth provider initialization
-│   ├── setup.ts                  # Interactive setup
+│   ├── setup.ts                  # Unified setup (auth provider init + .env.local)
 │   ├── seed-admin.ts             # Seed admin user
 │   └── ...
 │
@@ -113,44 +112,48 @@ Follow the steps below to configure the starter and begin building your app.
    bun install
    ```
 
-3. **Initialize authentication provider (one-time, irreversible)**
-   ```bash
-   bun run init-auth
-   ```
-   
-   This prompts you to select your auth provider:
-   - `better-auth` (default) - Self-hosted, Organizations, Email/Password
-   - `next-auth` - Auth.js v5, JWT Sessions
-   - `authkit` - WorkOS, Enterprise SSO
-   - `clerk` - Managed, Pre-built UI
-   
-   > **Warning**: This choice is permanent. The script removes unused provider code and locks your selection. To change providers later, you must start fresh or use `--force` (which restores from backup if available).
-
-4. **Set up environment variables**
+3. **Run setup (auth provider + environment variables)**
    ```bash
    bun run setup
    ```
-   
-   The setup wizard will only show configuration for your chosen auth provider.
 
-5. **Push database schema**
+   The unified wizard:
+   1. Initializes your auth provider (one-time, irreversible). You'll choose:
+      - `better-auth` (default) - Self-hosted, Organizations, Email/Password
+      - `next-auth` - Auth.js v5, JWT Sessions
+      - `authkit` - WorkOS, Enterprise SSO
+      - `clerk` - Managed, Pre-built UI
+   2. Configures `.env.local` for the chosen provider plus optional services
+      (Stripe, Upstash, Resend, admin user).
+
+   > **Warning**: The auth provider choice is permanent. Re-run with `--force` to switch (backup is restored first).
+
+   **Headless / CI:**
+   ```bash
+   bun run setup --yes --provider=better-auth
+   ```
+   In `--yes` mode, prompts accept their defaults and optional services are
+   skipped unless their env vars (e.g. `STRIPE_SECRET_KEY`, `ADMIN_EMAIL`) are
+   exported. See `bun run setup --help` for the full list.
+
+4. **Push database schema**
    ```bash
    bun run db:push
    ```
 
-6. **Seed admin user (optional)**
+5. **Seed admin user (optional)**
    ```bash
    bun run db:seed
    ```
 
-7. **Start development server with TUI**
+6. **Start development server with TUI**
    ```bash
    bun run dev
    ```
-   
+
    This opens an interactive Terminal UI with a sidebar showing all running tasks.
 
-8. **Open your browser**
+7. **Open your browser**
    Navigate to http://localhost:8801
 
 ### Docker Setup (Alternative)
@@ -178,8 +181,9 @@ This starts PostgreSQL and the Next.js app with auto-schema push.
 | `bun run db:push` | Push schema to database |
 | `bun run db:studio` | Open Drizzle Studio GUI |
 | `bun run db:seed` | Seed admin user |
-| `bun run setup` | Interactive environment setup |
-| `bun run init-auth` | Initialize auth provider (one-time) |
+| `bun run setup` | Unified setup: auth provider init + environment variables |
+| `bun run setup --yes --provider=<name>` | Headless setup for CI |
+| `bun run setup --force` | Re-initialize the auth provider (dangerous) |
 
 ### Filtering to specific packages
 
@@ -232,7 +236,7 @@ DATABASE_URL=postgresql://postgres:postgres@localhost:5432/nextjs_starter
 NEXT_PUBLIC_APP_URL=http://localhost:8801
 
 # Provider-specific variables are configured during `bun run setup`
-# based on your chosen auth provider from `bun run init-auth`
+# based on the auth provider chosen during the setup wizard
 ```
 
 ## Authentication
@@ -241,7 +245,7 @@ This starter uses a **single auth provider architecture**. You choose your auth 
 
 ### Selecting Your Provider
 
-Run `bun run init-auth` to select from:
+Run `bun run setup` (or pass `--provider=<name>`) to select from:
 
 | Provider | Features | Best For |
 |----------|----------|----------|
@@ -266,10 +270,10 @@ The auth provider choice is **intentionally permanent** to keep the codebase cle
 ```bash
 # Option 1: Start fresh
 rm -rf .auth-provider.lock .auth-backup
-bun run init-auth
+bun run setup
 
 # Option 2: Force re-init (restores from backup first)
-bun run init-auth --force
+bun run setup --force
 ```
 
 ### Direct Provider Selection
@@ -277,10 +281,10 @@ bun run init-auth --force
 Skip the interactive prompt:
 
 ```bash
-bun run init-auth --provider=better-auth
-bun run init-auth --provider=next-auth
-bun run init-auth --provider=authkit
-bun run init-auth --provider=clerk
+bun run setup --provider=better-auth
+bun run setup --provider=next-auth
+bun run setup --provider=authkit
+bun run setup --provider=clerk
 ```
 
 ## Development Guidelines
@@ -349,14 +353,14 @@ docker run -p 8801:8801 nextjs-starter
 
 **"No auth provider lock file found"**
 ```bash
-# Run init-auth first
-bun run init-auth
+# Run setup — it initializes auth if .auth-provider.lock is missing
+bun run setup
 ```
 
 **"Auth provider already initialized"**
 ```bash
 # Use --force to re-initialize (will restore backup first)
-bun run init-auth --force
+bun run setup --force
 ```
 
 ### Dependency Issues

@@ -238,7 +238,7 @@ export async function configureOptionalAndAdminVariables(
 
   const configureAdmin = await confirm({
     message: `Create an admin user?${hasExistingAdmin ? " (existing config found)" : ""}`,
-    default: !hasExistingAdmin,
+    default: hasExistingAdmin,
   });
 
   if (configureAdmin) {
