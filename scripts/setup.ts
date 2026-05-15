@@ -302,11 +302,25 @@ async function main() {
       default: true,
     });
     if (shouldCommit) {
-      commitAndTag();
-      console.log("");
-      console.log(
-        `${colors.green}${colors.bold}  ✅ Committed and tagged as v0-setup-done${colors.reset}`,
-      );
+      try {
+        commitAndTag();
+        console.log("");
+        console.log(
+          `${colors.green}${colors.bold}  ✅ Committed and tagged as v0-setup-done${colors.reset}`,
+        );
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        console.log("");
+        console.log(
+          `${colors.yellow}${colors.bold}  ⚠ Auto-commit failed (likely a pre-commit hook).${colors.reset}`,
+        );
+        console.log(
+          `${colors.dim}    ${message.split("\n")[0]}${colors.reset}`,
+        );
+        console.log(
+          `${colors.dim}    Setup itself completed successfully — commit and tag manually when ready.${colors.reset}`,
+        );
+      }
     }
   }
 

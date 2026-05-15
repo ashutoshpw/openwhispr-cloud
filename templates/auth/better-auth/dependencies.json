@@ -17,7 +17,7 @@
     ],
     "devDependencies": {
       "add": {
-        "@types/bcryptjs": "^3.0.0"
+        "@types/bcryptjs": "^2.4.6"
       },
       "remove": []
     }
