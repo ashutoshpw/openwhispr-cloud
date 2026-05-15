@@ -54,7 +54,7 @@
     "lucide-react": "^0.279.0",
     "mcp-handler": "^1.0.3",
     "nanoid": "^5.0.7",
-    "next": "16.2.4",
+    "next": "16.2.6",
     "next-themes": "^0.3.0",
     "postcss": "^8.5.8",
     "qrcode": "^1.5.4",
