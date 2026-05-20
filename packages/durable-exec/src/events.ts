@@ -5,6 +5,18 @@
  */
 
 export type DurableEvents = {
+  /** Daily trial/subscription expiration → readonly workspaces */
+  "cron/billing-trial-expiration": {
+    data: Record<string, never>;
+  };
+  /** Daily cleanup of stale pending workspaces */
+  "cron/billing-cleanup-pending": {
+    data: Record<string, never>;
+  };
+  /** Daily activation of referrals past refund approval window */
+  "cron/billing-referral-window": {
+    data: Record<string, never>;
+  };
   /** Trigger a rank-snapshot run (optionally for a single keyword) */
   "cron/seo-rank-snapshot": {
     data: {

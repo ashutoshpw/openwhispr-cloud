@@ -1,3 +1,6 @@
+import { billingCleanupPendingFunction } from "./billing/functions/cleanup-pending";
+import { billingReferralWindowFunction } from "./billing/functions/referral-window";
+import { billingTrialExpirationFunction } from "./billing/functions/trial-expiration";
 import { seoAioSnapshotFunction } from "./seo/functions/aio-snapshot";
 import { seoCompetitorRollupFunction } from "./seo/functions/competitor-rollup";
 import { seoGscSyncFunction } from "./seo/functions/gsc-sync";
@@ -7,6 +10,9 @@ import { seoRankSnapshotFunction } from "./seo/functions/rank-snapshot";
 import { seoSecretValidationFunction } from "./seo/functions/secret-validation";
 
 export const allFunctions = [
+  billingTrialExpirationFunction,
+  billingCleanupPendingFunction,
+  billingReferralWindowFunction,
   seoRankSnapshotFunction,
   seoGscSyncFunction,
   seoPromptSnapshotFunction,

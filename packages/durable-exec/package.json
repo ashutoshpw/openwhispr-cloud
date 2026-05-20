@@ -12,6 +12,7 @@
     "dev": "bunx inngest-cli dev -u http://localhost:8801/api/inngest --port 8288"
   },
   "dependencies": {
+    "@repo/billing": "workspace:*",
     "@repo/database": "workspace:*",
     "google-auth-library": "^10.6.2",
     "inngest": "^4.2.4"

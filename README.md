@@ -334,11 +334,11 @@ See [CHATGPT_APPS_SDK.md](./apps/next-app/docs/CHATGPT_APPS_SDK.md) for details.
 
 ### Vercel
 
-The `vercel.json` is configured for monorepo deployment:
+The root [`vercel.json`](vercel.json) configures monorepo deployment (build/install/output). Scheduled jobs (billing, SEO) run via **Inngest** — see `@repo/durable-exec` and `/api/inngest`; do not use Vercel Cron.
 
 ```json
 {
-  "buildCommand": "bun run build",
+  "buildCommand": "bun run build --filter=@repo/next-app",
   "installCommand": "bun install",
   "framework": "nextjs",
   "outputDirectory": "apps/next-app/.next"

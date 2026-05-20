@@ -99,6 +99,16 @@ export type {
   ValidateStripePriceResult,
 } from "./pricing-plans";
 
+// Re-export billing cron runners (Inngest)
+export {
+  runTrialExpirationCheck,
+  type TrialExpirationResult,
+} from "./cron/trial-expiration";
+export {
+  runPendingOrganizationCleanup,
+  type PendingCleanupResult,
+} from "./cron/cleanup-pending";
+
 // Re-export referrals (M3)
 export {
   REFERRAL_STATUS,

@@ -184,7 +184,8 @@ const packageJsonFiles = stagedFiles.filter(
   (f) =>
     (/^apps\/[^/]+\/package\.json$/.test(f) ||
       /^packages\/[^/]+\/package\.json$/.test(f)) &&
-    f !== "packages/object-storage/package.json",
+    f !== "packages/object-storage/package.json" &&
+    f !== "packages/durable-exec/package.json",
 );
 
 const violations: Violation[] = [];

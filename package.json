@@ -41,6 +41,7 @@
     "check:no-middleware": "bun run scripts/check-no-middleware.ts",
     "check:banned-deps": "bun run scripts/check-banned-deps.ts",
     "check:root-md": "bun run scripts/check-root-md.ts",
+    "check:no-per-minute-cron": "bun run scripts/check-no-per-minute-cron.ts",
     "prepare": "husky"
   },
   "devDependencies": {

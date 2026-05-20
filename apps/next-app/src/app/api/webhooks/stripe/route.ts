@@ -237,7 +237,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   }
 
   // Note: We don't automatically downgrade to readonly here
-  // The trial-expiration cron job handles setting readonly status
+  // The Inngest billing-trial-expiration function handles setting readonly status
   // This allows for grace periods and proper handling
 
   await syncOrgBillingOnSubscriptionDeleted(org[0].id, subscription);

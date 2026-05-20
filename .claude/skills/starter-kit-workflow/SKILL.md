@@ -158,5 +158,6 @@ it manually if you want a clean slate.
   templates there, not in `packages/auth/src/providers/` (which gets deleted
   by setup for the chosen provider).
 - The pre-commit hook enforces `max-lines: 600` per file, biome formatting,
-  type-checking of staged TS, banned-deps, and "no middleware in next-app
-  except templates". Don't bypass with `--no-verify`.
+  type-checking of staged TS, banned-deps, no per-minute cron schedules,
+  and "no middleware in next-app except templates". Don't bypass with
+  `--no-verify`.
