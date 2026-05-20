@@ -61,6 +61,7 @@ function recordBotHit(pathname: string, userAgent: string, origin: string) {
 async function checkUserWorkspaces(
   request: NextRequest,
   userId: string,
+  tenantId: string,
 ): Promise<{ hasWorkspace: boolean; shouldSetCookie: boolean }> {
   // Check cookie cache first
   const cachedValue = request.cookies.get(HAS_WORKSPACE_COOKIE)?.value;
@@ -75,12 +76,12 @@ async function checkUserWorkspaces(
   try {
     const { db } = await import("@repo/database");
     const { member } = await import("@repo/database/schema");
-    const { eq } = await import("@repo/database");
+    const { and, eq } = await import("@repo/database");
 
     const userMembers = await db()
       .select({ organizationId: member.organizationId })
       .from(member)
-      .where(eq(member.userId, userId))
+      .where(and(eq(member.userId, userId), eq(member.tenantId, tenantId)))
       .limit(1);
 
     const hasWorkspace = userMembers.length > 0;
@@ -120,6 +121,16 @@ function addCorsHeaders(response: NextResponse): void {
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+  const { resolveTenantFromHost } = await import("@repo/database");
+  const tenant = await resolveTenantFromHost(request.headers.get("host")).catch(
+    (error) => {
+      console.error("[Proxy] Error resolving tenant:", error);
+      return null;
+    },
+  );
+  if (!tenant) {
+    return new NextResponse(null, { status: 404 });
+  }
 
   // AIEO: fire-and-forget bot-hit ingest for AI crawlers
   const ua = request.headers.get("user-agent") ?? "";
@@ -185,6 +196,7 @@ export async function proxy(request: NextRequest) {
       const { hasWorkspace, shouldSetCookie } = await checkUserWorkspaces(
         request,
         session.user.id,
+        tenant.id,
       );
 
       if (!hasWorkspace) {

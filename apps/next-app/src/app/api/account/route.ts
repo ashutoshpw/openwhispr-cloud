@@ -19,7 +19,7 @@ export async function GET() {
     .select({
       id: user.id,
       name: user.name,
-      email: user.email,
+      email: user.publicEmail,
       image: user.image,
       username: user.username,
     })
@@ -42,6 +42,14 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const userId = session.user.id;
+  const [currentUser] = await db()
+    .select({ tenantId: user.tenantId })
+    .from(user)
+    .where(eq(user.id, userId))
+    .limit(1);
+  if (!currentUser) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
 
   const body = await request.json().catch(() => null);
   if (!body || typeof body !== "object") {
@@ -105,7 +113,13 @@ export async function PATCH(request: Request) {
       const [conflict] = await db()
         .select({ id: user.id })
         .from(user)
-        .where(and(eq(user.username, normalized), ne(user.id, userId)))
+        .where(
+          and(
+            eq(user.tenantId, currentUser.tenantId),
+            eq(user.username, normalized),
+            ne(user.id, userId),
+          ),
+        )
         .limit(1);
       if (conflict) {
         return NextResponse.json(
@@ -129,7 +143,7 @@ export async function PATCH(request: Request) {
       .returning({
         id: user.id,
         name: user.name,
-        email: user.email,
+        email: user.publicEmail,
         image: user.image,
         username: user.username,
       });

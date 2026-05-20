@@ -15,7 +15,7 @@ async function getMembers() {
       userId: member.userId,
       organizationId: member.organizationId,
       userName: user.name,
-      userEmail: user.email,
+      userEmail: user.publicEmail,
       orgName: organization.name,
       orgSlug: organization.slug,
     })

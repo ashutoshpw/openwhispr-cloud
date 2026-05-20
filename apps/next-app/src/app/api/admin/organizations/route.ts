@@ -1,7 +1,7 @@
 import { getSiteAdminStatus } from "@/lib/auth-utils";
 import { auth } from "@repo/auth/server";
 import { ORG_STATUS } from "@repo/billing/constants";
-import { db, eq } from "@repo/database";
+import { and, db, eq } from "@repo/database";
 import { member, organization, project, user } from "@repo/database/schema";
 import { nanoid } from "nanoid";
 import { revalidatePath } from "next/cache";
@@ -52,10 +52,11 @@ export async function POST(request: Request) {
     const name = (body?.name ?? "").toString().trim();
     const slug = (body?.slug ?? "").toString().trim().toLowerCase();
     const ownerUserId = (body?.ownerUserId ?? "").toString();
+    const tenantId = (body?.tenantId ?? "default").toString().trim();
 
-    if (!name || !slug || !ownerUserId) {
+    if (!name || !slug || !ownerUserId || !tenantId) {
       return NextResponse.json(
-        { error: "name, slug, and ownerUserId are required" },
+        { error: "name, slug, ownerUserId, and tenantId are required" },
         { status: 400 },
       );
     }
@@ -71,7 +72,7 @@ export async function POST(request: Request) {
     const [owner] = await db()
       .select({ id: user.id })
       .from(user)
-      .where(eq(user.id, ownerUserId))
+      .where(and(eq(user.id, ownerUserId), eq(user.tenantId, tenantId)))
       .limit(1);
     if (!owner) {
       return NextResponse.json(
@@ -83,7 +84,9 @@ export async function POST(request: Request) {
     const existing = await db()
       .select({ id: organization.id })
       .from(organization)
-      .where(eq(organization.slug, slug))
+      .where(
+        and(eq(organization.tenantId, tenantId), eq(organization.slug, slug)),
+      )
       .limit(1);
     if (existing[0]) {
       return NextResponse.json(
@@ -95,18 +98,21 @@ export async function POST(request: Request) {
     const orgId = nanoid();
     await db().insert(organization).values({
       id: orgId,
+      tenantId,
       name,
       slug,
       status: ORG_STATUS.ACTIVE,
     });
     await db().insert(member).values({
       id: nanoid(),
+      tenantId,
       organizationId: orgId,
       userId: ownerUserId,
       role: "owner",
     });
     await db().insert(project).values({
       id: nanoid(),
+      tenantId,
       name: "Default Project",
       slug: "default",
       organizationId: orgId,

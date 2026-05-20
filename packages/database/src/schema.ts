@@ -10,27 +10,59 @@ import {
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
+import { tenant } from "./schema-tenant";
+export { planTier } from "./schema-plan-tier";
+export type { PlanTier, NewPlanTier } from "./schema-plan-tier";
+export { tenant, tenantDomain } from "./schema-tenant";
+export type {
+  Tenant,
+  NewTenant,
+  TenantDomain,
+  NewTenantDomain,
+} from "./schema-tenant";
 
 // BetterAuth tables
-export const user = pgTable("user", {
-  id: text("id").primaryKey(),
-  name: text("name").notNull(),
-  email: text("email").notNull().unique(),
-  emailVerified: boolean("email_verified").default(false).notNull(),
-  image: text("image"),
-  username: text("username").unique(),
-  role: text("role").notNull().default("user"),
-  twoFactorEnabled: boolean("two_factor_enabled").default(false).notNull(),
-  archivedAt: timestamp("archived_at"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .$onUpdate(() => new Date())
-    .notNull(),
-});
+export const user = pgTable(
+  "user",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id")
+      .notNull()
+      .default("default")
+      .references(() => tenant.id, { onDelete: "restrict" }),
+    name: text("name").notNull(),
+    publicEmail: text("public_email").notNull(),
+    email: text("email").notNull().unique(),
+    emailVerified: boolean("email_verified").default(false).notNull(),
+    image: text("image"),
+    username: text("username"),
+    role: text("role").notNull().default("user"),
+    twoFactorEnabled: boolean("two_factor_enabled").default(false).notNull(),
+    archivedAt: timestamp("archived_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("user_tenant_public_email_unique").on(
+      table.tenantId,
+      table.publicEmail,
+    ),
+    uniqueIndex("user_tenant_username_unique").on(
+      table.tenantId,
+      table.username,
+    ),
+  ],
+);
 
 export const session = pgTable("session", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id")
+    .notNull()
+    .default("default")
+    .references(() => tenant.id, { onDelete: "restrict" }),
   expiresAt: timestamp("expires_at").notNull(),
   token: text("token").notNull().unique(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -46,6 +78,10 @@ export const session = pgTable("session", {
 
 export const account = pgTable("account", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id")
+    .notNull()
+    .default("default")
+    .references(() => tenant.id, { onDelete: "restrict" }),
   accountId: text("account_id").notNull(),
   providerId: text("provider_id").notNull(),
   userId: text("user_id")
@@ -66,6 +102,10 @@ export const account = pgTable("account", {
 
 export const verification = pgTable("verification", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id")
+    .notNull()
+    .default("default")
+    .references(() => tenant.id, { onDelete: "cascade" }),
   identifier: text("identifier").notNull(),
   value: text("value").notNull(),
   expiresAt: timestamp("expires_at").notNull(),
@@ -93,32 +133,49 @@ export const payments = pgTable("payments", {
   currency: varchar("currency", { length: 10 }).notNull(),
 });
 
-export const organization = pgTable("organization", {
-  id: text("id").primaryKey(),
-  name: text("name").notNull(),
-  slug: text("slug").notNull().unique(),
-  logo: text("logo"),
-  stripeCustomerId: text("stripe_customer_id"),
-  status: text("status").notNull().default("active"), // pending | active | readonly | suspended
-  invoiceEmail: varchar("invoice_email", { length: 254 }),
-  companyName: varchar("company_name", { length: 64 }),
-  billingCountry: varchar("billing_country", { length: 2 }),
-  billingAddress: text("billing_address"),
-  invoiceLanguage: varchar("invoice_language", { length: 10 })
-    .notNull()
-    .default("en"),
-  invoicePurchaseOrder: varchar("invoice_purchase_order", { length: 64 }),
-  taxIdType: varchar("tax_id_type", { length: 32 }),
-  taxIdValue: varchar("tax_id_value", { length: 64 }),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .$onUpdate(() => new Date())
-    .notNull(),
-});
+export const organization = pgTable(
+  "organization",
+  {
+    id: text("id").primaryKey(),
+    tenantId: text("tenant_id")
+      .notNull()
+      .default("default")
+      .references(() => tenant.id, { onDelete: "restrict" }),
+    name: text("name").notNull(),
+    slug: text("slug").notNull(),
+    logo: text("logo"),
+    stripeCustomerId: text("stripe_customer_id"),
+    status: text("status").notNull().default("active"), // pending | active | readonly | suspended
+    invoiceEmail: varchar("invoice_email", { length: 254 }),
+    companyName: varchar("company_name", { length: 64 }),
+    billingCountry: varchar("billing_country", { length: 2 }),
+    billingAddress: text("billing_address"),
+    invoiceLanguage: varchar("invoice_language", { length: 10 })
+      .notNull()
+      .default("en"),
+    invoicePurchaseOrder: varchar("invoice_purchase_order", { length: 64 }),
+    taxIdType: varchar("tax_id_type", { length: 32 }),
+    taxIdValue: varchar("tax_id_value", { length: 64 }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("organization_tenant_slug_unique").on(
+      table.tenantId,
+      table.slug,
+    ),
+  ],
+);
 
 export const member = pgTable("member", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id")
+    .notNull()
+    .default("default")
+    .references(() => tenant.id, { onDelete: "restrict" }),
   organizationId: text("organization_id")
     .notNull()
     .references(() => organization.id, { onDelete: "cascade" }),
@@ -135,6 +192,10 @@ export const member = pgTable("member", {
 
 export const invitation = pgTable("invitation", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id")
+    .notNull()
+    .default("default")
+    .references(() => tenant.id, { onDelete: "cascade" }),
   organizationId: text("organization_id")
     .notNull()
     .references(() => organization.id, { onDelete: "cascade" }),
@@ -153,6 +214,10 @@ export const project = pgTable(
   "project",
   {
     id: text("id").primaryKey(),
+    tenantId: text("tenant_id")
+      .notNull()
+      .default("default")
+      .references(() => tenant.id, { onDelete: "restrict" }),
     name: text("name").notNull(),
     slug: text("slug").notNull(),
     description: text("description"),
@@ -305,37 +370,6 @@ export const orgBilling = pgTable("org_billing", {
     .notNull(),
 });
 
-// Billing: Plan tier registry - admin-managed display names for plan tier keys.
-// Lets admins rename "tier1" -> "Pro" without touching code.
-// Also stores public pricing-page display data (Stripe linkage, copy, features).
-export const planTier = pgTable("plan_tier", {
-  id: text("id").primaryKey(),
-  key: text("key").notNull().unique(), // e.g., "free", "tier1", "tier2"
-  displayName: text("display_name").notNull(), // e.g., "Free", "Pro", "Business"
-  description: text("description"),
-  isPaid: boolean("is_paid").default(false).notNull(),
-  sortOrder: integer("sort_order").default(0).notNull(),
-
-  // Pricing page display fields (M3)
-  stripeProductId: text("stripe_product_id"), // logical FK to stripe.products.id
-  monthlyPriceId: text("monthly_price_id"), // Stripe price ID
-  yearlyPriceId: text("yearly_price_id"), // Stripe price ID
-  monthlyDisplayPrice: text("monthly_display_price"), // e.g., "$24/month"
-  yearlyDisplayPrice: text("yearly_display_price"), // e.g., "$240/year"
-  costLabel: text("cost_label"), // e.g., "per user/month"
-  features: jsonb("features").$type<string[]>().default([]).notNull(),
-  isPopular: boolean("is_popular").default(false).notNull(),
-  isExclusive: boolean("is_exclusive").default(false).notNull(), // contact-pricing tier
-  actionLabel: text("action_label"), // "Get Started" / "Contact Sales"
-  hideFromPricing: boolean("hide_from_pricing").default(false).notNull(),
-
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .$onUpdate(() => new Date())
-    .notNull(),
-});
-
 // Personal API tokens for the user account (account-scoped, not org-scoped).
 // Used for hitting the public API and the MCP server.
 export const accountApiToken = pgTable("account_api_token", {
@@ -382,8 +416,6 @@ export type AppSetting = typeof appSettings.$inferSelect;
 export type NewAppSetting = typeof appSettings.$inferInsert;
 export type OrgBilling = typeof orgBilling.$inferSelect;
 export type NewOrgBilling = typeof orgBilling.$inferInsert;
-export type PlanTier = typeof planTier.$inferSelect;
-export type NewPlanTier = typeof planTier.$inferInsert;
 export type AccountApiToken = typeof accountApiToken.$inferSelect;
 export type NewAccountApiToken = typeof accountApiToken.$inferInsert;
 

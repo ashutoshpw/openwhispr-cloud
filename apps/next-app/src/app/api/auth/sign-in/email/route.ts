@@ -1,5 +1,6 @@
 import { ANALYTICS_EVENTS, trackServerEvent } from "@repo/analytics";
 import { baseServer } from "@repo/auth/server";
+import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -18,6 +19,7 @@ export async function POST(request: Request) {
     const authResponse = await baseServer.signInEmailResponse({
       email,
       password,
+      headers: await headers(),
     });
 
     // Best-effort analytics tracking — don't block sign-in on this.

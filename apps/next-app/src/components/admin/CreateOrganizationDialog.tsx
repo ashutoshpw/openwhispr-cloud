@@ -19,18 +19,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { User } from "@repo/database/schema";
+import type { Tenant, User } from "@repo/database/schema";
 import { Building2, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-export function CreateOrganizationDialog() {
+export function CreateOrganizationDialog({ tenants }: { tenants: Tenant[] }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [ownerUserId, setOwnerUserId] = useState("");
+  const [tenantId, setTenantId] = useState("default");
   const [users, setUsers] = useState<User[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -41,11 +42,12 @@ export function CreateOrganizationDialog() {
     fetch("/api/admin/users")
       .then((r) => r.json())
       .then((data) => {
-        if (Array.isArray(data)) setUsers(data);
+        if (Array.isArray(data))
+          setUsers(data.filter((user) => user.tenantId === tenantId));
       })
       .catch(() => {})
       .finally(() => setLoadingUsers(false));
-  }, [open]);
+  }, [open, tenantId]);
 
   function onNameChange(v: string) {
     setName(v);
@@ -71,6 +73,7 @@ export function CreateOrganizationDialog() {
           name: name.trim(),
           slug: slug.trim(),
           ownerUserId,
+          tenantId,
         }),
       });
       const data = await res.json();
@@ -83,6 +86,7 @@ export function CreateOrganizationDialog() {
       setName("");
       setSlug("");
       setOwnerUserId("");
+      setTenantId("default");
       router.refresh();
     } finally {
       setSubmitting(false);
@@ -106,6 +110,21 @@ export function CreateOrganizationDialog() {
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="create-org-tenant">Tenant</Label>
+            <Select value={tenantId} onValueChange={setTenantId}>
+              <SelectTrigger id="create-org-tenant">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {tenants.map((tenant) => (
+                  <SelectItem key={tenant.id} value={tenant.id}>
+                    {tenant.name} ({tenant.id})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
           <div className="space-y-2">
             <Label htmlFor="create-org-name">Name</Label>
             <Input
@@ -141,7 +160,7 @@ export function CreateOrganizationDialog() {
               <SelectContent>
                 {users.map((u) => (
                   <SelectItem key={u.id} value={u.id}>
-                    {u.name} · {u.email}
+                    {u.name} · {u.publicEmail}
                   </SelectItem>
                 ))}
               </SelectContent>

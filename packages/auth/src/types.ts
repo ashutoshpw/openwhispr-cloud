@@ -4,6 +4,7 @@
 
 export interface UnifiedUser {
   id: string;
+  tenantId?: string | null;
   email: string;
   name: string | null;
   image: string | null;

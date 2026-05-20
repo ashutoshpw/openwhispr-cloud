@@ -6,7 +6,12 @@ import { defineConfig } from "drizzle-kit";
 config({ path: resolve(__dirname, "../../.env.local") });
 
 export default defineConfig({
-  schema: ["./src/schema.ts", "./src/schema-agents.ts", "./src/schema-seo.ts"],
+  schema: [
+    "./src/schema.ts",
+    "./src/schema-agents.ts",
+    "./src/schema-ext.ts",
+    "./src/schema-seo.ts",
+  ],
   schemaFilter: ["public", "archived"],
   out: "./drizzle",
   dialect: "postgresql",

@@ -84,7 +84,13 @@ export default async function UserDetailPage({
               <dt className="text-sm font-medium text-muted-foreground">
                 Email
               </dt>
-              <dd>{user.email}</dd>
+              <dd>{user.publicEmail}</dd>
+            </div>
+            <div>
+              <dt className="text-sm font-medium text-muted-foreground">
+                Tenant
+              </dt>
+              <dd>{user.tenantId}</dd>
             </div>
             <div>
               <dt className="text-sm font-medium text-muted-foreground">

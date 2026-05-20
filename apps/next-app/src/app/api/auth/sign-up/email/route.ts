@@ -6,6 +6,7 @@ import {
 import { baseServer } from "@repo/auth/server";
 import { createReferral, getReferralCodeByCode } from "@repo/billing";
 import { cookies } from "next/headers";
+import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -25,6 +26,7 @@ export async function POST(request: Request) {
       email,
       password,
       name,
+      headers: await headers(),
     });
 
     // Best-effort analytics tracking — don't block sign-up on this.

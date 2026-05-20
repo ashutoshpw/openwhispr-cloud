@@ -10,6 +10,7 @@ import {
 } from "@repo/database/schema";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
+import { getCurrentTenant } from "../tenant";
 
 export type SessionUser = {
   id: string;
@@ -41,11 +42,17 @@ export async function requireOrganizationMembership(
   membership: Member;
 }> {
   const { user } = await requireSession(redirectTo);
+  const tenant = await getCurrentTenant();
 
   const [org] = await db()
     .select()
     .from(organization)
-    .where(eq(organization.slug, workspaceSlug))
+    .where(
+      and(
+        eq(organization.tenantId, tenant.id),
+        eq(organization.slug, workspaceSlug),
+      ),
+    )
     .limit(1);
   if (!org) notFound();
 

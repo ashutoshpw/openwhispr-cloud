@@ -8,7 +8,7 @@ import {
   timestamp,
   unique,
 } from "drizzle-orm/pg-core";
-import { organization, project, user } from "./schema";
+import { organization, project, tenant, user } from "./schema";
 
 // ============================================================================
 // OIDC Provider (Better Auth oidcProvider plugin)
@@ -16,6 +16,10 @@ import { organization, project, user } from "./schema";
 
 export const oauthApplication = pgTable("oauth_application", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id")
+    .notNull()
+    .default("default")
+    .references(() => tenant.id, { onDelete: "cascade" }),
   name: text("name"),
   icon: text("icon"),
   metadata: text("metadata"),
@@ -31,6 +35,10 @@ export const oauthApplication = pgTable("oauth_application", {
 
 export const oauthAccessToken = pgTable("oauth_access_token", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id")
+    .notNull()
+    .default("default")
+    .references(() => tenant.id, { onDelete: "cascade" }),
   accessToken: text("access_token").unique(),
   refreshToken: text("refresh_token").unique(),
   accessTokenExpiresAt: timestamp("access_token_expires_at"),
@@ -44,6 +52,10 @@ export const oauthAccessToken = pgTable("oauth_access_token", {
 
 export const oauthConsent = pgTable("oauth_consent", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id")
+    .notNull()
+    .default("default")
+    .references(() => tenant.id, { onDelete: "cascade" }),
   clientId: text("client_id"),
   userId: text("user_id"),
   scopes: text("scopes"),
@@ -129,6 +141,10 @@ export type NewIntegrationInstallation =
 // BetterAuth two-factor plugin
 export const twoFactor = pgTable("two_factor", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id")
+    .notNull()
+    .default("default")
+    .references(() => tenant.id, { onDelete: "cascade" }),
   secret: text("secret").notNull(),
   backupCodes: text("backup_codes").notNull(),
   userId: text("user_id")
@@ -139,6 +155,10 @@ export const twoFactor = pgTable("two_factor", {
 // BetterAuth passkey plugin
 export const passkey = pgTable("passkey", {
   id: text("id").primaryKey(),
+  tenantId: text("tenant_id")
+    .notNull()
+    .default("default")
+    .references(() => tenant.id, { onDelete: "cascade" }),
   name: text("name"),
   publicKey: text("public_key").notNull(),
   userId: text("user_id")

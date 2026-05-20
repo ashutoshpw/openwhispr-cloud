@@ -2,9 +2,10 @@ import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "./schema";
 import * as schemaAgents from "./schema-agents";
+import * as schemaExt from "./schema-ext";
 import * as schemaSeo from "./schema-seo";
 
-const mergedSchema = { ...schema, ...schemaAgents, ...schemaSeo };
+const mergedSchema = { ...schema, ...schemaAgents, ...schemaExt, ...schemaSeo };
 
 let db: ReturnType<typeof drizzle>;
 

@@ -4,6 +4,15 @@ export * from "./schema-agents";
 export * from "./schema-analytics";
 export * from "./schema-seo";
 export { db } from "./client";
+export {
+  DEFAULT_TENANT_ID,
+  buildTenantAuthEmail,
+  ensureDefaultTenant,
+  isLocalTenantHost,
+  normalizeTenantDomain,
+  readDefaultTenantSeedFromEnv,
+  resolveTenantFromHost,
+} from "./tenant";
 
 // DAL helpers
 export { getAdminStats } from "./dal/admin";

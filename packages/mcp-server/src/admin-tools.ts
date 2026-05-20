@@ -72,7 +72,7 @@ export function registerAdminTools(
           const [found] = await db()
             .select()
             .from(user)
-            .where(eq(user.email, email))
+            .where(eq(user.publicEmail, email))
             .limit(1);
           return found
             ? mcpText(found)

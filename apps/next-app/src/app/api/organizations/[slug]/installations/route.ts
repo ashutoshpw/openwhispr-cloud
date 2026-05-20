@@ -1,5 +1,6 @@
 import { createInstallation } from "@/lib/integrations/install";
 import { toSafeInstallation } from "@/lib/integrations/types";
+import { getCurrentTenant } from "@/lib/tenant";
 import { auth } from "@repo/auth/server";
 import { and, db, eq } from "@repo/database";
 import {
@@ -25,10 +26,13 @@ async function checkOrgMembership(
       error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }),
     };
   }
+  const tenant = await getCurrentTenant();
   const [org] = await db()
     .select()
     .from(organization)
-    .where(eq(organization.slug, slug))
+    .where(
+      and(eq(organization.tenantId, tenant.id), eq(organization.slug, slug)),
+    )
     .limit(1);
   if (!org) {
     return {

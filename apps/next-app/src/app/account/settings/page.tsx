@@ -11,7 +11,7 @@ export default async function AccountSettingsPage() {
     .select({
       id: user.id,
       name: user.name,
-      email: user.email,
+      email: user.publicEmail,
       image: user.image,
       username: user.username,
     })

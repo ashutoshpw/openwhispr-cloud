@@ -3,7 +3,7 @@ import {
   getOrgBilling,
   getPlanTierDisplay,
 } from "@repo/billing/get-org-billing";
-import { and, db, eq } from "@repo/database";
+import { and, db, eq, resolveTenantFromHost } from "@repo/database";
 import { member, organization } from "@repo/database/schema";
 import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
@@ -20,11 +20,15 @@ export async function GET(req: NextRequest) {
   if (!slug) {
     return NextResponse.json({ shouldShow: false });
   }
+  const tenant = await resolveTenantFromHost(req.headers.get("host"));
+  if (!tenant) return NextResponse.json({ shouldShow: false });
 
   const [org] = await db()
     .select()
     .from(organization)
-    .where(eq(organization.slug, slug))
+    .where(
+      and(eq(organization.tenantId, tenant.id), eq(organization.slug, slug)),
+    )
     .limit(1);
   if (!org) return NextResponse.json({ shouldShow: false });
 

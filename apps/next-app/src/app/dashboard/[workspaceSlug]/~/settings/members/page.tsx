@@ -1,3 +1,4 @@
+import { getCurrentTenant } from "@/lib/tenant";
 import { auth } from "@repo/auth/server";
 import { db } from "@repo/database";
 import { and, eq } from "@repo/database";
@@ -22,12 +23,18 @@ export default async function MembersPage({ params }: PageProps) {
       `/auth/sign-in?redirect=/dashboard/${workspaceSlug}/~/settings/members`,
     );
   }
+  const tenant = await getCurrentTenant();
 
   // Get organization by slug
   const org = await db()
     .select()
     .from(organization)
-    .where(eq(organization.slug, workspaceSlug))
+    .where(
+      and(
+        eq(organization.tenantId, tenant.id),
+        eq(organization.slug, workspaceSlug),
+      ),
+    )
     .limit(1);
 
   if (!org[0]) {
@@ -58,7 +65,7 @@ export default async function MembersPage({ params }: PageProps) {
       createdAt: member.createdAt,
       userId: member.userId,
       userName: user.name,
-      userEmail: user.email,
+      userEmail: user.publicEmail,
       userImage: user.image,
     })
     .from(member)

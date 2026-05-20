@@ -62,6 +62,7 @@ export const adminxNav: AdminNavConfig = {
           href: "/adminx/dashboard",
         },
         { label: "Users", icon: Users, href: "/adminx/users" },
+        { label: "Tenants", icon: Building2, href: "/adminx/tenants" },
         {
           label: "Organizations",
           icon: Building2,

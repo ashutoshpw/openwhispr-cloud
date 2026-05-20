@@ -1,3 +1,4 @@
+import { getCurrentTenant } from "@/lib/tenant";
 import { auth } from "@repo/auth/server";
 import { BILLING_MANAGEMENT_ROLES } from "@repo/billing";
 import { stripe } from "@repo/billing/stripe/client";
@@ -79,11 +80,14 @@ export async function GET(_request: Request, { params }: RouteParams) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const { slug } = await params;
+  const tenant = await getCurrentTenant();
 
   const [org] = await db()
     .select()
     .from(organization)
-    .where(eq(organization.slug, slug))
+    .where(
+      and(eq(organization.tenantId, tenant.id), eq(organization.slug, slug)),
+    )
     .limit(1);
   if (!org) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -116,11 +120,17 @@ export async function PUT(request: Request, { params }: RouteParams) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const { slug: currentSlug } = await params;
+  const tenant = await getCurrentTenant();
 
   const [org] = await db()
     .select()
     .from(organization)
-    .where(eq(organization.slug, currentSlug))
+    .where(
+      and(
+        eq(organization.tenantId, tenant.id),
+        eq(organization.slug, currentSlug),
+      ),
+    )
     .limit(1);
   if (!org) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -182,7 +192,13 @@ export async function PUT(request: Request, { params }: RouteParams) {
       const [conflict] = await db()
         .select({ id: organization.id })
         .from(organization)
-        .where(and(eq(organization.slug, slug), ne(organization.id, org.id)))
+        .where(
+          and(
+            eq(organization.tenantId, tenant.id),
+            eq(organization.slug, slug),
+            ne(organization.id, org.id),
+          ),
+        )
         .limit(1);
       if (conflict) {
         return NextResponse.json(

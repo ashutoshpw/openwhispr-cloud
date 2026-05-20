@@ -335,7 +335,7 @@ export async function adminListReferralCodes(
       isActive: referralCodes.isActive,
       createdAt: referralCodes.createdAt,
       updatedAt: referralCodes.updatedAt,
-      ownerEmail: user.email,
+      ownerEmail: user.publicEmail,
     })
     .from(referralCodes)
     .leftJoin(user, eq(user.id, referralCodes.userId))

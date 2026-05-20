@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto";
 import { getSiteAdminStatus } from "@/lib/auth-utils";
 import { auth, getBetterAuthServer } from "@repo/auth/server";
-import { db, eq } from "@repo/database";
+import { buildTenantAuthEmail, db, eq } from "@repo/database";
 import { user } from "@repo/database/schema";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
@@ -47,6 +47,8 @@ export async function POST(request: Request) {
     const name = (body?.name ?? "").toString().trim();
     const email = (body?.email ?? "").toString().trim().toLowerCase();
     const role = (body?.role ?? "user").toString();
+    const tenantId = (body?.tenantId ?? "default").toString().trim();
+    const authEmail = buildTenantAuthEmail(tenantId, email);
 
     if (!name || !email) {
       return NextResponse.json(
@@ -58,7 +60,7 @@ export async function POST(request: Request) {
     const existing = await db()
       .select({ id: user.id })
       .from(user)
-      .where(eq(user.email, email))
+      .where(eq(user.email, authEmail))
       .limit(1);
     if (existing[0]) {
       return NextResponse.json(
@@ -75,6 +77,7 @@ export async function POST(request: Request) {
       email,
       password: tempPassword,
       name,
+      tenantId,
     });
     if (result.error || !result.data) {
       return NextResponse.json(
@@ -87,7 +90,7 @@ export async function POST(request: Request) {
     const [row] = await db()
       .select()
       .from(user)
-      .where(eq(user.email, email))
+      .where(eq(user.email, authEmail))
       .limit(1);
 
     if (row && role !== "user") {

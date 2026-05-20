@@ -6,16 +6,17 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import type { User } from "@repo/database/schema";
+import type { Tenant, User } from "@repo/database/schema";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface UserTableProps {
   users: User[];
+  tenants: Tenant[];
 }
 
-export function UserTable({ users: initialUsers }: UserTableProps) {
+export function UserTable({ users: initialUsers, tenants }: UserTableProps) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [users] = useState(initialUsers);
@@ -23,7 +24,7 @@ export function UserTable({ users: initialUsers }: UserTableProps) {
   const filteredUsers = users.filter(
     (user) =>
       user.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email?.toLowerCase().includes(searchQuery.toLowerCase()),
+      user.publicEmail?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
@@ -35,7 +36,7 @@ export function UserTable({ users: initialUsers }: UserTableProps) {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="max-w-sm"
         />
-        <CreateUserDialog />
+        <CreateUserDialog tenants={tenants} />
       </div>
       <div className="rounded-md border">
         <table className="w-full">
@@ -46,6 +47,9 @@ export function UserTable({ users: initialUsers }: UserTableProps) {
               </th>
               <th className="h-12 px-4 text-left align-middle font-medium">
                 Email
+              </th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                Tenant
               </th>
               <th className="h-12 px-4 text-left align-middle font-medium">
                 Role
@@ -82,7 +86,8 @@ export function UserTable({ users: initialUsers }: UserTableProps) {
                       )}
                     </span>
                   </td>
-                  <td className="p-4 align-middle">{user.email}</td>
+                  <td className="p-4 align-middle">{user.publicEmail}</td>
+                  <td className="p-4 align-middle">{user.tenantId}</td>
                   <td className="p-4 align-middle">
                     <Badge
                       variant={

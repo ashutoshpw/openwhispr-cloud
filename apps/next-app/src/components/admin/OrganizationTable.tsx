@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import type { Organization } from "@repo/database/schema";
+import type { Organization, Tenant } from "@repo/database/schema";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -26,10 +26,12 @@ function statusLabel(status: string): { label: string; archived: boolean } {
 
 interface OrganizationTableProps {
   organizations: Organization[];
+  tenants: Tenant[];
 }
 
 export function OrganizationTable({
   organizations: initialOrganizations,
+  tenants,
 }: OrganizationTableProps) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
@@ -50,7 +52,7 @@ export function OrganizationTable({
           onChange={(e) => setSearchQuery(e.target.value)}
           className="max-w-sm"
         />
-        <CreateOrganizationDialog />
+        <CreateOrganizationDialog tenants={tenants} />
       </div>
       <div className="rounded-md border">
         <table className="w-full">
@@ -61,6 +63,9 @@ export function OrganizationTable({
               </th>
               <th className="h-12 px-4 text-left align-middle font-medium">
                 Slug
+              </th>
+              <th className="h-12 px-4 text-left align-middle font-medium">
+                Tenant
               </th>
               <th className="h-12 px-4 text-left align-middle font-medium">
                 Status
@@ -86,6 +91,7 @@ export function OrganizationTable({
                 >
                   <td className="p-4 align-middle">{org.name}</td>
                   <td className="p-4 align-middle">{org.slug}</td>
+                  <td className="p-4 align-middle">{org.tenantId}</td>
                   <td className="p-4 align-middle">
                     <Badge variant={status.archived ? "outline" : "secondary"}>
                       {status.label}

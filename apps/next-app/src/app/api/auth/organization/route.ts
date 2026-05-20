@@ -1,7 +1,7 @@
 import { getBetterAuthServer } from "@repo/auth/server";
 import { auth } from "@repo/auth/server";
-import { db, eq } from "@repo/database";
-import { referrals } from "@repo/database/schema";
+import { db, eq, resolveTenantFromHost } from "@repo/database";
+import { member, organization, referrals } from "@repo/database/schema";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -69,6 +69,7 @@ export async function POST(request: Request) {
       body: { name, slug },
       headers: await headers(),
     });
+    const tenant = await resolveTenantFromHost((await headers()).get("host"));
 
     // F3: Link referral record to the newly created organization (non-fatal)
     const newOrgId: string | undefined =
@@ -77,6 +78,16 @@ export async function POST(request: Request) {
         : undefined;
     if (newOrgId && session.user?.id) {
       try {
+        if (tenant) {
+          await db()
+            .update(organization)
+            .set({ tenantId: tenant.id })
+            .where(eq(organization.id, newOrgId));
+          await db()
+            .update(member)
+            .set({ tenantId: tenant.id })
+            .where(eq(member.organizationId, newOrgId));
+        }
         await db()
           .update(referrals)
           .set({ refereeOrganizationId: newOrgId })

@@ -1,3 +1,4 @@
+import { getCurrentTenant } from "@/lib/tenant";
 import { auth } from "@repo/auth/server";
 import { db } from "@repo/database";
 import { and, desc, eq } from "@repo/database";
@@ -20,11 +21,17 @@ export default async function WorkspacePage({ params }: PageProps) {
   if (!session?.user?.id) {
     redirect("/auth/sign-in");
   }
+  const tenant = await getCurrentTenant();
 
   const [org] = await db()
     .select()
     .from(organization)
-    .where(eq(organization.slug, workspaceSlug))
+    .where(
+      and(
+        eq(organization.tenantId, tenant.id),
+        eq(organization.slug, workspaceSlug),
+      ),
+    )
     .limit(1);
 
   if (!org) {

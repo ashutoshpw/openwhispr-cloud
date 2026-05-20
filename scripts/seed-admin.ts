@@ -4,12 +4,11 @@
  * Run with: bun run db:seed
  */
 
+import { resolve } from "node:path";
 import { select } from "@inquirer/prompts";
 import bcrypt from "bcryptjs";
 import { config } from "dotenv";
-import { eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
-import { resolve } from "node:path";
 
 // Load .env.local
 config({ path: resolve(process.cwd(), ".env.local") });
@@ -54,14 +53,22 @@ async function main() {
   }
 
   // Dynamic imports to avoid loading db before env is configured
-  const { db } = await import("@repo/database");
+  const { buildTenantAuthEmail, db, ensureDefaultTenant, eq } = await import(
+    "@repo/database"
+  );
   const { user, account } = await import("@repo/database/schema");
+  const defaultTenant = await ensureDefaultTenant();
+  const normalizedAdminEmail = adminEmail.toLowerCase().trim();
+  const authEmail = buildTenantAuthEmail(
+    defaultTenant.id,
+    normalizedAdminEmail,
+  );
 
   // Check if user already exists
   const existingUser = await db()
     .select()
     .from(user)
-    .where(eq(user.email, adminEmail))
+    .where(eq(user.email, authEmail))
     .limit(1);
 
   if (existingUser.length > 0) {
@@ -69,7 +76,7 @@ async function main() {
 
     if (existing.role === "site-admin") {
       console.log(
-        `${colors.green}  ✅ Admin user already exists: ${adminEmail}${colors.reset}`,
+        `${colors.green}  ✅ Admin user already exists: ${normalizedAdminEmail}${colors.reset}`,
       );
       console.log("");
       process.exit(0);
@@ -77,7 +84,7 @@ async function main() {
 
     // User exists but not admin - ask what to do
     console.log(
-      `${colors.yellow}  User already exists: ${adminEmail} (role: ${existing.role})${colors.reset}`,
+      `${colors.yellow}  User already exists: ${normalizedAdminEmail} (role: ${existing.role})${colors.reset}`,
     );
     console.log("");
 
@@ -108,7 +115,7 @@ async function main() {
 
       console.log("");
       console.log(
-        `${colors.green}  ✅ User promoted to admin: ${adminEmail}${colors.reset}`,
+        `${colors.green}  ✅ User promoted to admin: ${normalizedAdminEmail}${colors.reset}`,
       );
       console.log("");
       process.exit(0);
@@ -127,8 +134,10 @@ async function main() {
 
   await db().insert(user).values({
     id: userId,
+    tenantId: defaultTenant.id,
     name: adminName,
-    email: adminEmail,
+    publicEmail: normalizedAdminEmail,
+    email: authEmail,
     emailVerified: true,
     role: "site-admin",
     createdAt: new Date(),
@@ -138,6 +147,7 @@ async function main() {
   // Create account record for email/password auth
   await db().insert(account).values({
     id: nanoid(),
+    tenantId: defaultTenant.id,
     userId: userId,
     accountId: userId,
     providerId: "credential",
@@ -151,7 +161,10 @@ async function main() {
   );
   console.log("");
   console.log(`${colors.bold}  Details:${colors.reset}`);
-  console.log(`    Email: ${colors.cyan}${adminEmail}${colors.reset}`);
+  console.log(`    Tenant: ${colors.cyan}${defaultTenant.name}${colors.reset}`);
+  console.log(
+    `    Email:  ${colors.cyan}${normalizedAdminEmail}${colors.reset}`,
+  );
   console.log(`    Name:  ${adminName}`);
   console.log("    Role:  site-admin");
   console.log("");

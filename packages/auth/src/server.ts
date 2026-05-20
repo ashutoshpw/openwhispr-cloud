@@ -6,7 +6,11 @@
 import "server-only";
 
 import { passkey } from "@better-auth/passkey";
-import { db } from "@repo/database";
+import {
+  buildTenantAuthEmail,
+  db,
+  resolveTenantFromHost,
+} from "@repo/database";
 import { eq } from "@repo/database";
 import * as schema from "@repo/database/schema";
 import bcrypt from "bcryptjs";
@@ -23,13 +27,16 @@ import type { UnifiedSession, UnifiedUser } from "./types";
 function normalizeUser(user: {
   id: string;
   email: string;
+  publicEmail?: string | null;
+  tenantId?: string | null;
   name?: string | null;
   image?: string | null;
   role?: string | null;
 }): UnifiedUser {
   return {
     id: user.id,
-    email: user.email,
+    email: user.publicEmail ?? user.email,
+    tenantId: user.tenantId ?? null,
     name: user.name ?? null,
     image: user.image ?? null,
     role: user.role ?? null,
@@ -130,7 +137,10 @@ class BetterAuthServer {
               const userId = (sessionData as { userId?: string })?.userId;
               if (!userId) return;
               const [row] = await db()
-                .select({ archivedAt: schema.user.archivedAt })
+                .select({
+                  archivedAt: schema.user.archivedAt,
+                  tenantId: schema.user.tenantId,
+                })
                 .from(schema.user)
                 .where(eq(schema.user.id, userId))
                 .limit(1);
@@ -141,6 +151,50 @@ class BetterAuthServer {
                     "This account has been suspended. Reach out to support if you think this is an error.",
                 });
               }
+              return {
+                data: {
+                  ...sessionData,
+                  tenantId: row?.tenantId ?? "default",
+                },
+              };
+            },
+          },
+        },
+        user: {
+          create: {
+            before: async (userData) => {
+              const email = (userData as { email?: string }).email ?? "";
+              const separator = email.indexOf(":");
+              const tenantId =
+                separator > 0 ? email.slice(0, separator) : "default";
+              const publicEmail =
+                separator > 0 ? email.slice(separator + 1) : email;
+              return {
+                data: {
+                  ...userData,
+                  tenantId,
+                  publicEmail,
+                },
+              };
+            },
+          },
+        },
+        account: {
+          create: {
+            before: async (accountData) => {
+              const userId = (accountData as { userId?: string }).userId;
+              if (!userId) return;
+              const [row] = await db()
+                .select({ tenantId: schema.user.tenantId })
+                .from(schema.user)
+                .where(eq(schema.user.id, userId))
+                .limit(1);
+              return {
+                data: {
+                  ...accountData,
+                  tenantId: row?.tenantId ?? "default",
+                },
+              };
             },
           },
         },
@@ -243,11 +297,19 @@ class BetterAuthServer {
     const userId = session.user?.id;
     if (userId) {
       const [row] = await db()
-        .select({ archivedAt: schema.user.archivedAt })
+        .select({
+          archivedAt: schema.user.archivedAt,
+          publicEmail: schema.user.publicEmail,
+          tenantId: schema.user.tenantId,
+        })
         .from(schema.user)
         .where(eq(schema.user.id, userId))
         .limit(1);
       if (row?.archivedAt) return null;
+      if (row && session.user) {
+        session.user.email = row.publicEmail;
+        (session.user as { tenantId?: string }).tenantId = row.tenantId;
+      }
     }
     return mapBetterAuthSession(session);
   }
@@ -260,10 +322,20 @@ class BetterAuthServer {
     return this.authInstance;
   }
 
-  async signInEmail(params: { email: string; password: string }) {
+  async signInEmail(params: {
+    email: string;
+    password: string;
+    tenantId?: string;
+  }) {
     try {
       const ctx = await this.authInstance.api.signInEmail({
-        body: params,
+        body: {
+          email: buildTenantAuthEmail(
+            params.tenantId ?? "default",
+            params.email,
+          ),
+          password: params.password,
+        },
       });
       return { data: ctx, error: null };
     } catch (error) {
@@ -280,9 +352,17 @@ class BetterAuthServer {
   async signInEmailResponse(params: {
     email: string;
     password: string;
+    headers?: Headers;
+    tenantId?: string;
   }): Promise<Response> {
+    const tenant = params.tenantId
+      ? { id: params.tenantId }
+      : await resolveTenantFromHost(params.headers?.get("host"));
     return this.authInstance.api.signInEmail({
-      body: params,
+      body: {
+        email: buildTenantAuthEmail(tenant?.id ?? "default", params.email),
+        password: params.password,
+      },
       asResponse: true,
     });
   }
@@ -291,10 +371,18 @@ class BetterAuthServer {
     email: string;
     password: string;
     name: string;
+    tenantId?: string;
   }) {
     try {
       const ctx = await this.authInstance.api.signUpEmail({
-        body: params,
+        body: {
+          email: buildTenantAuthEmail(
+            params.tenantId ?? "default",
+            params.email,
+          ),
+          password: params.password,
+          name: params.name,
+        },
       });
       return { data: ctx, error: null };
     } catch (error) {
@@ -312,9 +400,18 @@ class BetterAuthServer {
     email: string;
     password: string;
     name: string;
+    headers?: Headers;
+    tenantId?: string;
   }): Promise<Response> {
+    const tenant = params.tenantId
+      ? { id: params.tenantId }
+      : await resolveTenantFromHost(params.headers?.get("host"));
     return this.authInstance.api.signUpEmail({
-      body: params,
+      body: {
+        email: buildTenantAuthEmail(tenant?.id ?? "default", params.email),
+        password: params.password,
+        name: params.name,
+      },
       asResponse: true,
     });
   }
@@ -392,11 +489,20 @@ export const baseServer = {
     const server = getBetterAuthServer();
     return server.getApiHandler();
   },
-  signInEmail: async (params: { email: string; password: string }) => {
+  signInEmail: async (params: {
+    email: string;
+    password: string;
+    tenantId?: string;
+  }) => {
     const server = getBetterAuthServer();
     return server.signInEmail(params);
   },
-  signInEmailResponse: async (params: { email: string; password: string }) => {
+  signInEmailResponse: async (params: {
+    email: string;
+    password: string;
+    headers?: Headers;
+    tenantId?: string;
+  }) => {
     const server = getBetterAuthServer();
     return server.signInEmailResponse(params);
   },
@@ -404,6 +510,7 @@ export const baseServer = {
     email: string;
     password: string;
     name: string;
+    tenantId?: string;
   }) => {
     const server = getBetterAuthServer();
     return server.signUpEmail(params);
@@ -412,6 +519,8 @@ export const baseServer = {
     email: string;
     password: string;
     name: string;
+    headers?: Headers;
+    tenantId?: string;
   }) => {
     const server = getBetterAuthServer();
     return server.signUpEmailResponse(params);

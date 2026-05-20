@@ -48,7 +48,6 @@ export async function GET(request: Request) {
         { status: 403 },
       );
     }
-
     const projects = await db()
       .select()
       .from(project)
@@ -107,6 +106,17 @@ export async function POST(request: Request) {
         { status: 403 },
       );
     }
+    const [org] = await db()
+      .select({ tenantId: organization.tenantId })
+      .from(organization)
+      .where(eq(organization.id, organizationId))
+      .limit(1);
+    if (!org) {
+      return NextResponse.json(
+        { error: "Organization not found" },
+        { status: 404 },
+      );
+    }
 
     // Check if slug is already taken in this organization
     const existingProject = await db()
@@ -128,6 +138,7 @@ export async function POST(request: Request) {
       .insert(project)
       .values({
         id: nanoid(),
+        tenantId: org.tenantId,
         name,
         slug,
         description: description || null,

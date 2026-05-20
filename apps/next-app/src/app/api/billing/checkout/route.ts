@@ -7,6 +7,7 @@ import {
   createUpgradeCheckout,
   createWorkspaceCheckout,
 } from "@repo/billing/stripe/checkout";
+import { resolveTenantFromHost } from "@repo/database";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -36,9 +37,14 @@ function createErrorResponse(result: BillingMiddlewareResult): NextResponse {
  */
 export async function POST(request: Request) {
   try {
+    const requestHeaders = await headers();
     const session = await auth.api.getSession({
-      headers: await headers(),
+      headers: requestHeaders,
     });
+    const tenant = await resolveTenantFromHost(requestHeaders.get("host"));
+    if (!tenant) {
+      return NextResponse.json({ error: "Unknown tenant" }, { status: 404 });
+    }
 
     if (!session?.user?.id || !session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -104,6 +110,7 @@ export async function POST(request: Request) {
       priceId,
       workspaceName,
       workspaceSlug,
+      tenantId: tenant.id,
       userId: session.user.id,
       userEmail: session.user.email,
       withTrial,

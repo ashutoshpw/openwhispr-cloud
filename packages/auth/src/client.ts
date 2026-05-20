@@ -31,13 +31,16 @@ import type {
 function normalizeUser(user: {
   id: string;
   email: string;
+  tenantId?: string | null;
   name?: string | null;
   image?: string | null;
   role?: string | null;
 }): UnifiedUser {
+  const separator = user.email.indexOf(":");
   return {
     id: user.id,
-    email: user.email,
+    tenantId: user.tenantId ?? null,
+    email: separator > 0 ? user.email.slice(separator + 1) : user.email,
     name: user.name ?? null,
     image: user.image ?? null,
     role: user.role ?? null,

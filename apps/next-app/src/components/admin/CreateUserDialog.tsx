@@ -19,17 +19,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { Tenant } from "@repo/database/schema";
 import { Loader2, UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export function CreateUserDialog() {
+export function CreateUserDialog({ tenants }: { tenants: Tenant[] }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("user");
+  const [tenantId, setTenantId] = useState("default");
   const [submitting, setSubmitting] = useState(false);
 
   async function submit() {
@@ -42,7 +44,12 @@ export function CreateUserDialog() {
       const res = await fetch("/api/admin/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), email: email.trim(), role }),
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.trim(),
+          role,
+          tenantId,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -56,6 +63,7 @@ export function CreateUserDialog() {
       setName("");
       setEmail("");
       setRole("user");
+      setTenantId("default");
       router.refresh();
     } finally {
       setSubmitting(false);
@@ -107,6 +115,21 @@ export function CreateUserDialog() {
               <SelectContent>
                 <SelectItem value="user">user</SelectItem>
                 <SelectItem value="site-admin">site-admin</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="create-user-tenant">Tenant</Label>
+            <Select value={tenantId} onValueChange={setTenantId}>
+              <SelectTrigger id="create-user-tenant">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {tenants.map((tenant) => (
+                  <SelectItem key={tenant.id} value={tenant.id}>
+                    {tenant.name} ({tenant.id})
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
