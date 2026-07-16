@@ -1,0 +1,30 @@
+---
+title: Extend the starter without losing its setup flow
+description: Make product changes while preserving the one-time initialization workflow.
+---
+
+# Extend the starter without losing its setup flow
+
+Use this guide when you are ready to build on the starter after initial setup.
+
+## Finish setup first
+
+Run `bun run setup` before using the normal development command. The setup workflow selects authentication, creates the required local configuration, and updates the workspace for that choice.
+
+## Develop one workspace at a time
+
+Start the Next.js application directly when you only need the web app:
+
+```bash
+bun run --filter @repo/next-app dev
+```
+
+Use the root development commands when you need multiple workspaces together.
+
+## Validate changes before sharing them
+
+Run the focused app build after application changes:
+
+```bash
+bun run --filter @repo/next-app build
+```

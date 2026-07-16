@@ -1,9 +1,3 @@
-import { loader } from "@repo/fumadocs";
-import { blogCollection, docs } from "../.source/server";
-
-export const docsSource = loader({
-  baseUrl: "/docs",
-  source: docs.toFumadocsSource(),
-});
+import { blogCollection } from "../.source/server";
 
 export const blog = blogCollection;

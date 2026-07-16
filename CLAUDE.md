@@ -60,3 +60,11 @@ values. Leave it or delete manually.
   no middleware outside templates, biome formatting. Don't `--no-verify`.
 - Never commit `.auth-provider.lock`, `.auth-backup/`, or the rewritten
   root `"dev"` script — those are end-user artifacts.
+
+## Documentation policy
+
+- Public, task-oriented documentation belongs in `docs-public/`; use its Mintlify tabs to organize guidance around user goals.
+- Private developer and agent documentation belongs in `docs-internal/`.
+- Never add a generic `docs/` directory at the root or inside a workspace. The staged-path hook enforces this rule, except inside `.agents/**` and `.claude/**`.
+- `README.md`, `LICENCE.md`, `CLAUDE.md`, `AGENTS.md`, and `GEMINI.md` are the only root markdown exemptions.
+- Preview with `bun run docs:public` or `bun run docs:internal`; run the corresponding `:validate` script before sharing docs changes.

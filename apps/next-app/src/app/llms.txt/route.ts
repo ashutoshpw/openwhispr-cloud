@@ -33,7 +33,6 @@ export async function GET(): Promise<Response> {
   const staticPages = [
     { title: "Home", path: "/" },
     { title: "Pricing", path: "/pricing" },
-    { title: "Docs", path: "/docs" },
     { title: "Changelog", path: "/changelog" },
   ];
   for (const p of staticPages) {

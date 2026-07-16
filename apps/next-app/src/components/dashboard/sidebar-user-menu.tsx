@@ -11,7 +11,6 @@ import {
 import { cn } from "@/lib/utils";
 import { signOut, useSession } from "@repo/auth/client";
 import {
-  BookOpen,
   ChevronsUpDown,
   FileText,
   Home,
@@ -214,12 +213,6 @@ export function SidebarUserMenu() {
             <Link href="/help" className="flex items-center justify-between">
               <span>Help</span>
               <LifeBuoy className="h-4 w-4 text-muted-foreground" />
-            </Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/docs" className="flex items-center justify-between">
-              <span>Docs</span>
-              <BookOpen className="h-4 w-4 text-muted-foreground" />
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />

@@ -34,7 +34,7 @@ export const EMAIL_TEMPLATES: EmailTemplate[] = [
         <a href="{{app_url}}/dashboard" class="button">Go to Dashboard</a>
       </center>
       
-      <p>Need help getting started? Check out our <a href="{{app_url}}/docs">documentation</a> or reply to this email.</p>
+      <p>Need help getting started? Visit our <a href="{{app_url}}/help">help center</a> or reply to this email.</p>
       
       <p>Best regards,<br>The {{app_name}} Team</p>
     </div>
@@ -55,7 +55,7 @@ Your account has been created with the email: {{person.properties.email}}
 
 Get started by visiting your dashboard: {{app_url}}/dashboard
 
-Need help? Check out our documentation at {{app_url}}/docs or reply to this email.
+Need help? Visit {{app_url}}/help or reply to this email.
 
 Best regards,
 The {{app_name}} Team`,
@@ -163,7 +163,7 @@ The {{app_name}} Team`,
       </div>
       
       <center>
-        <a href="{{app_url}}/docs/tips" class="button">View All Tips</a>
+        <a href="{{app_url}}/help" class="button">Get Help</a>
       </center>
       
       <p>Questions or feedback? We'd love to hear from you - just reply to this email.</p>
@@ -191,7 +191,7 @@ Now that you've had some time to explore, here are some pro tips our power users
 
 Pro tip: Bookmark your most-used pages for quick access!
 
-View all tips: {{app_url}}/docs/tips
+Get help: {{app_url}}/help
 
 Questions or feedback? We'd love to hear from you - just reply to this email.
 

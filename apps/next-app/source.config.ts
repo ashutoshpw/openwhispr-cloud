@@ -1,17 +1,9 @@
-import {
-  defineCollections,
-  defineConfig,
-  defineDocs,
-} from "fumadocs-mdx/config";
+import { defineCollections, defineConfig } from "fumadocs-mdx/config";
 import { z } from "zod";
-
-export const docs = defineDocs({
-  dir: "../../packages/fumadocs/content/docs",
-});
 
 export const blogCollection = defineCollections({
   type: "doc",
-  dir: "../../packages/fumadocs/content/blog",
+  dir: "./content/blog",
   schema: z.object({
     title: z.string(),
     date: z.string(),

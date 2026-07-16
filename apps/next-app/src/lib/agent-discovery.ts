@@ -1,11 +1,10 @@
 import {
   absoluteUrl,
   getPublicBlogPaths,
-  getPublicDocsPaths,
   normalizePathname,
   sha256,
 } from "@/lib/site-config";
-import { blog, docsSource } from "@/lib/source";
+import { blog } from "@/lib/source";
 
 export function isMarkdownRequest(request: Request): boolean {
   return request.headers.get("accept")?.includes("text/markdown") ?? false;
@@ -29,14 +28,12 @@ export function isPublicMarkdownPath(pathname: string): boolean {
   return new Set([
     "/",
     "/blog",
-    "/docs",
     "/help",
     "/privacy",
     "/terms",
     "/changelog",
     "/marketing-page",
     ...getPublicBlogPaths(),
-    ...getPublicDocsPaths(),
   ]).has(normalized);
 }
 
@@ -56,7 +53,6 @@ export function getMarkdownContent(pathname: string): string | null {
       "- Blog and docs publishing",
       "- MCP and AI-agent integration",
       "",
-      `Docs: ${absoluteUrl("/docs")}`,
       `Blog: ${absoluteUrl("/blog")}`,
       `Get started: ${absoluteUrl("/auth/sign-in")}`,
     ].join("\n");
@@ -98,35 +94,6 @@ export function getMarkdownContent(pathname: string): string | null {
       .join("\n");
   }
 
-  if (normalized === "/docs") {
-    const docLinks = docsSource
-      .generateParams()
-      .map((params) => {
-        const path = `/docs/${params.slug?.join("/") ?? ""}`;
-        const page = docsSource.getPage(params.slug);
-        return page
-          ? `- [${page.data.title ?? path}](${absoluteUrl(path)}): ${page.data.description ?? ""}`
-          : null;
-      })
-      .filter(Boolean);
-
-    return ["# Documentation", "", ...docLinks].join("\n");
-  }
-
-  if (normalized.startsWith("/docs/")) {
-    const slug = normalized.replace(/^\/docs\//, "").split("/");
-    const page = docsSource.getPage(slug);
-    if (!page) return null;
-
-    return [
-      `# ${page.data.title ?? "Documentation"}`,
-      "",
-      page.data.description ?? "",
-      "",
-      `URL: ${absoluteUrl(normalized)}`,
-    ].join("\n");
-  }
-
   const staticPages: Record<string, string> = {
     "/help":
       "# Help\n\nSupport and self-serve guidance for the starter template.",
@@ -146,7 +113,6 @@ export function createLinkHeader(pathname: string): string {
 
   return [
     `</.well-known/api-catalog>; rel="api-catalog"`,
-    `</docs>; rel="service-doc"`,
     `<${markdownUrl}>; rel="alternate"; type="text/markdown"`,
   ].join(", ");
 }

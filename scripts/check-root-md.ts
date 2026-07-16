@@ -3,8 +3,8 @@
 /**
  * Pre-commit hook: block unexpected .md files in the repo root.
  *
- * Docs belong in apps/next-app/src/app/docs/ or the docs/ directory.
- * Only a curated allowlist of root-level markdown files is permitted.
+ * Documentation belongs in docs-public/ or docs-internal/.
+ * Only the explicit documentation-policy exemptions are permitted at the root.
  */
 
 import { execFileSync } from "node:child_process";
@@ -12,10 +12,8 @@ import { execFileSync } from "node:child_process";
 const ALLOWED = new Set([
   "README.md",
   "CLAUDE.md",
-  "CHANGELOG.md",
+  "LICENCE.md",
   "AGENTS.md",
-  "AGENT.md",
-  "DESIGN.md",
   "GEMINI.md",
 ]);
 
@@ -46,9 +44,7 @@ if (violations.length > 0) {
     console.error(`  x ${file}`);
   }
 
-  console.error(
-    "\nMove documentation into docs/ or apps/next-app/src/app/docs/.",
-  );
+  console.error("\nMove documentation into docs-public/ or docs-internal/.");
   console.error(`Allowed root-level files: ${[...ALLOWED].join(", ")}\n`);
 
   process.exit(1);

@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { blog, docsSource } from "@/lib/source";
+import { blog } from "@/lib/source";
 
 const DEFAULT_PRODUCTION_URL = "https://nextjs-starter-kit-app.vercel.app";
 
@@ -33,7 +33,6 @@ export function normalizePathname(pathname: string): string {
 export const publicStaticPaths = [
   "/",
   "/blog",
-  "/docs",
   "/help",
   "/privacy",
   "/terms",
@@ -41,23 +40,12 @@ export const publicStaticPaths = [
   "/marketing-page",
 ] as const;
 
-export function getPublicDocsPaths(): string[] {
-  return docsSource
-    .generateParams()
-    .map((params) => `/docs/${params.slug?.join("/") ?? ""}`)
-    .map(normalizePathname);
-}
-
 export function getPublicBlogPaths(): string[] {
   return blog.map((post) => `/blog/${post.info.path.replace(/\.mdx$/, "")}`);
 }
 
 export function getSitemapPaths(): string[] {
-  return [
-    ...publicStaticPaths,
-    ...getPublicDocsPaths(),
-    ...getPublicBlogPaths(),
-  ];
+  return [...publicStaticPaths, ...getPublicBlogPaths()];
 }
 
 export function sha256(value: string): string {

@@ -1,0 +1,31 @@
+---
+title: Connect a database
+description: Configure PostgreSQL and make the starter's schema available locally.
+---
+
+# Connect a database
+
+Use this guide when the application needs persistent data such as users, workspaces, or billing records.
+
+## Add a connection string
+
+Set `DATABASE_URL` in the root `.env.local` file with the PostgreSQL connection for your environment.
+
+## Apply the schema
+
+For local development, push the schema after setup:
+
+```bash
+bun run db:push
+```
+
+For shared environments, generate and review migrations before applying them:
+
+```bash
+bun run db:generate
+bun run db:migrate
+```
+
+## Inspect or seed data
+
+Use `bun run db:studio` to inspect local data and `bun run db:seed` when you need the starter's admin seed data.

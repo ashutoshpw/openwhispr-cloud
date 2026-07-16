@@ -34,17 +34,6 @@ const BANNED_RULES: BannedRule[] = [
     reason: "Use @repo/analytics instead",
     alternative: "@repo/analytics",
   },
-  // Fumadocs — fumadocs-mdx is allowed (build tool consumed directly by next.config.mjs)
-  {
-    pattern: "fumadocs-core",
-    reason: "Use @repo/fumadocs instead",
-    alternative: "@repo/fumadocs",
-  },
-  {
-    pattern: "fumadocs-ui",
-    reason: "Use @repo/fumadocs instead",
-    alternative: "@repo/fumadocs",
-  },
   // Durable execution
   {
     pattern: "inngest",

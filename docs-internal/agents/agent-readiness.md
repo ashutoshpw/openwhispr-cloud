@@ -1,10 +1,15 @@
+---
+title: Agent readiness implementation
+description: Discovery artifacts and verification notes for AI agents and readiness scanners.
+---
+
 # Agent Readiness Implementation
 
 This starter template publishes the basic discovery artifacts that external AI agents and agent-readiness scanners expect.
 
 ## Routes
 
-- `/sitemap.xml`: generated from public marketing, docs, and blog pages only
+- `/sitemap.xml`: generated from public marketing and blog pages only
 - `/robots.txt`: includes the sitemap reference and `Content-Signal`
 - `/.well-known/api-catalog`: curated API catalog for agent-facing surfaces
 - `/.well-known/openid-configuration`: root OIDC discovery wrapper

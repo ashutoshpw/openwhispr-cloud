@@ -1,6 +1,6 @@
 import { absoluteUrl } from "@/lib/site-config";
 import { blog } from "@/lib/source";
-import { defaultMdxComponents } from "@repo/fumadocs/components";
+import defaultMdxComponents from "fumadocs-ui/mdx";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 

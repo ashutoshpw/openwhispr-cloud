@@ -1,3 +1,8 @@
+---
+title: Test the ChatGPT Apps SDK
+description: Verification steps for the ChatGPT Apps SDK integration.
+---
+
 # Testing ChatGPT Apps SDK Integration
 
 This guide will help you test the ChatGPT Apps SDK integration locally and in production.
@@ -260,7 +265,7 @@ Once basic integration is verified:
 
 ## Resources
 
-- [Full Documentation](./CHATGPT_APPS_SDK.md)
+- [Full Documentation](../integrations/chatgpt-apps-sdk)
 - [Vercel Blog Post](https://vercel.com/blog/running-next-js-inside-chatgpt-a-deep-dive-into-native-app-integration)
 - [Example Starter](https://github.com/vercel-labs/chatgpt-apps-sdk-nextjs-starter)
 - [Model Context Protocol](https://modelcontextprotocol.io)

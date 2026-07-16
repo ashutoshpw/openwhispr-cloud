@@ -1,0 +1,20 @@
+---
+title: Find the code you need to change
+description: Locate application and shared-package code before extending the starter.
+---
+
+# Find the code you need to change
+
+Use this guide when you are deciding where a new capability belongs.
+
+## Add application behavior
+
+Put Next.js routes, pages, and application-specific components in `apps/next-app/src`. The app uses the App Router, so pages and route handlers belong under `src/app`.
+
+## Share behavior across the monorepo
+
+Put reusable integrations and domain code in an existing package under `packages/`, or add a new workspace package when it has more than one consumer.
+
+## Keep configuration close to its owner
+
+Environment setup belongs at the root, database schema changes belong in `packages/database`, and app UI changes belong with the Next.js application. This keeps setup-generated code separate from product code.

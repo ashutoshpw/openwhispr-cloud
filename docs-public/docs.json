@@ -1,0 +1,34 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Next.js 16 Starter Kit",
+  "theme": "mint",
+  "colors": {
+    "primary": "#0f766e",
+    "light": "#14b8a6",
+    "dark": "#2dd4bf"
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Start a project",
+        "icon": "rocket",
+        "pages": ["start/index", "start/getting-started"]
+      },
+      {
+        "tab": "Configure your app",
+        "icon": "settings",
+        "pages": ["configure/authentication", "configure/database"]
+      },
+      {
+        "tab": "Build your workflow",
+        "icon": "hammer",
+        "pages": ["customize/project-structure", "customize/extend-the-starter"]
+      },
+      {
+        "tab": "Operate and troubleshoot",
+        "icon": "life-buoy",
+        "pages": ["operate/run-locally", "operate/troubleshoot"]
+      }
+    ]
+  }
+}

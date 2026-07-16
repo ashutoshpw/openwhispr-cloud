@@ -1,0 +1,56 @@
+---
+title: Get the starter running
+description: Set up a local project, select authentication, and run the Next.js application.
+---
+
+# Get the starter running
+
+Follow these steps when you have cloned the starter and need a running local application.
+
+## Prerequisites
+
+- [Bun](https://bun.sh) v1.2+
+- [Node.js](https://nodejs.org) v18+
+- A PostgreSQL database
+
+## Installation
+
+Clone the repository and install dependencies:
+
+```bash
+git clone <your-repo-url>
+cd nextjs16-starter-kit
+bun install
+```
+
+## Initialize the project
+
+Run the setup workflow to choose an authentication provider and configure `.env.local`:
+
+```bash
+bun run setup
+```
+
+For CI or another non-interactive environment, select a provider explicitly:
+
+```bash
+bun run setup --yes --provider=better-auth
+```
+
+## Database Setup
+
+Set `DATABASE_URL` during setup, then make the local schema available:
+
+```bash
+bun run db:push
+```
+
+## Development
+
+After setup, start the development server:
+
+```bash
+bun run dev
+```
+
+For more detailed help, continue with the Configure, Build, or Operate tabs.

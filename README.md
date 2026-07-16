@@ -43,8 +43,10 @@ nextjs16-starter-kit/
 │       │   ├── lib/              # Core utilities
 │       │   └── ...
 │       ├── public/               # Static assets
-│       ├── content/              # MDX content
-│       └── docs/                 # App-specific docs
+│       └── content/              # Blog MDX content
+│
+├── docs-public/                  # Public Mintlify documentation
+├── docs-internal/                # Developer and agent Mintlify documentation
 │
 ├── packages/
 │   └── database/                 # Shared database package
@@ -328,7 +330,7 @@ This starter includes ChatGPT Apps SDK support for running inside ChatGPT.
 2. Connect via MCP: `https://your-app.vercel.app/mcp`
 3. Test with "Show me the content" in ChatGPT
 
-See [CHATGPT_APPS_SDK.md](./apps/next-app/docs/CHATGPT_APPS_SDK.md) for details.
+See [ChatGPT Apps SDK integration](./docs-internal/integrations/chatgpt-apps-sdk.md) for details.
 
 ## Deployment
 

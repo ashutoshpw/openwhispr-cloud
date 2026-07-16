@@ -1,3 +1,8 @@
+---
+title: Testing findings
+description: Known findings and follow-up work from application testing.
+---
+
 # Testing Findings - Next.js 16 Starter Kit
 
 ## Test Date

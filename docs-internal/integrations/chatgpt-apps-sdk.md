@@ -1,3 +1,8 @@
+---
+title: ChatGPT Apps SDK integration
+description: How the Next.js application integrates with the ChatGPT Apps SDK and MCP.
+---
+
 # ChatGPT Apps SDK Integration Guide
 
 This Next.js application now supports the ChatGPT Apps SDK, allowing it to be embedded and run as a widget inside ChatGPT's native interface using the Model Context Protocol (MCP).

@@ -1,0 +1,32 @@
+---
+title: Choose and configure authentication
+description: Select one authentication provider and initialize the starter safely.
+---
+
+# Choose and configure authentication
+
+Use the setup workflow when you need to give people a way to sign in. The starter keeps one selected provider in the generated application so unused provider code does not become part of your project.
+
+## Select a provider
+
+Run the setup wizard and choose the provider that fits your product and operating model:
+
+```bash
+bun run setup
+```
+
+The wizard supports Better Auth, NextAuth, AuthKit, and Clerk. It writes the provider-specific setup into your working tree, so make this choice before you begin feature development.
+
+## Configure environment values
+
+Complete the provider prompts in `.env.local`. Keep those values out of version control and use deployment environment variables for hosted environments.
+
+## Need a non-interactive setup?
+
+Use a selected provider in automation:
+
+```bash
+bun run setup --yes --provider=better-auth
+```
+
+See `bun run setup --help` for the supported options.

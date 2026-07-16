@@ -1,3 +1,8 @@
+---
+title: PostHog analytics integration
+description: Analytics events and workflow configuration for the starter.
+---
+
 # PostHog Analytics Integration
 
 This document describes the PostHog analytics integration for tracking user lifecycle events and triggering email workflows.

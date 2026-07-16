@@ -1,0 +1,17 @@
+---
+title: Internal documentation
+description: Development, integration, and verification guidance for maintainers and agents.
+---
+
+# Internal documentation
+
+Use this site for repository-maintenance guidance, implementation notes, and verification records. It is not public product documentation.
+
+## Documentation policy
+
+- Put user-facing, problem-oriented guidance in `docs-public/`.
+- Put developer and agent guidance in `docs-internal/`.
+- Do not add a generic `docs/` directory anywhere in the repository.
+- Run `bun run docs:internal` to preview this site and `bun run docs:internal:validate` before publishing documentation changes.
+
+The repository instructions in `AGENTS.md` and `CLAUDE.md` remain the source of truth for agent behavior and setup constraints.

@@ -27,8 +27,6 @@
       "@repo/auth/*": ["../../packages/auth/src/*"],
       "@repo/billing": ["../../packages/billing/src"],
       "@repo/billing/*": ["../../packages/billing/src/*"],
-      "@repo/fumadocs": ["../../packages/fumadocs/src"],
-      "@repo/fumadocs/*": ["../../packages/fumadocs/src/*"],
       "@repo/mcp-server": ["../../packages/mcp-server/src"],
       "@repo/mcp-server/*": ["../../packages/mcp-server/src/*"],
       "@repo/mcp-chatgpt": ["../../packages/mcp-chatgpt/src"],

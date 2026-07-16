@@ -1,0 +1,32 @@
+---
+title: Run the starter locally
+description: Start a configured project and verify its local environment.
+---
+
+# Run the starter locally
+
+Use this guide when setup is complete and you want to run the project on your machine.
+
+## Install dependencies
+
+```bash
+bun install
+```
+
+## Start the application
+
+After completing the setup workflow, run:
+
+```bash
+bun run dev
+```
+
+To run the Next.js app alone, use:
+
+```bash
+bun run --filter @repo/next-app dev
+```
+
+## Confirm required services
+
+Make sure the environment values selected during setup are available, especially the database connection and the URL used by the chosen authentication provider.

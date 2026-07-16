@@ -1,0 +1,28 @@
+---
+title: Troubleshoot local setup
+description: Resolve the common setup, database, and dependency problems before changing application code.
+---
+
+# Troubleshoot local setup
+
+## The development command says setup is required
+
+Run the initial setup workflow first:
+
+```bash
+bun run setup
+```
+
+The template intentionally blocks the regular development command until a provider and local environment have been selected.
+
+## The application cannot connect to the database
+
+Check that `DATABASE_URL` is present in `.env.local`, points to a reachable PostgreSQL database, and has the permissions required to apply the local schema.
+
+## Dependencies do not match the selected provider
+
+Re-run the setup workflow with the provider option you intend to use. Treat provider changes carefully because setup updates the working tree to keep only the selected implementation.
+
+## Need deeper help?
+
+Check the repository README for the complete setup command reference and configuration details.
