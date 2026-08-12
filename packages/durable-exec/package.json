@@ -17,9 +17,13 @@
     "google-auth-library": "catalog:",
     "inngest": "catalog:"
   },
+  "peerDependencies": {
+    "next": ">=14.0.0"
+  },
   "devDependencies": {
     "@types/node": "catalog:",
     "inngest-cli": "^1.18.0",
+    "next": "catalog:",
     "typescript": "catalog:"
   }
 }

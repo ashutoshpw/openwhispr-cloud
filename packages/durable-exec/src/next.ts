@@ -14,7 +14,9 @@ import { seoPromptSnapshotFunction } from "./seo/functions/prompt-snapshot";
 import { seoRankSnapshotFunction } from "./seo/functions/rank-snapshot";
 import { seoSecretValidationFunction } from "./seo/functions/secret-validation";
 
-export const { GET, POST, PUT } = serve({
+type Handler = (req: Request) => Promise<Response>;
+
+const handler = serve({
   client: inngest,
   functions: [
     seoRankSnapshotFunction,
@@ -25,4 +27,12 @@ export const { GET, POST, PUT } = serve({
     seoCompetitorRollupFunction,
     seoPosthogReferrerRollupFunction,
   ],
-});
+}) as unknown as {
+  GET: Handler;
+  POST: Handler;
+  PUT: Handler;
+};
+
+export const GET = (req: Request) => handler.GET(req);
+export const POST = (req: Request) => handler.POST(req);
+export const PUT = (req: Request) => handler.PUT(req);
