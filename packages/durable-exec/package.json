@@ -15,7 +15,7 @@
     "@repo/billing": "workspace:*",
     "@repo/database": "workspace:*",
     "google-auth-library": "catalog:",
-    "inngest": "^4.2.4"
+    "inngest": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",

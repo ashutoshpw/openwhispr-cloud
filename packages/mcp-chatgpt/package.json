@@ -8,7 +8,8 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "catalog:"
+    "@modelcontextprotocol/sdk": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@types/node": "catalog:",

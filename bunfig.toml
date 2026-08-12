@@ -1,3 +1,6 @@
 [install]
+# Keep TypeScript 7's root compiler binary separate from the TypeScript 6 API
+# compatibility package used by the staged-file checker.
+linker = "isolated"
 # Allow postinstall scripts for packages that require binary compilation
 trustedDependencies = ["inngest-cli"]

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { refetchSession } from "@repo/auth/client";
-import { upload } from "@vercel/blob/client";
+import { upload } from "@repo/object-storage/client";
 import { Loader2, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";

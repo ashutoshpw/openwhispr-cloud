@@ -3,7 +3,7 @@
 import { execSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import path from "node:path";
-import ts from "typescript";
+import ts from "@typescript/typescript6";
 
 const TYPE_EXTENSIONS = new Set([".ts", ".tsx", ".mts", ".cts"]);
 const cwd = process.cwd();
