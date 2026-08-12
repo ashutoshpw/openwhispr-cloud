@@ -2,7 +2,8 @@
 
 ## Monorepo Structure
 
-This is a Turborepo monorepo using bun workspaces with TUI mode enabled.
+This is a Turborepo monorepo using Bun workspaces and a root Bun dependency
+catalog with TUI mode enabled.
 
 ```
 .
@@ -67,6 +68,26 @@ bun run --filter @repo/database build   # Build database package only
 - Preview with `bun run docs:public` or `bun run docs:internal`; validate with the corresponding `:validate` command.
 
 ## Package Dependencies
+
+### Shared dependency catalog
+
+Shared external dependency versions are defined once in the root `package.json`
+under `catalog`. Workspace `dependencies`, `devDependencies`, and
+`optionalDependencies` must reference catalog-managed packages with
+`"catalog:"`; do not repeat their version strings in `apps/*` or `packages/*`.
+Peer dependency ranges remain package-specific when a library supports multiple
+host versions. Use `workspace:*` for local `@repo/*` packages.
+
+After changing a catalog or adding a catalog-managed dependency, run:
+
+```bash
+bun install
+bun run check:catalog-deps
+```
+
+Auth-provider templates under `.setup/templates/auth/` must preserve catalog
+references so setup does not recreate direct dependency versions in
+`packages/auth`.
 
 ### Importing from @repo/database
 

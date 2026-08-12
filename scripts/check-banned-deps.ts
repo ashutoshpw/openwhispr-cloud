@@ -169,12 +169,8 @@ interface Violation {
 }
 
 const stagedFiles = getStagedFiles();
-const packageJsonFiles = stagedFiles.filter(
-  (f) =>
-    (/^apps\/[^/]+\/package\.json$/.test(f) ||
-      /^packages\/[^/]+\/package\.json$/.test(f)) &&
-    f !== "packages/object-storage/package.json" &&
-    f !== "packages/durable-exec/package.json",
+const packageJsonFiles = stagedFiles.filter((f) =>
+  /^apps\/[^/]+\/package\.json$/.test(f),
 );
 
 const violations: Violation[] = [];

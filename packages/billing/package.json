@@ -25,12 +25,12 @@
   },
   "dependencies": {
     "@repo/database": "workspace:*",
-    "nanoid": "^5.0.7",
+    "nanoid": "catalog:",
     "stripe": "^14.16.0",
     "stripe-sync-engine": "^0.1.0"
   },
   "devDependencies": {
-    "typescript": "latest",
+    "typescript": "catalog:",
     "vitest": "^3.2.1"
   }
 }

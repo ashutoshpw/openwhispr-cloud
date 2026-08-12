@@ -6,3 +6,4 @@ bun run check:banned-deps
 bun run check:no-per-minute-cron
 bun run check:root-md
 bunx lint-staged
+bun run check:catalog-deps
