@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@types/node": "^20",
-    "@types/react": "19.2.14",
-    "typescript": "latest"
+    "@types/react": "catalog:",
+    "typescript": "catalog:"
   }
 }

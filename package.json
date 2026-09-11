@@ -5,6 +5,20 @@
   "license": "SEE LICENSE IN LICENSE",
   "packageManager": "bun@1.2.0",
   "workspaces": ["apps/*", "packages/*"],
+  "catalog": {
+    "@modelcontextprotocol/sdk": "^1.22.0",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "fumadocs-mdx": "^14.2.11",
+    "google-auth-library": "^10.6.2",
+    "mcp-handler": "^1.0.3",
+    "nanoid": "^5.0.7",
+    "next": "16.2.6",
+    "react": "19.2.5",
+    "react-dom": "19.2.5",
+    "typescript": "latest",
+    "zod": "^3.23.5"
+  },
   "scripts": {
     "dev": "bun run .setup/dev-guard.ts",
     "dev:all": "turbo run dev",
@@ -53,7 +67,7 @@
     "posthog-node": "^5.24.15",
     "tsx": "^4.21.0",
     "turbo": "^2.5.0",
-    "typescript": "latest"
+    "typescript": "catalog:"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx,mjs,cjs,mts,cts,json,jsonc,css}": [

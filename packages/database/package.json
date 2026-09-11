@@ -23,6 +23,6 @@
   "devDependencies": {
     "drizzle-kit": "^0.31.7",
     "dotenv": "^17.2.3",
-    "typescript": "latest"
+    "typescript": "catalog:"
   }
 }
