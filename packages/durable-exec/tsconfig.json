@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist",
+    "rootDir": "..",
     "lib": ["es2022"],
     "paths": {
       "@repo/database": ["../database/src"],
