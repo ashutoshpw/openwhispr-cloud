@@ -1,7 +1,7 @@
 import { captureReferralIntent, getReferralCodeByCode } from "@repo/billing";
 import { NextResponse } from "next/server";
 
-export const REFERRAL_COOKIE_NAME = "referral_code";
+const REFERRAL_COOKIE_NAME = "referral_code";
 const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30; // 30 days
 
 /**

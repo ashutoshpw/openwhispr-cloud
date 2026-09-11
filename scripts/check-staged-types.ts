@@ -1,13 +1,11 @@
 #!/usr/bin/env bun
 
-import { execSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { execSync, spawnSync } from "node:child_process";
+import { existsSync, unlinkSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import ts from "typescript";
 
 const TYPE_EXTENSIONS = new Set([".ts", ".tsx", ".mts", ".cts"]);
 const cwd = process.cwd();
-
 const SKIP_PATH_PREFIXES = [".setup/templates/"];
 
 function isSkippedPath(filePath: string): boolean {
@@ -72,58 +70,84 @@ function groupFilesByTsconfig(files: string[]): Map<string, string[]> {
   return grouped;
 }
 
-function formatDiagnostic(diagnostic: ts.Diagnostic): string {
-  const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
-  if (!diagnostic.file || diagnostic.start === undefined) {
-    return `TS${diagnostic.code}: ${message}`;
-  }
+function pathMatchesStagedFile(line: string, stagedFiles: string[]): boolean {
+  const normalizedLine = line.replace(/\\/g, "/");
 
-  const relativeFile = path.relative(cwd, diagnostic.file.fileName);
-  const pos = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
-  return `${relativeFile}:${pos.line + 1}:${pos.character + 1} TS${diagnostic.code}: ${message}`;
+  return stagedFiles.some((file) => {
+    const relative = file.replace(/\\/g, "/");
+    const absolute = normalize(file).replace(/\\/g, "/");
+    return (
+      normalizedLine.includes(`${relative}:`) ||
+      normalizedLine.includes(`${relative}(`) ||
+      normalizedLine.includes(`${absolute}:`) ||
+      normalizedLine.includes(`${absolute}(`)
+    );
+  });
 }
 
-function checkFileGroup(tsconfigPath: string, stagedFiles: string[]): string[] {
-  const configResult = ts.readConfigFile(tsconfigPath, ts.sys.readFile);
-  if (configResult.error) {
-    return [formatDiagnostic(configResult.error)];
-  }
+function filterDiagnostics(
+  output: string,
+  stagedFiles: string[],
+  temporaryConfigPath: string,
+): string[] {
+  const lines = output
+    .split(/\r?\n/)
+    .map((line) => line.trimEnd())
+    .filter(Boolean);
 
-  const parsed = ts.parseJsonConfigFileContent(
-    configResult.config,
-    ts.sys,
+  const normalizedConfigPath = temporaryConfigPath.replace(/\\/g, "/");
+  const relevant = lines.filter((line) => {
+    const normalizedLine = line.replace(/\\/g, "/");
+    return (
+      pathMatchesStagedFile(line, stagedFiles) ||
+      normalizedLine.includes(normalizedConfigPath) ||
+      /^error TS\d+\b/.test(line)
+    );
+  });
+
+  return relevant.length > 0 ? relevant : lines;
+}
+
+let temporaryConfigCounter = 0;
+
+function checkFileGroup(tsconfigPath: string, stagedFiles: string[]): string[] {
+  const temporaryConfigPath = path.join(
     path.dirname(tsconfigPath),
-    {
+    `.tsconfig.staged-${process.pid}-${temporaryConfigCounter++}.json`,
+  );
+
+  const temporaryConfig = {
+    extends: `./${path.basename(tsconfigPath)}`,
+    compilerOptions: {
       noEmit: true,
       incremental: false,
       composite: false,
-      tsBuildInfoFile: undefined,
+      types: ["node"],
     },
-    tsconfigPath,
+    files: stagedFiles.map(normalize),
+    include: [],
+    exclude: [],
+  };
+
+  writeFileSync(
+    temporaryConfigPath,
+    `${JSON.stringify(temporaryConfig, null, 2)}\n`,
   );
 
-  const rootNames = stagedFiles.map((file) => normalize(file));
-  const stagedSet = new Set(rootNames);
-  const options: ts.CompilerOptions = {
-    ...parsed.options,
-    noEmit: true,
-    incremental: false,
-    composite: false,
-    tsBuildInfoFile: undefined,
-    types: Array.from(new Set([...(parsed.options.types ?? []), "node"])),
-  };
-  const program = ts.createProgram({
-    rootNames,
-    options,
-  });
+  try {
+    const result = spawnSync(
+      "bun",
+      ["x", "tsc", "--project", temporaryConfigPath, "--pretty", "false"],
+      { cwd, encoding: "utf8" },
+    );
 
-  const diagnostics = ts.getPreEmitDiagnostics(program);
-  const filtered = diagnostics.filter((diagnostic) => {
-    if (!diagnostic.file) return false;
-    return stagedSet.has(normalize(diagnostic.file.fileName));
-  });
+    if (result.status === 0) return [];
 
-  return filtered.map(formatDiagnostic);
+    const output = [result.stdout, result.stderr].filter(Boolean).join("\n");
+    return filterDiagnostics(output, stagedFiles, temporaryConfigPath);
+  } finally {
+    unlinkSync(temporaryConfigPath);
+  }
 }
 
 const stagedFiles = getStagedFiles();

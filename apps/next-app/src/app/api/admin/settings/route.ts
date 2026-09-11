@@ -8,7 +8,7 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 
 // Well-known app settings keys
-export const APP_SETTINGS_KEYS = {
+const APP_SETTINGS_KEYS = {
   ENTERPRISE_CONTACT_LINK: "enterprise_contact_link",
   FREE_WORKSPACE_LIMIT: "free_workspace_limit",
   TRIAL_DURATION_DAYS: "trial_duration_days",
