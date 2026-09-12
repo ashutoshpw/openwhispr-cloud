@@ -8,6 +8,7 @@ config({ path: resolve(__dirname, "../../.env.local") });
 export default defineConfig({
   schema: [
     "./src/schema.ts",
+    "./src/schema-agent-auth.ts",
     "./src/schema-agents.ts",
     "./src/schema-ext.ts",
     "./src/schema-seo.ts",

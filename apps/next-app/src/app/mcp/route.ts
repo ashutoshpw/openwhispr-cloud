@@ -1,4 +1,6 @@
 import { baseURL } from "@/../baseUrl";
+import { bearerChallenge } from "@/lib/agent-auth/discovery";
+import { verifyAgentAccessToken } from "@/lib/agent-auth/tokens";
 import { verifyAccountToken } from "@/lib/auth/account-token";
 import {
   logMcpRequest,
@@ -30,12 +32,17 @@ async function withAuth(
   if (process.env.MCP_REQUIRE_AUTH === "false") {
     return { userId: null };
   }
+  // Agent access tokens (auth.md flow) take precedence over opaque account tokens.
+  const agentToken = await verifyAgentAccessToken(req);
+  if (agentToken) {
+    return { userId: agentToken.userId };
+  }
   const result = await verifyAccountToken(req);
   if (!result) {
     return {
       error: NextResponse.json(
         { error: "unauthorized", message: "Bearer token required" },
-        { status: 401, headers: { "WWW-Authenticate": "Bearer" } },
+        { status: 401, headers: { "WWW-Authenticate": bearerChallenge() } },
       ),
     };
   }

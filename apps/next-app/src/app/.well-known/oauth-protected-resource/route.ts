@@ -1,3 +1,4 @@
+import { AGENT_SCOPES_SUPPORTED } from "@/lib/agent-auth/discovery";
 import { absoluteUrl, getSiteUrl } from "@/lib/site-config";
 
 export async function GET(): Promise<Response> {
@@ -5,7 +6,8 @@ export async function GET(): Promise<Response> {
     {
       resource: absoluteUrl("/mcp"),
       authorization_servers: [getSiteUrl()],
-      scopes_supported: ["openid", "profile", "email"],
+      scopes_supported: AGENT_SCOPES_SUPPORTED,
+      bearer_methods_supported: ["header"],
     },
     {
       headers: {

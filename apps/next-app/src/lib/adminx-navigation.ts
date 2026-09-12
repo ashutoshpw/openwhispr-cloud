@@ -19,6 +19,7 @@ import {
   Search,
   Settings,
   Shield,
+  ShieldCheck,
   Sliders,
   SlidersHorizontal,
   Sparkles,
@@ -70,6 +71,11 @@ export const adminxNav: AdminNavConfig = {
         },
         { label: "Projects", icon: FolderKanban, href: "/adminx/projects" },
         { label: "Agents", icon: Bot, href: "/adminx/agents" },
+        {
+          label: "Agent Auth",
+          icon: ShieldCheck,
+          href: "/adminx/agent-auth",
+        },
       ],
     },
     {

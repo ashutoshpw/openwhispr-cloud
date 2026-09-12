@@ -1,5 +1,6 @@
 // Re-export everything from schema and client
 export * from "./schema";
+export * from "./schema-agent-auth";
 export * from "./schema-agents";
 export * from "./schema-analytics";
 export * from "./schema-seo";
