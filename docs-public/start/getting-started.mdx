@@ -1,0 +1,58 @@
+---
+title: Getting started
+description: Configure and run the Next.js 16 Starter Kit locally.
+---
+
+# Getting started
+
+## Prerequisites
+
+- Bun matching the version in the root `package.json`.
+- Node.js 18 or newer for tools that require it.
+- PostgreSQL, local or hosted.
+
+## Install and configure
+
+```bash
+git clone <your-repository-url>
+cd nextjs16-starter-kit
+bun install
+bun run setup
+```
+
+The setup wizard selects one authentication provider and writes the provider
+configuration into the working tree. It then collects values for the database
+and optional integrations. Use `bun run setup --help` for non-interactive
+options, for example:
+
+```bash
+bun run setup --yes --provider=better-auth
+```
+
+Keep credentials in the root `.env.local`; use `env.example` as the variable
+name reference and never commit real values.
+
+## Prepare the database
+
+For local development, push the schema and optionally create the admin seed:
+
+```bash
+bun run db:push
+bun run db:seed
+```
+
+Use reviewed migrations (`bun run db:generate` followed by
+`bun run db:migrate`) for shared environments.
+
+## Run the app
+
+```bash
+bun run dev
+```
+
+The development guard permits this command after setup. The Next.js app listens
+on port `8801` by default. To run only the app without the root TUI, use:
+
+```bash
+bun run --filter @repo/next-app dev
+```

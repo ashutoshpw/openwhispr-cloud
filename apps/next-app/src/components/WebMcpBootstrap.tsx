@@ -22,7 +22,7 @@ export function WebMcpBootstrap() {
                   properties: {
                     path: {
                       type: 'string',
-                      description: 'Optional docs path to open, such as /docs/getting-started.'
+                      description: 'Optional docs path to open, such as /docs/start/getting-started.'
                     }
                   }
                 },

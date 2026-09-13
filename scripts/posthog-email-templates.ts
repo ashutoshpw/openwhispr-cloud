@@ -163,7 +163,7 @@ The {{app_name}} Team`,
       </div>
       
       <center>
-        <a href="{{app_url}}/docs/tips" class="button">View All Tips</a>
+        <a href="{{app_url}}/docs" class="button">Browse Documentation</a>
       </center>
       
       <p>Questions or feedback? We'd love to hear from you - just reply to this email.</p>
@@ -191,7 +191,7 @@ Now that you've had some time to explore, here are some pro tips our power users
 
 Pro tip: Bookmark your most-used pages for quick access!
 
-View all tips: {{app_url}}/docs/tips
+Browse the documentation: {{app_url}}/docs
 
 Questions or feedback? We'd love to hear from you - just reply to this email.
 

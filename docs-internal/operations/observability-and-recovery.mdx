@@ -1,0 +1,31 @@
+---
+title: Observability and recovery
+description: Safe logging, health checks, external-service diagnostics, and recovery boundaries.
+---
+
+# Observability and recovery
+
+`/status` is the lightweight public readiness endpoint. Agent/MCP routes use
+structured request/response logging from `@repo/mcp-chatgpt`; agent-auth writes
+state changes to its audit table. PostHog and Vercel analytics are observability
+integrations, not proof that a request or workflow reached production.
+
+## Diagnostic order
+
+1. Check the deployment status and build revision.
+2. Verify required environment names are present without printing values.
+3. Check database connectivity and a non-empty query path.
+4. Check Inngest/Stripe/PostHog/provider delivery using their request IDs and
+   dashboards.
+5. Inspect application logs for safe error context and correlate audit/event
+   identifiers.
+
+## Recovery boundaries
+
+- Re-run idempotent jobs only after checking their event/state identifiers.
+- Reconcile Stripe and database state through the billing sync path; do not
+  edit subscription rows ad hoc.
+- Revoke compromised agent tokens/registrations and rotate signing or
+  encryption keys through a planned migration.
+- Preserve evidence while redacting credentials, personal data, and full
+  provider payloads from incident artifacts.

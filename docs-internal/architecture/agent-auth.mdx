@@ -1,0 +1,111 @@
+---
+title: Agent-auth architecture
+description: Internal implementation and security invariants for agentic registration.
+---
+
+# Agent-auth architecture
+
+The current implementation (introduced on local `main` at `d6fc034`) exposes a
+public, machine-readable agent registration protocol while keeping its security
+and persistence rules internal.
+
+## Route ownership
+
+| Surface | Responsibility |
+| --- | --- |
+| `/auth.md` | Generates the LLM-readable protocol manifest from current discovery constants |
+| `POST /agent/identity` | Anonymous, service-auth, and ID-JAG registration dispatch |
+| `POST /agent/identity/claim` | Starts or re-mints a user-code claim attempt |
+| `POST /agent/identity/claim/complete` | Authenticated user confirms a code; agents never submit it |
+| `POST /oauth2/token` | JWT-bearer assertion exchange and claim polling grant |
+| `POST /oauth2/revoke` | Idempotent RFC 7009 access-token revocation |
+| `POST /agent/event/notify` | Trusted-provider Security Event Token revocation push |
+| `GET /.well-known/jwks.json` | Public key set for service-signed assertions/tokens |
+
+Shared flow logic lives in `apps/next-app/src/lib/agent-auth/`: registration
+expiry/scope resolution, claim attempts, ID-JAG verification, trusted-provider
+JWKS resolution, key signing, token checks, rate limiting, and audit writes.
+
+## Credential lifecycle
+
+1. Registration creates a high-entropy claim token whose hash is persisted; the
+   plaintext is returned once.
+2. Anonymous registrations receive pre-claim `api.read` credentials. Service
+   auth registrations start with no identity assertion and require a user-code
+   ceremony.
+3. A signed-in user completes the code ceremony. The service transitions the
+   registration, issues post-claim `api.read api.write` scope, and returns a
+   service-signed identity assertion plus bearer access token.
+4. An identity assertion is exchanged through the JWT-bearer grant. Assertions
+   and access tokens are stateless JWTs, while issued-token rows provide
+   revocation state.
+5. Token revocation, registration revocation, expiry, and provider SET events
+   invalidate the appropriate credential layer and emit audit records.
+
+## Security invariants
+
+- ID-JAG checks enforce trusted issuer, audience, verified email, fresh
+  `auth_time`, near-term expiry, and a non-replayed `jti`.
+- Service keys are loaded through `keys.ts`; public verification uses JWKS.
+  Key rotation and TTL settings come from the documented environment names,
+  never from request input.
+- Claim tokens and user codes are hashed at rest. User codes have a short
+  window; the outer claim window and registration lifetime are separate.
+- Polling honors the advertised interval and returns RFC-shaped pending,
+  slow-down, or expired states. Rate limiting is per IP and currently fails
+  open when Redis is absent or reports an error; production must configure and
+  monitor the limiter.
+- SET notifications verify provider trust, audience, type, signature, and
+  replay `jti` before revoking matching registrations and derived tokens.
+- Revocation responses avoid token enumeration by returning success for unknown
+  or already-revoked access tokens.
+
+## Implementation and persistence map
+
+- `id-jag.ts` uses the unverified issuer only to select a tenant trust-list row;
+  it then verifies the signature with the provider JWKS and enforces issuer,
+  audience, `jti`, verified-email, `iat`, and `auth_time` checks. A successful
+  `jti` is inserted into `agent_jti_seen` before the registration continues.
+- `providers.ts` accepts only active `agent_provider` rows for the tenant. The
+  remote JWKS resolver caches keys, refreshes no more often than every ten
+  minutes, caps the cache at 24 hours, and retries once after a key-rotation
+  failure.
+- `keys.ts` loads `AGENT_AUTH_PRIVATE_KEY` and `AGENT_AUTH_KEY_ID`. Production
+  requires the configured private key unless `AGENT_AUTH_ENABLED=false`; local
+  development may use an ephemeral key. `AGENT_AUTH_ASSERTION_TTL_DAYS`,
+  `AGENT_AUTH_ACCESS_TOKEN_TTL`, and `AGENT_AUTH_REGISTRATION_TTL_DAYS` control
+  the assertion, access-token, and registration windows. `ID_JAG_MAX_AUTH_AGE_SECONDS`
+  controls the freshness requirement for provider assertions.
+- `rate-limit.ts` uses `UPSTASH_REDIS_REST_URL` and
+  `UPSTASH_REDIS_REST_TOKEN` when configured (5 requests/hour for anonymous
+  registration and 60 requests/hour for other identity registration types).
+  It currently fails open when Redis is absent or errors, so production must
+  configure and monitor the limiter rather than treating it as a hard WAF.
+- `claims.ts` stores hashes of the claim token, attempt token, and six-digit
+  user code. The outer claim window is 24 hours, each code is valid for 10
+  minutes, five failed codes exhaust an attempt, and polling is advertised at
+  five-second intervals.
+
+The schema lifecycle is split across `agent_provider` (trust),
+`agent_registration` (identity and scope state), `agent_claim_attempt` (user
+ceremonies), `agent_token` (revocation ledger), `agent_delegation` (stable
+issuer/subject/audience links), `agent_jti_seen` (ID-JAG and SET replay), and
+`agent_auth_audit` (state-change evidence). Claim completion changes the
+registration to `claimed`, associates the user and primary organization,
+revokes pre-claim tokens, and emits a post-claim assertion/token on the next
+poll.
+
+## Tenant and threat-model assumptions
+
+The current route handlers use the `default` tenant while the trust-list and
+schema APIs already carry tenant IDs. Do not infer a tenant from an untrusted
+host, email, or assertion claim; introduce an explicit resolver before adding
+multi-tenant agent registration. Existing-account ID-JAG matches require a
+user confirmation ceremony, while an unmatched verified email may create a
+minimal user through the documented JIT path. Treat anonymous credentials as
+unclaimed and low-scope until a signed-in human completes the ceremony.
+
+The public contract is documented in the separately published
+`docs-public/integrate/agent-auth` page. Update both pages when a protocol
+constant or error state changes; keep this site free of a cross-site URL until
+the public and internal hosting URLs are recorded in the repository policy.

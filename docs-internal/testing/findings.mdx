@@ -1,0 +1,27 @@
+---
+title: Testing findings and evidence
+description: Dated validation records, baseline limitations, and follow-up evidence.
+---
+
+# Testing findings and evidence
+
+This page replaces the old snapshot in `apps/next-app/docs/TESTING_FINDINGS.md`.
+Keep findings dated and tied to the source revision and environment in which
+they were observed.
+
+## Recording rules
+
+- Separate resolved findings, open defects, environment blockers, and inherited
+  baseline debt.
+- Include the exact command/route and relevant redacted output.
+- Do not call a build or export proof of authenticated, device, live-provider,
+  or production behavior.
+- Re-test after source or dependency changes; do not carry an old conclusion
+  forward without evidence.
+
+## Current baseline note
+
+The app build can compile without configured database/Stripe values but may log
+expected data-fetch errors while prerendering pages that need those services.
+Treat this as an environment-dependent validation boundary until a configured
+database/provider run proves the non-empty paths.

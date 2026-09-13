@@ -1,0 +1,35 @@
+---
+title: Billing module
+description: Stripe, subscriptions, feature limits, referrals, and billing jobs.
+---
+
+# Billing module
+
+`@repo/billing` owns billing domain logic and exports subscriptions,
+organization state, feature limits, usage checks, audit records, pricing plans,
+referrals, and Stripe adapters. `apps/next-app` owns the route/UI composition;
+Stripe webhooks are handled under `src/app/api/webhooks/stripe`.
+
+## Data and flow
+
+1. A checkout or portal request is authorized for the organization and routed
+   through the billing package.
+2. Stripe webhook events are verified and synchronized into the shared database.
+3. Subscription and organization helpers derive active/trial/read-only state.
+4. Feature and usage checks gate workspace/member/project mutations.
+5. Referral and credit-grant transitions write audit records and affect billing
+   state through the package APIs.
+
+The package also exposes Inngest runners for trial expiration and pending
+organization cleanup. These are registered through `@repo/durable-exec`, not
+Vercel Cron.
+
+## Change invariants
+
+- Keep Stripe identifiers and webhook signatures server-side.
+- Treat webhook handlers as retryable and make synchronization idempotent.
+- Preserve read-only and archived-organization checks when adding mutations.
+- Update package exports, UI/API consumers, and billing tests together.
+
+See `packages/billing/src/__tests__/billing.test.ts` for the existing focused
+coverage and use the package test command before changing billing behavior.

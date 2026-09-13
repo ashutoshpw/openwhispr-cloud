@@ -1,0 +1,29 @@
+---
+title: Run the starter locally
+description: Start a configured project and verify its local services.
+---
+
+# Run the starter locally
+
+Install dependencies and complete setup first:
+
+```bash
+bun install
+bun run setup
+```
+
+Start the full workspace TUI:
+
+```bash
+bun run dev
+```
+
+Or start only the Next.js app:
+
+```bash
+bun run --filter @repo/next-app dev
+```
+
+The app uses port `8801` by default. Run the Inngest CLI separately when
+testing durable jobs, and ensure the database and any selected provider
+variables are available in the root `.env.local`.

@@ -1,0 +1,35 @@
+---
+title: Analytics module
+description: Client/server analytics boundaries, event contracts, and workflow scripts.
+---
+
+# Analytics module
+
+`@repo/analytics` is the shared analytics package. Its entry point exports event
+constants and types, client tracking helpers, React hooks/provider, server
+tracking helpers, and feature-flag functions. Query/admin adapters are exposed
+through package subpaths.
+
+## Boundaries
+
+- Client code imports the client entry point or hooks and must be behind a
+  client boundary.
+- Server routes and jobs use server helpers so PostHog credentials never enter
+  browser bundles.
+- Admin analytics queries live in the package/query adapters and are consumed
+  by `apps/next-app/src/app/adminx/analytics`.
+- Vercel analytics is an optional client-side integration; PostHog events and
+  workflow actions remain the canonical lifecycle contract.
+
+## Event changes
+
+Add event names and property types in `packages/analytics/src/events.ts`, then
+update all producers and the PostHog setup/workflow scripts. Keep user context
+minimal and avoid sensitive values. The setup and test utilities are under
+`.setup/setup-posthog.ts` and `scripts/posthog*`.
+
+## Verification
+
+Use the event and workflow test scripts with disposable credentials, inspect
+the browser/server boundary in the build, and confirm events in the intended
+PostHog project. A passing script does not prove production delivery.

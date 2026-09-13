@@ -1,0 +1,36 @@
+---
+title: Data and tenancy architecture
+description: Database client, schemas, DAL boundaries, and tenant resolution.
+---
+
+# Data and tenancy architecture
+
+`@repo/database` owns the Drizzle client, schema exports, tenant helpers, and
+data-access helpers. `apps/next-app` and other packages should use its exports
+instead of constructing a second database client.
+
+## Schema groups
+
+Schema files cover core auth/application data, tenants and organizations,
+analytics, SEO/AIEO, agents, and agent-auth registrations/tokens/audit state.
+The agent-auth tables are defined in `packages/database/src/schema-agent-auth.ts`
+and are re-exported from the package entry point.
+
+## Tenant resolution
+
+The tenant helpers normalize host/domain input and resolve a configured tenant
+before tenant-scoped reads or writes. The default tenant is used only where a
+route explicitly documents that behavior (for example the current agent-auth
+protocol implementation). New routes must not infer tenant identity from
+untrusted request data without applying the existing resolver and membership
+checks.
+
+## DAL and migration rules
+
+- Keep query composition in `packages/database/src/dal` or an owning domain
+  package; route handlers should not duplicate SQL policy.
+- Use `db:push` only for disposable local development.
+- Generate, review, and apply migrations for shared environments.
+- Test a non-empty query path after a migration; a journal entry alone does not
+  prove that the live schema is usable.
+- Seeds are explicit scripts and must not run implicitly in production.

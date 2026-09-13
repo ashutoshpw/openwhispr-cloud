@@ -1,0 +1,28 @@
+---
+title: Documentation tooling
+description: Canonical content roots, generated app docs, and validation ownership.
+---
+
+# Documentation tooling
+
+The hand-maintained documentation sources are the root `docs-public/` and
+`docs-internal/` trees. Their `docs.json` files own Mintlify navigation. The
+public tree is also consumed by the app's Fumadocs loader when the in-app
+`/docs` surface in `apps/next-app/src/app/docs/` is retained, making it a
+generated view rather than a second content source.
+
+## Ownership
+
+- Edit content in the appropriate root tree.
+- Keep navigation slugs in `docs.json` synchronized with files.
+- Keep `/auth.md` generated from `apps/next-app/src/app/auth.md/route.ts` and
+  update the public/internal agent-auth pages when its contract changes.
+- Do not add `apps/*/docs`, `packages/*/docs`, or another generic `docs/`
+  directory.
+
+## Validation
+
+Use the public/internal preview and broken-link commands, the staged path policy,
+and the coverage checker. Source-path references in internal pages should be
+covered by `docs-internal/coverage.json` and verified at the same commit as the
+documentation change.

@@ -1,0 +1,39 @@
+---
+title: Choose an authentication provider
+description: Select and configure the provider that the generated starter will use.
+---
+
+# Choose an authentication provider
+
+The starter generates one authentication implementation during setup. Choose
+the provider before building product features so the application and shared
+auth package stay consistent.
+
+## Select a provider
+
+Run the wizard:
+
+```bash
+bun run setup
+```
+
+The supported choices are Better Auth, NextAuth, AuthKit/WorkOS, and Clerk.
+The non-interactive equivalent is:
+
+```bash
+bun run setup --yes --provider=better-auth
+```
+
+## Configure provider values
+
+The wizard records the selected provider in the generated environment and
+copies the matching templates from `.setup/templates/auth/<provider>/`.
+Complete the provider-specific variables in `.env.local` and configure the
+same variables in the deployment environment.
+
+## Switching later
+
+Provider switching rewrites generated files and dependencies. Commit feature
+work first, run the setup command with the provider you want, and review the
+resulting diff before continuing. Do not commit `.auth-provider.lock` or
+`.auth-backup/` artifacts.

@@ -1,0 +1,31 @@
+---
+title: Integration module
+description: Installation, encryption, provider access, and MCP proxy/runtime paths.
+---
+
+# Integration module
+
+Integration records and installation flows span the database schema, app routes,
+and helpers under `apps/next-app/src/lib/integrations`.
+
+## Flow
+
+1. The integration catalog and provider metadata are seeded through
+   `scripts/seed-integrations.ts`.
+2. A workspace/project installation is authorized by the membership/access
+   helpers and persisted with encrypted credentials.
+3. Provider handlers and the MCP proxy/runtime translate requests without
+   exposing stored secrets to client components.
+4. Account, organization, project, and admin routes expose only the operations
+   appropriate to their authorization boundary.
+
+`INTEGRATION_ENCRYPTION_KEY` protects credential material at rest. Changing the
+key requires a deliberate rotation/migration procedure; do not silently use a
+new key against existing rows.
+
+## Verification
+
+Test install, reinstall, removal, access denial, provider failure, and proxy
+timeout behavior with a disposable integration. Confirm that logs contain
+request identifiers and safe metadata, not decrypted credentials or provider
+tokens.

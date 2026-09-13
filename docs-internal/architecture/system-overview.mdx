@@ -1,0 +1,38 @@
+---
+title: System overview
+description: How the Next.js app, workspace packages, setup workflow, and external services fit together.
+---
+
+# System overview
+
+The repository is a Bun workspace/Turborepo monorepo. `apps/next-app` owns the
+HTTP and UI surface. Reusable server/domain behavior is split into `packages/*`
+and consumed through workspace exports.
+
+## Request path
+
+1. Next.js resolves an App Router page or `route.ts` under
+   `apps/next-app/src/app`.
+2. `apps/next-app/src/proxy.ts` handles cross-cutting request policy where
+   applicable. Next.js 16 uses the `proxy.ts` convention; do not add a
+   production `middleware.ts`.
+3. Route handlers call package APIs, authentication helpers, and database/DAL
+   functions. UI server components should keep data access on the server;
+   client components are used only where browser state or interaction requires
+   them.
+4. External services (PostgreSQL, Stripe, PostHog, Inngest, provider APIs,
+   storage, and MCP clients) are reached through the owning package or adapter.
+
+## Ownership map
+
+| Layer | Owns | Examples |
+| --- | --- | --- |
+| App routes/UI | URL contracts, auth gates, composition | `apps/next-app/src/app`, `src/components` |
+| App libraries | request adapters and app-specific policy | `src/lib`, `src/providers` |
+| Shared packages | reusable domain and integration contracts | `packages/auth`, `billing`, `database`, `analytics` |
+| Setup | one-time generated provider/environment workflow | `.setup/` |
+| Scripts | seeds, checks, migration/integration utilities | `scripts/` |
+
+Use the separately published `docs-public/customize/project-structure` page
+for the user-facing overview and the package pages in this site for
+implementation contracts.

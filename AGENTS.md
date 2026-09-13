@@ -16,7 +16,9 @@ This is a Turborepo monorepo using bun workspaces with TUI mode enabled.
 │       │   └── utils/      # Utility functions
 │       ├── public/         # Static assets
 │       ├── content/        # MDX content
-│       └── docs/           # Documentation
+│       └── ...
+├── docs-public/            # Public, task-oriented Mintlify documentation
+├── docs-internal/          # Private developer and agent Mintlify documentation
 ├── packages/
 │   └── database/           # Shared Drizzle database package (@repo/database)
 │       ├── src/
@@ -56,6 +58,22 @@ Run commands for specific packages:
 bun run --filter @repo/next-app dev     # Run dev for Next.js app only
 bun run --filter @repo/database build   # Build database package only
 ```
+
+## Documentation policy
+
+- Put public, task-oriented guidance in `docs-public/`.
+- Put developer, agent, architecture, security, operations, and verification
+  guidance in `docs-internal/`.
+- Keep `/auth.md` generated from its route as the machine-readable agent
+  contract; document its consumer and implementation views separately.
+- Do not add hand-maintained `docs/` or nested `*/docs/*` directories. The
+  existing `apps/next-app/src/app/docs/` route is an allowed generated mirror
+  of `docs-public/`; staged-path checks also ignore `.agents/**` and
+  `.claude/**`, which hold executable agent instructions.
+- `README.md`, `CLAUDE.md`, `AGENTS.md`, `GEMINI.md`, and `LICENCE.md` are the
+  root markdown policy exemptions.
+- Preview with `bun run docs:public` or `bun run docs:internal`; validate with
+  the corresponding `:validate` command and `bun run check:doc-coverage`.
 
 ## Package Dependencies
 

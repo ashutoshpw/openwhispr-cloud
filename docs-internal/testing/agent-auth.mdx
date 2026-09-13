@@ -1,0 +1,22 @@
+---
+title: Agent-auth test matrix
+description: Manual and automated scenarios for registration, claims, tokens, and revocation.
+---
+
+# Agent-auth test matrix
+
+Run these scenarios against a disposable database and non-production keys. Do
+not paste tokens or private key material into test output.
+
+| Area | Scenarios |
+| --- | --- |
+| Discovery | `/auth.md`, protected-resource, authorization-server, OIDC, and JWKS responses; URL and scope consistency |
+| Registration | Anonymous, service-auth with valid/invalid email, identity assertion with trusted/untrusted issuer |
+| Claim ceremony | User-code creation, wrong code, correct code, expired code, expired outer claim window, duplicate completion |
+| Token grants | JWT-bearer success, wrong audience/issuer/type, expired assertion, revoked registration, claim polling pending/slow-down/expired/success |
+| Revocation | Unknown token, repeated token, valid token, registration-wide SET revocation, replayed SET `jti` |
+| Abuse controls | IP rate limits, malformed JSON/form bodies, missing fields, anti-enumeration response behavior |
+| Persistence | Registration/token/audit/replay rows, scope transition, expiry cleanup, tenant association |
+
+For each case record status code, stable error code, response headers, database
+state, and whether the assertion/token is accepted by `/mcp`.

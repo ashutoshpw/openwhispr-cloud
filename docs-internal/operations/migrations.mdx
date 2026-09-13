@@ -1,0 +1,33 @@
+---
+title: Database migrations
+description: Safe schema generation, application, and live verification.
+---
+
+# Database migrations
+
+The database schema and Drizzle configuration live in `packages/database`.
+Local development may use:
+
+```bash
+bun run db:push
+```
+
+For shared environments:
+
+```bash
+bun run db:generate
+bun run db:migrate
+```
+
+## Review checklist
+
+1. Confirm the schema change is owned by the correct schema module and remains
+   tenant-safe.
+2. Inspect generated SQL, indexes, constraints, and data backfill behavior.
+3. Check the migration against a disposable non-empty database.
+4. Apply it through the configured deployment process and verify a real query
+   path, not only the migration journal.
+5. Record rollback or forward-fix steps before production application.
+
+Seeds and manual migration helpers are explicit scripts. They must not be
+silently invoked by a normal app build or request.

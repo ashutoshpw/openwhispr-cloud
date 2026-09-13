@@ -5,7 +5,7 @@ A production-ready starter for building full-stack Next.js apps with the App Rou
 This repository gives you a solid starting point instead of starting from scratch. It is built as a Turborepo monorepo with bun workspaces, so you can start from a working foundation and customize it for your product, SaaS, admin dashboard, or internal tool.
 
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-7.x-blue)](https://www.typescriptlang.org/)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.x-38bdf8)](https://tailwindcss.com/)
 [![Turborepo](https://img.shields.io/badge/Turborepo-Monorepo-EF4444)](https://turbo.build/)
 
@@ -43,16 +43,22 @@ nextjs16-starter-kit/
 │       │   ├── lib/              # Core utilities
 │       │   └── ...
 │       ├── public/               # Static assets
-│       ├── content/              # MDX content
-│       └── docs/                 # App-specific docs
+│       ├── content/              # Blog MDX content
+│       └── ...
+│
+├── docs-public/                  # Public, task-oriented Mintlify docs
+├── docs-internal/                # Private developer and agent Mintlify docs
 │
 ├── packages/
-│   └── database/                 # Shared database package
-│       ├── src/
-│       │   ├── schema.ts         # Drizzle schemas
-│       │   ├── client.ts         # DB connection
-│       │   └── index.ts          # Exports
-│       └── drizzle.config.ts
+│   ├── ai/                       # OpenAI-compatible model helpers
+│   ├── analytics/                # PostHog/Vercel analytics
+│   ├── auth/                     # Selected authentication provider
+│   ├── billing/                  # Stripe and billing domain logic
+│   ├── database/                 # Drizzle schemas and DALs
+│   ├── durable-exec/             # Inngest and SEO/AIEO jobs
+│   ├── mcp-chatgpt/              # MCP context and logging
+│   ├── mcp-server/               # MCP tool registration
+│   └── object-storage/            # Vercel Blob/S3 providers
 │
 ├── .setup/                       # Initial-setup machinery (delete after first run)
 │   ├── setup.ts                  # Unified setup (auth provider init + .env.local)
@@ -90,7 +96,7 @@ nextjs16-starter-kit/
 | Database | PostgreSQL + Drizzle ORM (shared package) |
 | Forms | React Hook Form + Zod |
 | State Management | TanStack Query (React Query) |
-| API Layer | tRPC (TypeScript RPC) |
+| API Layer | Next.js Route Handlers and server actions |
 | Caching | Redis (Upstash) |
 | Payments | Stripe (optional) |
 | AI Integration | ChatGPT Apps SDK + MCP |
@@ -189,6 +195,11 @@ This starts PostgreSQL and the Next.js app with auto-schema push.
 | `bun run setup` | Unified setup: auth provider init + environment variables |
 | `bun run setup --yes --provider=<name>` | Headless setup for CI |
 | `bun run setup --force` | Re-initialize the auth provider (dangerous) |
+| `bun run docs:public` | Preview public Mintlify documentation |
+| `bun run docs:internal` | Preview internal Mintlify documentation |
+| `bun run docs:public:validate` | Validate public documentation links |
+| `bun run docs:internal:validate` | Validate internal documentation links |
+| `bun run check:doc-coverage` | Verify documented source roots and nav pages |
 
 ### Filtering to specific packages
 
@@ -328,7 +339,8 @@ This starter includes ChatGPT Apps SDK support for running inside ChatGPT.
 2. Connect via MCP: `https://your-app.vercel.app/mcp`
 3. Test with "Show me the content" in ChatGPT
 
-See [CHATGPT_APPS_SDK.md](./apps/next-app/docs/CHATGPT_APPS_SDK.md) for details.
+See [MCP integration](./docs-public/integrate/mcp.mdx) and
+[agent authentication](./docs-public/integrate/agent-auth.mdx) for details.
 
 ## Deployment
 

@@ -1,0 +1,35 @@
+---
+title: Connect to MCP
+description: Discover and call the starter's authenticated Model Context Protocol endpoint.
+---
+
+# Connect to MCP
+
+The app exposes an HTTP MCP endpoint at `/mcp`. A bearer access token is
+required by default; local setups may explicitly disable that requirement with
+`MCP_REQUIRE_AUTH=false`.
+
+## Discover the server
+
+Use the server card and protected-resource metadata:
+
+```http
+GET /.well-known/mcp/server-card.json
+GET /.well-known/oauth-protected-resource
+```
+
+The server currently advertises tools and no resources or prompts. Tool names,
+input schemas, and widget metadata are registered by the application and the
+`@repo/mcp-server` package.
+
+## Call the endpoint
+
+Send MCP requests to the endpoint from the server card with:
+
+```http
+Authorization: Bearer <access_token>
+```
+
+Use [Agent authentication](/integrate/agent-auth) to obtain a token. Treat
+`401` responses and the `WWW-Authenticate` challenge as a signal to restart
+discovery and authentication.

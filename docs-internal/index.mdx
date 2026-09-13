@@ -1,0 +1,25 @@
+---
+title: Internal documentation
+description: Source-aligned architecture, module, operations, and verification guidance for maintainers and agents.
+---
+
+# Internal documentation
+
+This site is for repository maintainers and coding agents. It records how the
+starter works, where implementation ownership lives, and how to change or
+verify it. It is not a substitute for `AGENTS.md` or `CLAUDE.md`, which remain
+the source of truth for agent behavior and repository constraints.
+
+## Documentation policy
+
+- Put user-facing, problem-oriented guidance in `docs-public/`.
+- Put developer, architecture, security, operator, and agent guidance here.
+- Keep the machine-readable `/auth.md` contract generated from its route; do
+  not hand-maintain a conflicting protocol copy.
+- Do not put credentials, private keys, user data, or production-only values in
+  either documentation site.
+- Preview with `bun run docs:internal` and validate with
+  `bun run docs:internal:validate`.
+
+Start with [Coverage](/coverage) to see which source domains are documented and
+which files own their behavior.

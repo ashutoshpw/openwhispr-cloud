@@ -1,0 +1,228 @@
+{
+  "schemaVersion": 1,
+  "entries": [
+    {
+      "id": "system-overview",
+      "page": "architecture/system-overview.mdx",
+      "visibility": "internal",
+      "sources": ["apps/next-app/src", "apps/next-app/package.json"]
+    },
+    {
+      "id": "auth-and-setup",
+      "page": "architecture/auth-and-setup.mdx",
+      "visibility": "internal",
+      "sources": ["packages/auth/src", ".setup"]
+    },
+    {
+      "id": "data-and-tenancy",
+      "page": "architecture/data-and-tenancy.mdx",
+      "visibility": "internal",
+      "sources": [
+        "packages/database/src",
+        "packages/database/drizzle.config.ts"
+      ]
+    },
+    {
+      "id": "agent-auth",
+      "page": "architecture/agent-auth.mdx",
+      "visibility": "internal",
+      "sources": [
+        "apps/next-app/src/lib/agent-auth",
+        "apps/next-app/src/app/auth.md",
+        "apps/next-app/src/app/agent",
+        "apps/next-app/src/app/oauth2",
+        "packages/database/src/schema-agent-auth.ts"
+      ]
+    },
+    {
+      "id": "mcp-and-agent-surfaces",
+      "page": "architecture/mcp-and-agent-surfaces.mdx",
+      "visibility": "internal",
+      "sources": [
+        "packages/mcp-chatgpt/src",
+        "packages/mcp-server/src",
+        "apps/next-app/src/app/mcp",
+        "apps/next-app/src/app/.well-known"
+      ]
+    },
+    {
+      "id": "analytics",
+      "page": "modules/analytics.mdx",
+      "visibility": "internal",
+      "sources": ["packages/analytics/src", "scripts/posthog"]
+    },
+    {
+      "id": "billing",
+      "page": "modules/billing.mdx",
+      "visibility": "internal",
+      "sources": ["packages/billing/src", "apps/next-app/src/app/api/billing"]
+    },
+    {
+      "id": "database",
+      "page": "modules/database.mdx",
+      "visibility": "internal",
+      "sources": ["packages/database/src"]
+    },
+    {
+      "id": "durable-exec-seo",
+      "page": "modules/durable-exec-seo.mdx",
+      "visibility": "internal",
+      "sources": [
+        "packages/durable-exec/src",
+        "apps/next-app/src/app/api/inngest"
+      ]
+    },
+    {
+      "id": "ai-and-storage",
+      "page": "modules/ai-and-storage.mdx",
+      "visibility": "internal",
+      "sources": ["packages/ai/src", "packages/object-storage/src"]
+    },
+    {
+      "id": "integrations",
+      "page": "modules/integrations.mdx",
+      "visibility": "internal",
+      "sources": [
+        "apps/next-app/src/lib/integrations",
+        "apps/next-app/src/app/api/integrations"
+      ]
+    },
+    {
+      "id": "docs-tooling",
+      "page": "modules/docs-tooling.mdx",
+      "visibility": "internal",
+      "sources": [
+        "docs-public",
+        "docs-internal",
+        "apps/next-app/source.config.ts",
+        "apps/next-app/src/app/docs"
+      ]
+    },
+    {
+      "id": "configuration-and-secrets",
+      "page": "operations/configuration-and-secrets.mdx",
+      "visibility": "internal",
+      "sources": ["env.example", ".setup/setup-env"]
+    },
+    {
+      "id": "deployments",
+      "page": "operations/deployments.mdx",
+      "visibility": "internal",
+      "sources": ["vercel.json", "Dockerfile", "apps/next-app/next.config.mjs"]
+    },
+    {
+      "id": "migrations",
+      "page": "operations/migrations.mdx",
+      "visibility": "internal",
+      "sources": [
+        "packages/database/migrations-manual",
+        "packages/database/drizzle.config.ts"
+      ]
+    },
+    {
+      "id": "observability-and-recovery",
+      "page": "operations/observability-and-recovery.mdx",
+      "visibility": "internal",
+      "sources": [
+        "apps/next-app/src/app/status",
+        "packages/analytics/src",
+        "scripts"
+      ]
+    },
+    {
+      "id": "verification-matrix",
+      "page": "testing/verification-matrix.mdx",
+      "visibility": "internal",
+      "sources": ["package.json", ".husky/pre-commit"]
+    },
+    {
+      "id": "agent-auth-testing",
+      "page": "testing/agent-auth.mdx",
+      "visibility": "internal",
+      "sources": ["apps/next-app/src/app/agent", "apps/next-app/src/app/oauth2"]
+    },
+    {
+      "id": "findings",
+      "page": "testing/findings.mdx",
+      "visibility": "internal",
+      "sources": ["apps/next-app/src"]
+    },
+    {
+      "id": "public-getting-started",
+      "site": "docs-public",
+      "page": "start/getting-started.mdx",
+      "visibility": "public",
+      "sources": ["package.json", ".setup/setup.ts", "env.example"]
+    },
+    {
+      "id": "public-authentication",
+      "site": "docs-public",
+      "page": "configure/authentication.mdx",
+      "visibility": "public",
+      "sources": ["packages/auth/src", ".setup/templates/auth"]
+    },
+    {
+      "id": "public-database",
+      "site": "docs-public",
+      "page": "configure/database.mdx",
+      "visibility": "public",
+      "sources": [
+        "packages/database/src",
+        "packages/database/drizzle.config.ts"
+      ]
+    },
+    {
+      "id": "public-project-structure",
+      "site": "docs-public",
+      "page": "customize/project-structure.mdx",
+      "visibility": "public",
+      "sources": ["apps/next-app/src", "packages"]
+    },
+    {
+      "id": "public-extend-starter",
+      "site": "docs-public",
+      "page": "customize/extend-the-starter.mdx",
+      "visibility": "public",
+      "sources": ["apps/next-app/src", "packages", ".setup"]
+    },
+    {
+      "id": "public-agent-auth",
+      "site": "docs-public",
+      "page": "integrate/agent-auth.mdx",
+      "visibility": "public",
+      "sources": [
+        "apps/next-app/src/app/auth.md",
+        "apps/next-app/src/app/agent",
+        "apps/next-app/src/app/oauth2"
+      ]
+    },
+    {
+      "id": "public-mcp",
+      "site": "docs-public",
+      "page": "integrate/mcp.mdx",
+      "visibility": "public",
+      "sources": ["apps/next-app/src/app/mcp", "packages/mcp-server/src"]
+    },
+    {
+      "id": "public-run-locally",
+      "site": "docs-public",
+      "page": "operate/run-locally.mdx",
+      "visibility": "public",
+      "sources": ["package.json", "apps/next-app/package.json"]
+    },
+    {
+      "id": "public-deploy",
+      "site": "docs-public",
+      "page": "operate/deploy.mdx",
+      "visibility": "public",
+      "sources": ["vercel.json", "Dockerfile", "apps/next-app/next.config.mjs"]
+    },
+    {
+      "id": "public-troubleshoot",
+      "site": "docs-public",
+      "page": "operate/troubleshoot.mdx",
+      "visibility": "public",
+      "sources": ["package.json", ".setup", "env.example"]
+    }
+  ]
+}

@@ -6,7 +6,9 @@ import {
 import { z } from "zod";
 
 export const docs = defineDocs({
-  dir: "../../packages/fumadocs/content/docs",
+  // Public docs are the canonical source for the generated in-app /docs view.
+  // Keep this as a mirror rather than maintaining a second docs tree.
+  dir: "../../docs-public",
 });
 
 export const blogCollection = defineCollections({

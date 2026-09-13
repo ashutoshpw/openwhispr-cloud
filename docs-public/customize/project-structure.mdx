@@ -1,0 +1,36 @@
+---
+title: Find the code you need to change
+description: Locate application, package, setup, and documentation code.
+---
+
+# Find the code you need to change
+
+## Application behavior
+
+Put Next.js pages and route handlers in `apps/next-app/src/app`. Shared React
+components live in `apps/next-app/src/components`; app helpers and integration
+adapters live in `apps/next-app/src/lib`.
+
+## Shared behavior
+
+Use the existing workspace package when a capability has more than one
+consumer:
+
+| Package | Responsibility |
+| --- | --- |
+| `@repo/auth` | Selected authentication implementation and session helpers |
+| `@repo/database` | Drizzle client, schemas, tenancy, and DALs |
+| `@repo/billing` | Stripe, subscriptions, pricing, usage, and referrals |
+| `@repo/analytics` | PostHog/Vercel analytics and event contracts |
+| `@repo/durable-exec` | Inngest events/functions and SEO/AIEO jobs |
+| `@repo/mcp-chatgpt` / `@repo/mcp-server` | MCP context, tools, metadata, and logging |
+| `@repo/ai` | OpenAI-compatible model helpers |
+| `@repo/object-storage` | Vercel Blob and S3 storage providers |
+
+## Setup-generated code
+
+Initial setup machinery belongs in `.setup/`. Edit provider templates there;
+do not hand-edit generated provider files and expect setup to preserve them.
+
+For maintainer architecture and module contracts, see the internal
+documentation site rather than adding a nested `docs/` directory.

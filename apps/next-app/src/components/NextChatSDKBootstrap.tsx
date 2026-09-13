@@ -24,7 +24,7 @@ export function NextChatSDKBootstrap({ baseUrl }: { baseUrl: string }) {
   const isInIframe = window.self !== window.top;
   
   // Only add base tag if we're in an iframe (ChatGPT Apps SDK context)
-  // The assetPrefix in next.config.js already handles base URL for direct browser access
+  // The assetPrefix in next.config.mjs already handles base URL for direct browser access
   if (isInIframe) {
     const baseTag = document.createElement('base');
     baseTag.href = ${JSON.stringify(validatedBaseUrl.toString())};

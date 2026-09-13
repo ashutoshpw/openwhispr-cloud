@@ -1,0 +1,38 @@
+---
+title: Verification matrix
+description: Quality gates and manual checks for code and documentation changes.
+---
+
+# Verification matrix
+
+## Repository gates
+
+```bash
+bun run lint
+bun run format:check
+bun run build
+bun run --filter @repo/billing test
+```
+
+The build may log expected configuration warnings when database or optional
+provider variables are absent; distinguish those baseline warnings from
+compile/type failures and record the environment used.
+
+## Documentation gates
+
+```bash
+bun run docs:public:validate
+bun run docs:internal:validate
+bun run check:doc-paths
+bun run check:doc-coverage
+```
+
+Review both rendered navigation trees, internal-site access control, source
+links, code snippets, command names, ports, and environment-variable names.
+
+## Runtime smoke checks
+
+With a disposable configured environment, check `/status`, public docs,
+`/auth.md`, OAuth/OIDC metadata, JWKS, API catalog, MCP server card, agent
+skills, `/llms.txt`, and `/mcp`. Record whether each check is local, CI, preview,
+authenticated, device, or live-provider validation.

@@ -1,0 +1,40 @@
+---
+title: Connect a database
+description: Configure PostgreSQL and apply the starter schema.
+---
+
+# Connect a database
+
+Set `DATABASE_URL` in the root `.env.local` file. The shared
+`@repo/database` package owns the Drizzle client, schema exports, tenant
+helpers, and data-access helpers used by the app and other packages.
+
+## Apply local changes
+
+```bash
+bun run db:push
+```
+
+Inspect local data with:
+
+```bash
+bun run db:studio
+```
+
+Seed an initial admin user when needed:
+
+```bash
+bun run db:seed
+```
+
+## Apply shared-environment changes
+
+Generate and review a migration, then apply it:
+
+```bash
+bun run db:generate
+bun run db:migrate
+```
+
+Avoid `db:push` against shared or production data because it can apply schema
+changes without a reviewed migration history.

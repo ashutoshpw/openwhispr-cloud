@@ -1,0 +1,35 @@
+---
+title: Deployment and runtime
+description: Vercel, Docker, runtime URLs, proxy behavior, and external docs hosting.
+---
+
+# Deployment and runtime
+
+The Next.js app is built from `apps/next-app` through the root Turborepo
+commands. `apps/next-app/next.config.mjs` configures the Next.js build and
+external package behavior; `apps/next-app/src/proxy.ts` is the Next.js 16
+request interception entry point.
+
+## Vercel
+
+`vercel.json` defines install/build/output behavior. Set the required runtime
+environment variables in the project and configure Inngest separately for
+durable functions. Preview and production URLs feed the shared `site-config`
+base-URL helper, which is used by discovery metadata and agent credentials.
+
+## Docker
+
+The root `Dockerfile` packages the app. Apply database migrations separately,
+provide runtime variables through the deployment secret store, and expose the
+port expected by the app (`8801` by default in development).
+
+## Documentation sites
+
+If Mintlify hosts `docs-public/` and `docs-internal/` separately, confirm the
+internal site's access control before publishing. If `/docs` remains in the
+Next.js app, it must load the public source tree rather than a forked copy.
+
+## Post-deploy checks
+
+Check `/status`, `/robots.txt`, `/sitemap.xml`, `/auth.md`, OAuth/OIDC metadata,
+JWKS, the MCP server card, and `/mcp` with the intended authentication state.

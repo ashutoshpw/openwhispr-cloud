@@ -1,0 +1,26 @@
+---
+title: Documentation coverage
+description: Source-to-documentation ownership for the starter repository.
+---
+
+# Documentation coverage
+
+`coverage.json` is the reviewable inventory for both documentation audiences.
+Every entry names a page, visibility, and one or more source roots; public
+entries set `site: docs-public`, while omitted sites default to
+`docs-internal`. It is checked by `bun run check:doc-coverage` so a deleted or
+renamed implementation root does not silently leave a page claiming coverage.
+
+## Coverage rules
+
+- Package behavior is documented by domain, not by every individual helper.
+- Public integration contracts have a corresponding page in `docs-public/`.
+- Security and operator invariants are internal even when the endpoint is
+  public.
+- Generated files and low-level UI primitives are covered by their owning
+  domain unless they have an independent operational contract.
+- A source-only entry is acceptable when exported types/comments are the most
+  accurate contract; the reason must be recorded in the manifest.
+
+When adding a package, route family, schema, external integration, or setup
+workflow, update the manifest and its page in the same change.

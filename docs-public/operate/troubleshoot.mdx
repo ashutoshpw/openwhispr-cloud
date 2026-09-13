@@ -1,0 +1,35 @@
+---
+title: Troubleshoot local setup
+description: Resolve setup, database, dependency, and provider problems.
+---
+
+# Troubleshoot local setup
+
+## The dev command says setup is required
+
+Run the initialization workflow:
+
+```bash
+bun run setup
+```
+
+The root `dev` command is intentionally guarded until an auth provider and
+local environment have been selected.
+
+## The app cannot connect to PostgreSQL
+
+Check `DATABASE_URL` in the root `.env.local`, confirm the server is reachable,
+then run `bun run db:push` for a disposable local database. Use migrations for
+shared environments.
+
+## Provider variables are missing
+
+Confirm the provider selected by setup and fill only that provider's variables.
+If you must switch providers, commit work first and use the documented setup
+switching flow because it rewrites generated files.
+
+## A package or build check fails
+
+Reinstall dependencies with `bun install`, then run the focused workspace build
+and `bun run lint`. For maintainer-only failures, consult the internal
+operations and verification pages.

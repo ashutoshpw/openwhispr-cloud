@@ -1,0 +1,48 @@
+---
+title: Integrate an agent
+description: Register an agent identity and exchange it for access to the MCP resource.
+---
+
+# Integrate an agent
+
+The service publishes a machine-readable protocol at `/auth.md`. Fetch it and
+the OAuth discovery documents at runtime instead of hard-coding deployment
+URLs.
+
+## Discover
+
+Fetch:
+
+```http
+GET /auth.md
+GET /.well-known/oauth-protected-resource
+GET /.well-known/oauth-authorization-server
+```
+
+The protected resource is `/mcp`. The advertised scopes and endpoints in the
+responses are authoritative for the deployment.
+
+## Register
+
+`POST /agent/identity` accepts one of these methods:
+
+- `anonymous` — creates a pre-claim credential and a claim ceremony token.
+- `service_auth` — starts a user-code ceremony for a supplied `login_hint`.
+- `identity_assertion` — exchanges a trusted, audience-bound ID-JAG for a
+  service identity assertion.
+
+The response describes whether a claim is required. Never ask the user to send
+the claim code back to the agent; the user enters it on the verification page.
+
+## Exchange and use credentials
+
+Post the returned identity assertion to the advertised token endpoint using the
+RFC 7523 JWT-bearer grant. Claim ceremonies use the advertised claim grant and
+polling interval. On success, send the resulting bearer token to `/mcp`.
+
+There is no refresh token. Re-exchange a still-valid identity assertion or
+restart registration when it expires. Use the advertised revocation endpoint
+when a credential should no longer be accepted.
+
+For complete error codes, expiry behavior, and polling semantics, follow the
+generated `/auth.md` document.
