@@ -6,7 +6,7 @@ This is a Turborepo monorepo with a production-ready Next.js 16 application and 
 
 ## Tech Stack
 
-- **Package Manager**: Bun (v1.2+) with Turborepo
+- **Package Manager**: Bun (v1.3.14+) with Turborepo and a root dependency catalog
 - **Framework**: Next.js 16 with App Router
 - **Language**: TypeScript with strict mode enabled
 - **Styling**: TailwindCSS with Shadcn UI components

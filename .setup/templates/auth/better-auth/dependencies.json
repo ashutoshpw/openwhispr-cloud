@@ -2,7 +2,7 @@
   "packages/auth": {
     "add": {
       "@repo/database": "workspace:*",
-      "bcryptjs": "^2.4.3",
+      "bcryptjs": "catalog:",
       "better-auth": "^1.2.12",
       "server-only": "^0.0.1"
     },

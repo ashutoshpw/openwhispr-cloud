@@ -15,11 +15,15 @@
     "@repo/billing": "workspace:*",
     "@repo/database": "workspace:*",
     "google-auth-library": "catalog:",
-    "inngest": "^4.2.4"
+    "inngest": "catalog:"
+  },
+  "peerDependencies": {
+    "next": ">=14.0.0"
   },
   "devDependencies": {
-    "@types/node": "^20",
+    "@types/node": "catalog:",
     "inngest-cli": "^1.18.0",
+    "next": "catalog:",
     "typescript": "catalog:"
   }
 }

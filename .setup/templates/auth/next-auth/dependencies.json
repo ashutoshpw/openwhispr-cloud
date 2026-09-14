@@ -3,8 +3,8 @@
     "add": {
       "@repo/database": "workspace:*",
       "@auth/drizzle-adapter": "^1.7.4",
-      "bcryptjs": "^2.4.3",
-      "nanoid": "^5.0.9",
+      "bcryptjs": "catalog:",
+      "nanoid": "catalog:",
       "next-auth": "^5.0.0-beta.25",
       "server-only": "^0.0.1"
     },

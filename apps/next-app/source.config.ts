@@ -13,7 +13,7 @@ export const docs = defineDocs({
 
 export const blogCollection = defineCollections({
   type: "doc",
-  dir: "../../packages/fumadocs/content/blog",
+  dir: "./content/blog",
   schema: z.object({
     title: z.string(),
     date: z.string(),

@@ -18,7 +18,8 @@ This repository gives you a solid starting point instead of starting from scratc
 
 ## Features
 
-- **Turborepo Monorepo** with bun workspaces for optimal DX
+- **Turborepo Monorepo** with Bun workspaces and a shared dependency catalog
+  for consistent installs
 - **Next.js 16** with App Router for optimal performance
 - **Single Auth Provider Architecture** - Choose your auth provider once at project init (BetterAuth, NextAuth, AuthKit, or Clerk)
 - **Shared Database Package** with PostgreSQL and Drizzle ORM for type-safe queries
@@ -200,6 +201,7 @@ This starts PostgreSQL and the Next.js app with auto-schema push.
 | `bun run docs:public:validate` | Validate public documentation links |
 | `bun run docs:internal:validate` | Validate internal documentation links |
 | `bun run check:doc-coverage` | Verify documented source roots and nav pages |
+| `bun run check:catalog-deps` | Verify staged manifests use catalog references |
 
 ### Filtering to specific packages
 

@@ -42,7 +42,7 @@
     "@tanstack/react-query-devtools": "^5.13.3",
     "@upstash/ratelimit": "^0.4.4",
     "@upstash/redis": "^1.24.2",
-    "bcryptjs": "^3.0.3",
+    "bcryptjs": "catalog:",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
@@ -74,14 +74,10 @@
   "devDependencies": {
     "@types/bcryptjs": "^3.0.0",
     "@types/mdx": "^2.0.13",
-    "@types/node": "^20",
+    "@types/node": "catalog:",
     "@types/qrcode": "^1.5.6",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "typescript": "catalog:"
-  },
-  "overrides": {
-    "@types/react": "19.2.14",
-    "@types/react-dom": "19.2.3"
   }
 }

@@ -4,7 +4,7 @@
       "@repo/database": "workspace:*",
       "@workos-inc/authkit-nextjs": "^2.0.0",
       "@workos-inc/node": "^7.37.0",
-      "nanoid": "^5.0.9",
+      "nanoid": "catalog:",
       "server-only": "^0.0.1"
     },
     "remove": [

@@ -1,5 +1,8 @@
 import { auth } from "@repo/auth/server";
-import { type HandleUploadBody, handleUpload } from "@vercel/blob/client";
+import {
+  type HandleUploadBody,
+  handleUpload,
+} from "@repo/object-storage/client";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 

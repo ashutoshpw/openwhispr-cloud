@@ -55,7 +55,8 @@ values. Leave it or delete manually.
 - **Auth provider templates** live in `.setup/templates/auth/<provider>/`. Edit
   them there — the live `packages/auth/src/providers/` folder gets deleted
   by setup for the chosen provider.
-- **Pre-commit hooks enforce**: 600-line max per code file
+- **Pre-commit hooks enforce**: catalog references for shared dependency
+  versions, 600-line max per code file
   (`scripts/check-max-lines.ts`), staged-TS type-checking, banned deps,
   no middleware outside templates, biome formatting. Don't `--no-verify`.
 - Never commit `.auth-provider.lock`, `.auth-backup/`, or the rewritten

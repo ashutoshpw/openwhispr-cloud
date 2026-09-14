@@ -8,3 +8,4 @@ bun run check:no-per-minute-cron
 bun run check:root-md
 bunx lint-staged
 bun run scripts/check-staged-catalog.mjs
+bun run check:catalog-deps
