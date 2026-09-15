@@ -137,6 +137,7 @@ export const dictionaryEntry = pgTable(
   "dictionary_entry",
   {
     id: text("id").primaryKey(),
+    clientEntryId: text("client_entry_id"),
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
@@ -150,13 +151,20 @@ export const dictionaryEntry = pgTable(
       .$onUpdate(() => new Date())
       .notNull(),
   },
-  (table) => [index("dictionary_user_idx").on(table.userId)],
+  (table) => [
+    uniqueIndex("dictionary_client_id_unique").on(
+      table.userId,
+      table.clientEntryId,
+    ),
+    index("dictionary_user_idx").on(table.userId),
+  ],
 );
 
 export const snippet = pgTable(
   "snippet",
   {
     id: text("id").primaryKey(),
+    clientEntryId: text("client_entry_id"),
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
@@ -168,7 +176,13 @@ export const snippet = pgTable(
       .$onUpdate(() => new Date())
       .notNull(),
   },
-  (table) => [index("snippet_user_idx").on(table.userId)],
+  (table) => [
+    uniqueIndex("snippet_client_id_unique").on(
+      table.userId,
+      table.clientEntryId,
+    ),
+    index("snippet_user_idx").on(table.userId),
+  ],
 );
 
 export const conversation = pgTable(
