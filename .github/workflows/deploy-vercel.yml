@@ -79,7 +79,3 @@ jobs:
           deploy_args: '--archive=tgz'
           environment: ${{ (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')) && 'production' || 'preview' }}
           alias_prefix: ${{ matrix.alias_prefix }}
-          prebuild_script: |
-            git config --global user.email "ashutosh@w3dev.in"
-            git config --global user.name "Ashutosh"
-            git commit --amend --no-edit --author="Ashutosh <ashutosh@w3dev.in>"

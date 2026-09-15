@@ -91,7 +91,3 @@ jobs:
           deploy_args: '--archive=tgz'
           alias_prefix: ${{ matrix.alias_prefix }}
           environment: 'preview'
-          prebuild_script: |
-            git config --global user.email "ashutosh@w3dev.in"
-            git config --global user.name "Ashutosh"
-            git commit --amend --no-edit --author="Ashutosh <ashutosh@w3dev.in>"
