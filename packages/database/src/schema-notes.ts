@@ -71,6 +71,7 @@ export const folder = pgTable(
   "folder",
   {
     id: text("id").primaryKey(),
+    clientFolderId: text("client_folder_id"),
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
@@ -89,6 +90,10 @@ export const folder = pgTable(
       .notNull(),
   },
   (table) => [
+    uniqueIndex("folder_client_id_unique").on(
+      table.userId,
+      table.clientFolderId,
+    ),
     uniqueIndex("folder_user_name_unique").on(table.userId, table.name),
     index("folder_user_sort_idx").on(table.userId, table.sortOrder),
   ],

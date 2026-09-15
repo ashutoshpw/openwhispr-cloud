@@ -1,6 +1,6 @@
-import { config } from "dotenv";
 import { resolve } from "node:path";
 import { Pool } from "@neondatabase/serverless";
+import { config } from "dotenv";
 
 // Load .env.local from monorepo root
 config({ path: resolve(__dirname, "../../.env.local") });
