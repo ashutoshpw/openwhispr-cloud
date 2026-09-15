@@ -28,7 +28,7 @@ permissions:
 
 jobs:
   deploy-preview:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: >
       github.event_name != 'pull_request' ||
       (!startsWith(github.event.pull_request.title, 'WIP') &&

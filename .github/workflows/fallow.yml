@@ -3,7 +3,7 @@ on: [push, pull_request]
 
 jobs:
   fallow:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       security-events: write
