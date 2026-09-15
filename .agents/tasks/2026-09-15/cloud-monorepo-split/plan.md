@@ -670,3 +670,87 @@ Shared: `DATABASE_URL` (Neon), `BETTER_AUTH_SECRET`,
   gradually, to avoid dead Inngest functions firing in prod.
 - **Two `check` scripts to respect**: `check:no-middleware` (use `proxy.ts`)
   and `check-no-per-minute-cron` (use Inngest for schedules).
+
+---
+
+## 9. Phase 2 — documentation & productization debt
+
+Everything below is stale starter-kit content that must be replaced before the
+repo is presentable as "OpenWhispr Cloud". Grouped by blast radius.
+
+### 9.1 Root documentation (user-facing)
+
+| File | Debt |
+| ---- | ---- |
+| `README.md` | Entirely starter marketing ("Next.js 16 Starter Project", badges, "Why use this starter?", single `apps/next-app` structure, starter deploy instructions). Rewrite: what OpenWhispr Cloud is, the six apps + shared packages table, per-app dev ports, deploy overview (6 Vercel projects, GH Actions matrix), link to docs sites and the split plan. |
+| `CLAUDE.md` / `AGENTS.md` / `GEMINI.md` | Still describe the single-app layout, "choose your auth provider" wizard, starter scripts, and next-app paths. Rewrite to the six-app architecture, per-app port map, `bun run dev:www|api|…`, the docs policy, and the contract source-of-truth note (`@repo/api-schemas` + desktop repo reference). |
+| `env.example` | Single-app var list; starter sections (DEFAULT_TENANT_*, SEO/AIEO, agents). Replace with per-app sections exactly as §5.3, plus shared block. |
+| `.cursor/rules/*.mdc` | Six rule files written for the starter's app structure. Rewrite or delete (keep 00-core if genericized). |
+| `.setup/templates/**` + `.setup/auth-init/**` | Starter auth-provider selection scaffolding (better-auth/next-auth/clerk/authkit). OpenWhispr hardcodes better-auth — either delete the wizard paths or mark them starter-only. `.setup/auth-init/operations.ts` still patches `apps/next-app` (currently no-ops behind `existsSync` guards). |
+| `.agents/skills/*`, `skills-lock.json` | Starter vendored skills — keep, but verify none reference next-app paths in their instructions. |
+| `Dockerfile` | Already repointed at `apps/www`; add a header comment noting it builds only the www app (other apps get their own images only if needed). |
+
+### 9.2 Documentation sites (Mintlify)
+
+`docs-public/` and `docs-internal/` describe the starter end-to-end. All
+stale pages need rewriting against the new architecture, and `docs.json`
+navigation updated:
+
+- **docs-public**: `start/getting-started.mdx`, `operate/run-locally.mdx`
+  (still `bun run --filter @repo/next-app dev`; six apps now), `operate/deploy.mdx`
+  (single-project story → six-project matrix + Root Directory table),
+  `configure/authentication.mdx` (auth provider choice → fixed better-auth
+  config: bearer + cross-subdomain cookies), `customize/extend-the-starter.mdx`,
+  `customize/project-structure.mdx`, `configure/database.mdx`,
+  `integrate/mcp.mdx` (now a dedicated `apps/mcp`), `integrate/agent-auth.mdx`
+  (agent-auth removed — repurpose or drop), `start/index.mdx`, `index.mdx`,
+  `docs.json` nav.
+- **docs-internal**: `architecture/system-overview.mdx` (single-app → six-app
+  diagram, shared-DB + cross-app trust model), `architecture/data-and-tenancy.mdx`
+  (tenancy removed — rename to data model; document the OpenWhispr schema
+  domains), `architecture/auth-and-setup.mdx` (bearer rotation, cookie
+  domain/SameSite, trustedOrigins), `architecture/agent-auth.mdx` + `mcp-and-agent-surfaces.mdx`
+  (rewritten around apps/mcp + V1 tools), `modules/integrations.mdx` +
+  `modules/durable-exec-seo.mdx` (features removed — delete pages + nav
+  entries + coverage.json entries), `modules/docs-tooling.mdx` (next-app →
+  www), `operations/deployments.mdx` (six projects, Root Directory, env per
+  project), `operations/configuration-and-secrets.mdx` (per-project env),
+  `testing/findings.mdx` + `testing/agent-auth.mdx` (rewrite),
+  `coverage.mdx`/`coverage.json` (align entries with final page set).
+- **Gate**: `bun run docs:public:validate`, `docs:internal:validate`,
+  `check:doc-coverage` must stay green after the rewrite (update
+  `coverage.json` entries alongside page changes).
+
+### 9.3 Product surface (www/admin UI strings & branding)
+
+| Item | Debt |
+| ---- | ---- |
+| `apps/www/src/components/LandingPage/*` | Starter hero/marketing copy (`HeroSection.tsx` et al.) — replace with OpenWhispr Cloud product content (marketing pages, pricing tiers matching Stripe `free/pro/business`, terms/privacy links). |
+| `apps/www/src/components/NavBar.tsx` | Starter nav links/brand. |
+| `apps/www/src/lib/site-config.ts` | `DEFAULT_PRODUCTION_URL` still `nextjs-starter-kit-app.vercel.app` → `https://openwhispr.com`. |
+| `apps/admin/src/app/adminx/(components)/AdminTopNav.tsx` + titles | Check for starter branding ("Nextjs Starter Kit" was in DashboardTopNav — already fixed there; sweep admin). |
+| `apps/www` metadata | Root layout title/description already "OpenWhispr" (M1); sweep remaining pages (`blog`, `docs` landing) for starter titles. |
+| `apps/www/public/` | 836 KB of starter screenshots/logos (better-auth.png, stripe.png, dash.jpg…) — replace with OpenWhispr assets or trim. |
+| `apps/www/src/app/blog`, `changelog` | Starter sample MDX posts (`content/blog/sample-post-*`) — replace or hide route. |
+| `packages/auth/src/server.ts` passkey | `rpName` already "OpenWhispr" (done in M2). |
+
+### 9.4 Repo metadata
+
+- GitHub repo description/website fields (currently starter-era).
+- `package.json` root `"name": "nextjs-starter-monorepo"` →
+  `"openwhispr-cloud"`; `LICENSE` still "SEE LICENSE IN LICENSE" — confirm
+  license choice for a private product repo.
+- `fallow.yml` / `codeql.yml` — verify configs still make sense.
+- Branch protection / ruleset on `main` currently blocks on secret scanning
+  unblocks — keep, but note the `backup/pre-secret-purge` local branch and
+  remote starter-era branches (`billing-portal`, `copilot/*`) still contain
+  the leaked-secret history; delete after key rotation.
+
+### 9.5 Sequencing
+
+Doc debt splits naturally: (a) **root docs + env.example + branding sweep**
+belong with M7 (www is the last UI-bearing app — brand it once, document
+once); (b) **docs sites rewrite** belongs with M11 cutover when the
+architecture story is final; (c) **repo metadata** can happen anytime.
+`check:doc-coverage`, `docs:*:validate`, `check:root-md`, `check:doc-paths`
+gate all doc changes — run them per change.
