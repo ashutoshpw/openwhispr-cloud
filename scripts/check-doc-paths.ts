@@ -4,7 +4,7 @@ import { execFileSync } from "node:child_process";
 
 const IGNORED_PREFIXES = [".agents/", ".claude/"];
 const ALLOWED_DOC_ROOTS = ["docs-public/", "docs-internal/"];
-const GENERATED_DOC_PATHS = ["apps/next-app/src/app/docs/"];
+const GENERATED_DOC_PATHS = ["apps/www/src/app/docs/"];
 
 function getStagedFiles(): string[] {
   const output = execFileSync(

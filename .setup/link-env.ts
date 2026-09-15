@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 /**
- * Symlink the root .env.local into apps/next-app/.env.local and
+ * Symlink the root .env.local into every app workspace and
  * packages/database/.env.local so every workspace reads the same
  * environment without duplicating secrets.
  *
@@ -16,7 +16,9 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE = resolve(ROOT, ".env.local");
 
 const TARGETS = [
-  resolve(ROOT, "apps/next-app/.env.local"),
+  ...["www", "api", "auth", "notes", "admin", "mcp"].map((app) =>
+    resolve(ROOT, `apps/${app}/.env.local`),
+  ),
   resolve(ROOT, "packages/database/.env.local"),
 ];
 

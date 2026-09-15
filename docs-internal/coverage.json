@@ -5,13 +5,13 @@
       "id": "system-overview",
       "page": "architecture/system-overview.mdx",
       "visibility": "internal",
-      "sources": ["apps/next-app/src", "apps/next-app/package.json"]
+      "sources": ["apps/www/src", "apps/api/src", "packages"]
     },
     {
       "id": "auth-and-setup",
       "page": "architecture/auth-and-setup.mdx",
       "visibility": "internal",
-      "sources": ["packages/auth/src", ".setup"]
+      "sources": ["packages/auth/src", "apps/auth/src", ".setup"]
     },
     {
       "id": "data-and-tenancy",
@@ -26,13 +26,7 @@
       "id": "agent-auth",
       "page": "architecture/agent-auth.mdx",
       "visibility": "internal",
-      "sources": [
-        "apps/next-app/src/lib/agent-auth",
-        "apps/next-app/src/app/auth.md",
-        "apps/next-app/src/app/agent",
-        "apps/next-app/src/app/oauth2",
-        "packages/database/src/schema-agent-auth.ts"
-      ]
+      "sources": ["packages/auth/src", "apps/auth/src"]
     },
     {
       "id": "mcp-and-agent-surfaces",
@@ -41,8 +35,7 @@
       "sources": [
         "packages/mcp-chatgpt/src",
         "packages/mcp-server/src",
-        "apps/next-app/src/app/mcp",
-        "apps/next-app/src/app/.well-known"
+        "apps/mcp/src"
       ]
     },
     {
@@ -55,7 +48,7 @@
       "id": "billing",
       "page": "modules/billing.mdx",
       "visibility": "internal",
-      "sources": ["packages/billing/src", "apps/next-app/src/app/api/billing"]
+      "sources": ["packages/billing/src", "apps/admin/src/app/api/admin"]
     },
     {
       "id": "database",
@@ -67,10 +60,7 @@
       "id": "durable-exec-seo",
       "page": "modules/durable-exec-seo.mdx",
       "visibility": "internal",
-      "sources": [
-        "packages/durable-exec/src",
-        "apps/next-app/src/app/api/inngest"
-      ]
+      "sources": ["packages/durable-exec/src", "apps/api/src/app/api/inngest"]
     },
     {
       "id": "ai-and-storage",
@@ -82,10 +72,7 @@
       "id": "integrations",
       "page": "modules/integrations.mdx",
       "visibility": "internal",
-      "sources": [
-        "apps/next-app/src/lib/integrations",
-        "apps/next-app/src/app/api/integrations"
-      ]
+      "sources": [".agents/tasks/2026-09-15/cloud-monorepo-split/plan.md"]
     },
     {
       "id": "docs-tooling",
@@ -94,8 +81,8 @@
       "sources": [
         "docs-public",
         "docs-internal",
-        "apps/next-app/source.config.ts",
-        "apps/next-app/src/app/docs"
+        "apps/www/source.config.ts",
+        "apps/www/src/app/docs"
       ]
     },
     {
@@ -108,7 +95,11 @@
       "id": "deployments",
       "page": "operations/deployments.mdx",
       "visibility": "internal",
-      "sources": ["vercel.json", "Dockerfile", "apps/next-app/next.config.mjs"]
+      "sources": [
+        ".github/workflows/deploy-vercel.yml",
+        "Dockerfile",
+        "apps/www/next.config.mjs"
+      ]
     },
     {
       "id": "migrations",
@@ -124,7 +115,7 @@
       "page": "operations/observability-and-recovery.mdx",
       "visibility": "internal",
       "sources": [
-        "apps/next-app/src/app/status",
+        "apps/www/src/app/status",
         "packages/analytics/src",
         "scripts"
       ]
@@ -139,13 +130,13 @@
       "id": "agent-auth-testing",
       "page": "testing/agent-auth.mdx",
       "visibility": "internal",
-      "sources": ["apps/next-app/src/app/agent", "apps/next-app/src/app/oauth2"]
+      "sources": ["apps/auth/src", "packages/auth/src"]
     },
     {
       "id": "findings",
       "page": "testing/findings.mdx",
       "visibility": "internal",
-      "sources": ["apps/next-app/src"]
+      "sources": ["apps/www/src"]
     },
     {
       "id": "public-getting-started",
@@ -176,46 +167,46 @@
       "site": "docs-public",
       "page": "customize/project-structure.mdx",
       "visibility": "public",
-      "sources": ["apps/next-app/src", "packages"]
+      "sources": ["apps/www/src", "packages"]
     },
     {
       "id": "public-extend-starter",
       "site": "docs-public",
       "page": "customize/extend-the-starter.mdx",
       "visibility": "public",
-      "sources": ["apps/next-app/src", "packages", ".setup"]
+      "sources": ["apps/www/src", "packages", ".setup"]
     },
     {
       "id": "public-agent-auth",
       "site": "docs-public",
       "page": "integrate/agent-auth.mdx",
       "visibility": "public",
-      "sources": [
-        "apps/next-app/src/app/auth.md",
-        "apps/next-app/src/app/agent",
-        "apps/next-app/src/app/oauth2"
-      ]
+      "sources": ["apps/auth/src", "packages/auth/src"]
     },
     {
       "id": "public-mcp",
       "site": "docs-public",
       "page": "integrate/mcp.mdx",
       "visibility": "public",
-      "sources": ["apps/next-app/src/app/mcp", "packages/mcp-server/src"]
+      "sources": ["apps/mcp/src", "packages/mcp-server/src"]
     },
     {
       "id": "public-run-locally",
       "site": "docs-public",
       "page": "operate/run-locally.mdx",
       "visibility": "public",
-      "sources": ["package.json", "apps/next-app/package.json"]
+      "sources": ["package.json", "apps/www/package.json"]
     },
     {
       "id": "public-deploy",
       "site": "docs-public",
       "page": "operate/deploy.mdx",
       "visibility": "public",
-      "sources": ["vercel.json", "Dockerfile", "apps/next-app/next.config.mjs"]
+      "sources": [
+        ".github/workflows/deploy-vercel.yml",
+        "Dockerfile",
+        "apps/www/vercel.json"
+      ]
     },
     {
       "id": "public-troubleshoot",

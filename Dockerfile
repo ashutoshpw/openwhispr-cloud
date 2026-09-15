@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Copy root workspace files
 COPY package.json bun.lock turbo.json ./
-COPY apps/next-app/package.json ./apps/next-app/
+COPY apps/www/package.json ./apps/www/
 COPY packages/database/package.json ./packages/database/
 
 # Install dependencies
@@ -18,5 +18,5 @@ RUN bun run build
 
 EXPOSE 8801
 
-WORKDIR /app/apps/next-app
+WORKDIR /app/apps/www
 CMD ["bun", "run", "start"]

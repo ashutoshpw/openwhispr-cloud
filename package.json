@@ -69,7 +69,13 @@
     "docs:public:validate": "cd docs-public && bunx --yes mint@4.1.0 broken-links",
     "docs:internal": "cd docs-internal && bunx --yes mint@4.1.0 dev --port 3334 --no-open",
     "docs:internal:validate": "cd docs-internal && bunx --yes mint@4.1.0 broken-links",
-    "prepare": "husky"
+    "prepare": "husky",
+    "dev:www": "bun run --filter @repo/www dev",
+    "dev:api": "bun run --filter @repo/api dev",
+    "dev:auth": "bun run --filter @repo/auth-app dev",
+    "dev:notes": "bun run --filter @repo/notes dev",
+    "dev:admin": "bun run --filter @repo/admin dev",
+    "dev:mcp": "bun run --filter @repo/mcp-app dev"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
