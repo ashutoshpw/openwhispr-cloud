@@ -29,7 +29,9 @@
       "@repo/durable-exec": ["../../packages/durable-exec/src"],
       "@repo/durable-exec/*": ["../../packages/durable-exec/src/*"],
       "@repo/object-storage": ["../../packages/object-storage/src"],
-      "@repo/object-storage/*": ["../../packages/object-storage/src/*"]
+      "@repo/object-storage/*": ["../../packages/object-storage/src/*"],
+      "@repo/api-schemas": ["../../packages/api-schemas/src"],
+      "@repo/api-schemas/*": ["../../packages/api-schemas/src/*"]
     }
   },
   "include": [

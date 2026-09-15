@@ -19,7 +19,6 @@
     "@repo/database": "workspace:*",
     "@repo/durable-exec": "workspace:*",
     "@repo/object-storage": "workspace:*",
-    "@repo/ui": "workspace:*",
     "@tailwindcss/postcss": "^4.2.2",
     "@upstash/ratelimit": "^0.4.4",
     "@upstash/redis": "^1.24.2",
@@ -35,7 +34,8 @@
     "resend": "^6.9.1",
     "sonner": "^1.4.41",
     "tailwindcss": "^4.2.2",
-    "zod": "catalog:"
+    "zod": "catalog:",
+    "@repo/api-schemas": "workspace:*"
   },
   "devDependencies": {
     "@types/bcryptjs": "^3.0.0",

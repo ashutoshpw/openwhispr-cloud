@@ -54,6 +54,7 @@
     "tailwind-merge": "^2.3.0",
     "tailwindcss": "^4.2.2",
     "zod": "catalog:",
+    "@repo/api-schemas": "workspace:*",
     "@repo/ui": "workspace:*"
   },
   "devDependencies": {

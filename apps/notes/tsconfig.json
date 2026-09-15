@@ -23,7 +23,9 @@
       "@repo/billing": ["../../packages/billing/src"],
       "@repo/billing/*": ["../../packages/billing/src/*"],
       "@repo/ui": ["../../packages/ui/src"],
-      "@repo/ui/*": ["../../packages/ui/src/*"]
+      "@repo/ui/*": ["../../packages/ui/src/*"],
+      "@repo/api-schemas": ["../../packages/api-schemas/src"],
+      "@repo/api-schemas/*": ["../../packages/api-schemas/src/*"]
     }
   },
   "include": [
