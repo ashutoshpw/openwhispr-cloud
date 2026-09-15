@@ -1,76 +1,35 @@
 "use client";
 import { motion } from "framer-motion";
-import Image from "next/image";
+import { Cloud, KeyRound, ShieldCheck, Users } from "lucide-react";
 
-const ProjectsData = [
+const CloudFeaturesData = [
   {
     id: 1,
-    name: "Nextjs 16",
+    name: "Cloud Sync",
     description:
-      "A framework for React that enables server-side rendering and effortless deployment.",
-    image: "/nextjs.svg",
-    imageDark: "/nextjs-dark.png",
+      "Your notes and transcriptions sync securely across every device where you run OpenWhispr.",
+    icon: Cloud,
   },
   {
     id: 2,
-    name: "TypeScript",
+    name: "Team Spaces",
     description:
-      "A typed superset of JavaScript that enhances code maintainability and scalability.",
-    image: "/typescript.png",
+      "Share notes with your team in workspaces, with roles and invitations managed in one place.",
+    icon: Users,
   },
   {
     id: 3,
-    name: "Tailwind CSS",
+    name: "API & MCP Access",
     description:
-      "A utility-first CSS framework for building custom designs with ease.",
-    image: "/tailwind.png",
+      "Pipe your transcripts into scripts, automations, and AI agents through the API and MCP.",
+    icon: KeyRound,
   },
   {
     id: 4,
-    name: "Shadcn UI",
-    description: "Beautifully designed components by Shadcn.",
-    image: "/shadcn.png",
-    imageDark: "/shadcn-dark.png",
-  },
-  {
-    id: 6,
-    name: "PostgreSQL",
+    name: "Privacy-first Local Models",
     description:
-      "Powerful, open-source relational database system with strong reliability and performance.",
-    image: "/postgres.png", // Note: Add postgres.png to public directory
-  },
-  {
-    id: 7,
-    name: "Drizzle ORM",
-    description:
-      "Modern TypeScript ORM for SQL databases with excellent type safety and performance.",
-    image: "/drizzle.png", // Note: Add drizzle.png to public directory
-  },
-  {
-    id: 8,
-    name: "BetterAuth",
-    description:
-      "Modern, self-hosted authentication framework for TypeScript with excellent security.",
-    image: "/better-auth.png",
-  },
-  {
-    id: 9,
-    name: "Stripe Subsctiptions & One time payments",
-    description:
-      "Payment processing solution for handling subscriptions and one-off transactions securely.",
-    image: "/stripe.png",
-  },
-  {
-    id: 10,
-    name: "Upstash (Redis)",
-    description: "Redis-based cloud database service for rate-limiting.",
-    image: "/upstash.png",
-  },
-  {
-    id: 11,
-    name: "Tanstack Query",
-    description: "For client side fetching, caching, and revalidation.",
-    image: "/tanstack.png",
+      "Dictate with local Whisper and Parakeet models on device, and reach for cloud models only when you choose to.",
+    icon: ShieldCheck,
   },
 ];
 
@@ -79,14 +38,15 @@ const SpringAnimatedFeatures = () => {
     <div className="flex flex-col justify-center items-center lg:w-[75%]">
       <div className="flex flex-col mb-12">
         <h1 className="scroll-m-20 text-3xl sm:text-xl md:text-3xl font-semibold tracking-tight lg:text-4xl text-center max-w-[700px]">
-          Built with the best
+          Built for private dictation
         </h1>
         <p className="mx-auto max-w-[500px]  md:text-lg text-center mt-2 ">
-          Your customers deserve a product built with the best technologies
+          Everything the desktop app does, plus sync, sharing, and automation
         </p>
       </div>
       <div className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {ProjectsData.map((project) => {
+        {CloudFeaturesData.map((feature) => {
+          const FeatureIcon = feature.icon;
           return (
             <motion.div
               whileHover={{
@@ -96,20 +56,14 @@ const SpringAnimatedFeatures = () => {
                 type: "spring",
                 bounce: 0.7,
               }}
-              key={project.id}
+              key={feature.id}
               className="mt-5 text-left border p-6 rounded-md dark:bg-black"
             >
               <article>
-                <Image
-                  src={project?.imageDark ? project?.imageDark : project.image}
-                  width={40}
-                  height={30}
-                  className="mb-3 rounded"
-                  alt={project.name}
-                />
-                <div className="mb-1 text-sm font-medium ">{project.name}</div>
+                <FeatureIcon className="mb-3 size-8 text-blue-600" />
+                <div className="mb-1 text-sm font-medium ">{feature.name}</div>
                 <div className="max-w-[250px] text-sm font-normal text-gray-500">
-                  {project.description}
+                  {feature.description}
                 </div>
               </article>
             </motion.div>

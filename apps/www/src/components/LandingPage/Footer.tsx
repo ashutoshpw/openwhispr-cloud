@@ -30,9 +30,8 @@ export default function Footer() {
                   Sign Up To Our Newsletter
                 </h2>
                 <p className="mt-4 max-w-lg  ">
-                  Want the best SEO educational content from nerds who have fun
-                  building and learning in the SEO space? If the answer is yes,
-                  sign up.
+                  Product updates, new local model highlights, and tips for
+                  getting more out of private voice-to-text. No spam, ever.
                 </p>
               </div>
               <form
@@ -44,6 +43,11 @@ export default function Footer() {
                   placeholder="Enter your email"
                   type="email"
                 />
+                {errors.email && (
+                  <p className="text-xs text-red-500">
+                    Please enter a valid email address.
+                  </p>
+                )}
                 <Button type="submit">Sign Up</Button>
               </form>
             </div>
@@ -52,29 +56,29 @@ export default function Footer() {
           <div className="py-8 lg:py-16 lg:pe-16">
             <div className="mt-8 grid grid-cols-1 gap-8 sm:grid-cols-2">
               <div>
-                <p className="font-medium ">Socials</p>
+                <p className="font-medium ">Community</p>
 
                 <ul className="mt-6 space-y-4 text-sm">
                   <li>
                     <a
-                      href="https://x.com/ak_ishere"
+                      href="https://x.com/openwhispr"
                       target="_blank"
                       className="transition hover:opacity-75"
                       rel="noreferrer"
                     >
                       {" "}
-                      Twitter{" "}
+                      X (Twitter){" "}
                     </a>
                   </li>
                   <li>
                     <a
-                      href="https://www.youtube.com/@AIStackTeam"
+                      href="https://github.com/openwhispr"
                       target="_blank"
                       className="  transition hover:opacity-75"
                       rel="noreferrer"
                     >
                       {" "}
-                      YouTube{" "}
+                      GitHub{" "}
                     </a>
                   </li>
                 </ul>
@@ -87,7 +91,7 @@ export default function Footer() {
                   <li>
                     <a
                       target="_blank"
-                      href="/"
+                      href="/docs"
                       rel="noopener noreferrer"
                       className="  transition hover:opacity-75"
                     >
@@ -96,9 +100,9 @@ export default function Footer() {
                     </a>
                   </li>
                   <li>
-                    <a href="/" className="  transition hover:opacity-75">
+                    <a href="/blog" className="  transition hover:opacity-75">
                       {" "}
-                      Methodology{" "}
+                      Blog{" "}
                     </a>
                   </li>
                 </ul>
@@ -121,7 +125,7 @@ export default function Footer() {
               </ul>
 
               <p className="mt-8 text-xs  ">
-                &copy; {new Date().getFullYear()}. SomeCompany LLC. All rights
+                &copy; {new Date().getFullYear()} OpenWhispr. All rights
                 reserved.
               </p>
             </div>

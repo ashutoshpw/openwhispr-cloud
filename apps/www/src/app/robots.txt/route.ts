@@ -6,7 +6,7 @@ export async function GET(): Promise<Response> {
   const baseUrl =
     process.env.BETTER_AUTH_URL ??
     process.env.NEXT_PUBLIC_APP_URL ??
-    "https://nextjs-starter-kit-app.vercel.app";
+    "https://openwhispr.com";
 
   const body = `# AI crawlers — explicitly allowed for GEO/AIEO indexing
 User-agent: GPTBot

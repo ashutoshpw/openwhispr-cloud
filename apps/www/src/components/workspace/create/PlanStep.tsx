@@ -87,7 +87,7 @@ export function PlanStep({
         />
         <PlanCard
           title="Pro"
-          description="Everything you need to scale cold email"
+          description="Everything you need for dictation and team notes"
           selected={plan === "pro"}
           onClick={() => onPlanChange("pro")}
         />

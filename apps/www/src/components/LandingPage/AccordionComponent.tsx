@@ -14,27 +14,23 @@ export function AccordionComponent() {
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value="item-1">
           <AccordionTrigger>
-            How does your platform enhance the quality of AI-generated content?
+            Does my dictation audio leave my device?
           </AccordionTrigger>
           <AccordionContent>
-            We&apos;ve developed a sophisticated methodology that combines the
-            latest in AI technology, including perplexity analysis,
-            OpenAI&apos;s nuanced attribute creation, and Anthropic&apos;s
-            Claude for in-depth prompting. This ensures our content is not only
-            highly relevant and engaging but also adheres to the highest quality
-            standards.
+            Not necessarily. OpenWhispr runs local Whisper and Parakeet models
+            on your machine, so transcription happens entirely on device. Cloud
+            models are available when you want them, and the choice is always
+            yours per dictation.
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-2">
           <AccordionTrigger>
-            What quality assurance measures does your platform implement?
+            What does OpenWhispr Cloud add over the desktop app?
           </AccordionTrigger>
           <AccordionContent>
-            We prioritize quality at every stage of the content creation
-            process. From comprehensive topic research and intent analysis to
-            creating detailed outlines and finalizing content through a rigorous
-            sanitizing phase, our platform ensures every piece of content is
-            polished, accurate, and impactful.
+            Cloud sync across devices, shared team workspaces, API keys for
+            automation, and MCP access so AI agents can search and work with
+            your notes. The desktop experience stays the same.
           </AccordionContent>
         </AccordionItem>
       </Accordion>

@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 
 import { blog, docsSource } from "@/lib/source";
 
-const DEFAULT_PRODUCTION_URL = "https://nextjs-starter-kit-app.vercel.app";
+const DEFAULT_PRODUCTION_URL = "https://openwhispr.com";
 
 export function getSiteUrl(): string {
   const envUrl =

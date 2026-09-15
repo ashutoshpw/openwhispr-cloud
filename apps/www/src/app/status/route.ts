@@ -4,7 +4,7 @@ export async function GET(): Promise<Response> {
   return Response.json(
     {
       status: "ok",
-      service: "nextjs-starter-kit",
+      service: "openwhispr-cloud",
       url: absoluteUrl("/"),
       timestamp: new Date().toISOString(),
     },

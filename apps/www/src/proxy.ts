@@ -12,10 +12,14 @@ import { type NextRequest, NextResponse } from "next/server";
 const HAS_WORKSPACE_COOKIE = "has_workspace";
 const WORKSPACE_COOKIE_TTL = 5 * 60; // 5 minutes
 
-function authHost(path: string): string {
+function authHost(request: NextRequest, path: string): string {
+  // Preview/staging deployments set NEXT_PUBLIC_AUTH_URL to their own auth
+  // host; production falls back to the canonical domain.
   const base =
-    process.env.NEXT_PUBLIC_AUTH_URL ?? "https://auth.openwhispr.com";
-  return `${base}${path}`;
+    process.env.NEXT_PUBLIC_AUTH_URL ??
+    process.env.BETTER_AUTH_URL ??
+    new URL("/auth/sign-in", request.url).origin;
+  return `${base.replace(/\/$/, "")}${path}`;
 }
 
 /**
@@ -85,7 +89,9 @@ export async function proxy(request: NextRequest) {
     }
 
     if (!session) {
-      const response = NextResponse.redirect(authHost("/auth/sign-in"));
+      const response = NextResponse.redirect(
+        authHost(request, "/auth/sign-in"),
+      );
       response.cookies.delete(HAS_WORKSPACE_COOKIE);
       return response;
     }
@@ -98,7 +104,9 @@ export async function proxy(request: NextRequest) {
       );
 
       if (!hasWorkspace) {
-        const response = NextResponse.redirect(authHost("/auth/onboarding"));
+        const response = NextResponse.redirect(
+          authHost(request, "/auth/onboarding"),
+        );
         if (shouldSetCookie) {
           setWorkspaceCookie(response, false);
         }

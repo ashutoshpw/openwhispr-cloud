@@ -27,19 +27,22 @@ import {
 
 const components: { title: string; href: string; description: string }[] = [
   {
-    title: "Marketing Page",
-    href: "/marketing-page",
-    description: "Write something catchy here to get them to click.",
+    title: "Cloud Sync",
+    href: "/docs",
+    description:
+      "Notes and transcriptions follow you across every device with OpenWhispr installed.",
   },
   {
-    title: "Second Tab",
-    href: "/",
-    description: "Write something catchy here to get them to click.",
+    title: "Team Spaces",
+    href: "/docs",
+    description:
+      "Share notes in shared workspaces with roles, invitations, and per-member access.",
   },
   {
-    title: "Third Tab",
-    href: "/",
-    description: "Write something catchy here to get them to click.",
+    title: "API & MCP Access",
+    href: "/docs",
+    description:
+      "Automate with API keys and let AI agents search your notes over MCP.",
   },
 ];
 
@@ -66,7 +69,7 @@ export function NavBar({
             </SheetTrigger>
             <SheetContent side="left">
               <SheetHeader>
-                <SheetTitle>Next Starter</SheetTitle>
+                <SheetTitle>OpenWhispr</SheetTitle>
               </SheetHeader>
               <div className="flex flex-col space-y-3 mt-4">
                 <SheetClose asChild>
