@@ -2,7 +2,7 @@
 
 import { CreateUserDialog } from "@/components/admin/CreateUserDialog";
 import { RowActionsMenu } from "@/components/admin/RowActionsMenu";
-import type { Tenant, User } from "@repo/database/schema";
+import type { User } from "@repo/database/schema";
 import { Badge } from "@repo/ui/components/badge";
 import { Button } from "@repo/ui/components/button";
 import { Input } from "@repo/ui/components/input";
@@ -13,10 +13,9 @@ import { useState } from "react";
 
 interface UserTableProps {
   users: User[];
-  tenants: Tenant[];
 }
 
-export function UserTable({ users: initialUsers, tenants }: UserTableProps) {
+export function UserTable({ users: initialUsers }: UserTableProps) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [users] = useState(initialUsers);
@@ -36,7 +35,7 @@ export function UserTable({ users: initialUsers, tenants }: UserTableProps) {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="max-w-sm"
         />
-        <CreateUserDialog tenants={tenants} />
+        <CreateUserDialog />
       </div>
       <div className="rounded-md border">
         <table className="w-full">
@@ -47,9 +46,6 @@ export function UserTable({ users: initialUsers, tenants }: UserTableProps) {
               </th>
               <th className="h-12 px-4 text-left align-middle font-medium">
                 Email
-              </th>
-              <th className="h-12 px-4 text-left align-middle font-medium">
-                Tenant
               </th>
               <th className="h-12 px-4 text-left align-middle font-medium">
                 Role
@@ -87,7 +83,6 @@ export function UserTable({ users: initialUsers, tenants }: UserTableProps) {
                     </span>
                   </td>
                   <td className="p-4 align-middle">{user.publicEmail}</td>
-                  <td className="p-4 align-middle">{user.tenantId}</td>
                   <td className="p-4 align-middle">
                     <Badge
                       variant={

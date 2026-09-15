@@ -1,16 +1,14 @@
 /**
- * @repo/auth/server - Better Auth server implementation
+ * @repo/auth/server - Better Auth server implementation (OpenWhispr Cloud)
  *
- * Direct export - no dynamic provider switching.
+ * Single auth server on auth.openwhispr.com. Issues bearer tokens to the
+ * desktop client (set-auth-token rotation) and cookie sessions to the web
+ * properties (www / notes / admin) via a cross-subdomain session cookie.
  */
 import "server-only";
 
 import { passkey } from "@better-auth/passkey";
-import {
-  buildTenantAuthEmail,
-  db,
-  resolveTenantFromHost,
-} from "@repo/database";
+import { db } from "@repo/database";
 import { eq } from "@repo/database";
 import * as schema from "@repo/database/schema";
 import bcrypt from "bcryptjs";
@@ -19,16 +17,56 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
 import { toNextJsHandler } from "better-auth/next-js";
-import { oidcProvider, organization, twoFactor } from "better-auth/plugins";
+import {
+  bearer,
+  oidcProvider,
+  organization,
+  twoFactor,
+} from "better-auth/plugins";
 
 import type { UnifiedSession, UnifiedUser } from "./types";
+
+const SESSION_COOKIE_PREFIX = "openwhispr";
+
+function isProduction(): boolean {
+  return (
+    process.env.NODE_ENV === "production" ||
+    process.env.VERCEL_ENV === "production"
+  );
+}
+
+function cookieDomain(): string | undefined {
+  if (!isProduction()) return undefined;
+  // Shared across api/auth/www/notes/admin subdomains for the desktop
+  // cookie-fallback probe and dashboard sessions.
+  return process.env.AUTH_COOKIE_DOMAIN ?? ".openwhispr.com";
+}
+
+function trustedOrigins(): string[] {
+  const defaults = [
+    "https://openwhispr.com",
+    "https://www.openwhispr.com",
+    "https://api.openwhispr.com",
+    "https://notes.openwhispr.com",
+    "https://admin.openwhispr.com",
+    "http://localhost:8801",
+    "http://localhost:8802",
+    "http://localhost:8804",
+    "http://localhost:8805",
+    "http://localhost:8806",
+  ];
+  const extra = (process.env.AUTH_TRUSTED_ORIGINS ?? "")
+    .split(",")
+    .map((o) => o.trim())
+    .filter(Boolean);
+  return [...defaults, ...extra];
+}
 
 // Session mapper
 function normalizeUser(user: {
   id: string;
   email: string;
   publicEmail?: string | null;
-  tenantId?: string | null;
   name?: string | null;
   image?: string | null;
   role?: string | null;
@@ -36,7 +74,6 @@ function normalizeUser(user: {
   return {
     id: user.id,
     email: user.publicEmail ?? user.email,
-    tenantId: user.tenantId ?? null,
     name: user.name ?? null,
     image: user.image ?? null,
     role: user.role ?? null,
@@ -99,7 +136,7 @@ export interface BetterAuthServerOptions {
 function getAuthConfig() {
   const baseURL =
     process.env.BETTER_AUTH_URL ||
-    process.env.NEXT_PUBLIC_APP_URL ||
+    process.env.NEXT_PUBLIC_AUTH_URL ||
     (process.env.VERCEL_ENV === "production"
       ? process.env.VERCEL_PROJECT_PRODUCTION_URL
       : process.env.VERCEL_BRANCH_URL || process.env.VERCEL_URL);
@@ -111,7 +148,7 @@ function getAuthConfig() {
       ? baseURL.startsWith("http")
         ? baseURL
         : `https://${baseURL}`
-      : "http://localhost:3000",
+      : "http://localhost:8803",
     secret,
   };
 }
@@ -123,13 +160,30 @@ class BetterAuthServer {
     const config = getAuthConfig();
 
     this.authInstance = betterAuth({
-      appName: "Cold Email Platform",
+      appName: "OpenWhispr",
       database: drizzleAdapter(db(), {
         provider: "pg",
         schema,
       }),
       secret: config.secret,
       baseURL: config.baseURL,
+      trustedOrigins: trustedOrigins(),
+      advanced: {
+        cookiePrefix: SESSION_COOKIE_PREFIX,
+        defaultCookieAttributes: {
+          domain: cookieDomain(),
+          // Desktop webviews and cross-subdomain dashboard calls need the
+          // cookie on XHRs from other origins.
+          sameSite: "none",
+          secure: isProduction(),
+          partitioned: isProduction(),
+        },
+      },
+      rateLimit: {
+        enabled: true,
+        window: 60,
+        max: 100,
+      },
       databaseHooks: {
         session: {
           create: {
@@ -137,10 +191,7 @@ class BetterAuthServer {
               const userId = (sessionData as { userId?: string })?.userId;
               if (!userId) return;
               const [row] = await db()
-                .select({
-                  archivedAt: schema.user.archivedAt,
-                  tenantId: schema.user.tenantId,
-                })
+                .select({ archivedAt: schema.user.archivedAt })
                 .from(schema.user)
                 .where(eq(schema.user.id, userId))
                 .limit(1);
@@ -151,12 +202,7 @@ class BetterAuthServer {
                     "This account has been suspended. Reach out to support if you think this is an error.",
                 });
               }
-              return {
-                data: {
-                  ...sessionData,
-                  tenantId: row?.tenantId ?? "default",
-                },
-              };
+              return { data: { ...sessionData } };
             },
           },
         },
@@ -164,35 +210,10 @@ class BetterAuthServer {
           create: {
             before: async (userData) => {
               const email = (userData as { email?: string }).email ?? "";
-              const separator = email.indexOf(":");
-              const tenantId =
-                separator > 0 ? email.slice(0, separator) : "default";
-              const publicEmail =
-                separator > 0 ? email.slice(separator + 1) : email;
               return {
                 data: {
                   ...userData,
-                  tenantId,
-                  publicEmail,
-                },
-              };
-            },
-          },
-        },
-        account: {
-          create: {
-            before: async (accountData) => {
-              const userId = (accountData as { userId?: string }).userId;
-              if (!userId) return;
-              const [row] = await db()
-                .select({ tenantId: schema.user.tenantId })
-                .from(schema.user)
-                .where(eq(schema.user.id, userId))
-                .limit(1);
-              return {
-                data: {
-                  ...accountData,
-                  tenantId: row?.tenantId ?? "default",
+                  publicEmail: email,
                 },
               };
             },
@@ -239,33 +260,35 @@ class BetterAuthServer {
           },
         },
       },
-      ...((process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID &&
-        process.env.GOOGLE_CLIENT_SECRET) ||
-      (process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID &&
-        process.env.GITHUB_CLIENT_SECRET)
-        ? {
-            socialProviders: {
-              ...(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID &&
-              process.env.GOOGLE_CLIENT_SECRET
-                ? {
-                    google: {
-                      clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-                      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-                    },
-                  }
-                : {}),
-              ...(process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID &&
-              process.env.GITHUB_CLIENT_SECRET
-                ? {
-                    github: {
-                      clientId: process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID,
-                      clientSecret: process.env.GITHUB_CLIENT_SECRET,
-                    },
-                  }
-                : {}),
-            },
-          }
-        : {}),
+      socialProviders: {
+        ...(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID &&
+        process.env.GOOGLE_CLIENT_SECRET
+          ? {
+              google: {
+                clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+                clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+              },
+            }
+          : {}),
+        ...(process.env.NEXT_PUBLIC_MICROSOFT_CLIENT_ID &&
+        process.env.MICROSOFT_CLIENT_SECRET
+          ? {
+              microsoft: {
+                clientId: process.env.NEXT_PUBLIC_MICROSOFT_CLIENT_ID,
+                clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
+              },
+            }
+          : {}),
+        ...(process.env.NEXT_PUBLIC_APPLE_CLIENT_ID &&
+        process.env.APPLE_CLIENT_SECRET
+          ? {
+              apple: {
+                clientId: process.env.NEXT_PUBLIC_APPLE_CLIENT_ID,
+                clientSecret: process.env.APPLE_CLIENT_SECRET,
+              },
+            }
+          : {}),
+      },
       session: {
         cookieCache: {
           enabled: true,
@@ -274,10 +297,13 @@ class BetterAuthServer {
       },
       plugins: [
         nextCookies(),
+        // Issues session tokens as Authorization bearer tokens (set-auth-token
+        // response header) — the desktop client's only credential transport.
+        bearer(),
         organization(),
         twoFactor(),
         passkey({
-          rpName: "Cold Email Platform",
+          rpName: "OpenWhispr",
           rpID: process.env.PASSKEY_RP_ID,
           origin:
             process.env.BETTER_AUTH_URL || process.env.NEXT_PUBLIC_APP_URL,
@@ -300,15 +326,13 @@ class BetterAuthServer {
         .select({
           archivedAt: schema.user.archivedAt,
           publicEmail: schema.user.publicEmail,
-          tenantId: schema.user.tenantId,
         })
         .from(schema.user)
         .where(eq(schema.user.id, userId))
         .limit(1);
       if (row?.archivedAt) return null;
       if (row && session.user) {
-        session.user.email = row.publicEmail;
-        (session.user as { tenantId?: string }).tenantId = row.tenantId;
+        session.user.email = row.publicEmail ?? session.user.email;
       }
     }
     return mapBetterAuthSession(session);
@@ -322,18 +346,11 @@ class BetterAuthServer {
     return this.authInstance;
   }
 
-  async signInEmail(params: {
-    email: string;
-    password: string;
-    tenantId?: string;
-  }) {
+  async signInEmail(params: { email: string; password: string }) {
     try {
       const ctx = await this.authInstance.api.signInEmail({
         body: {
-          email: buildTenantAuthEmail(
-            params.tenantId ?? "default",
-            params.email,
-          ),
+          email: params.email,
           password: params.password,
         },
       });
@@ -353,33 +370,21 @@ class BetterAuthServer {
     email: string;
     password: string;
     headers?: Headers;
-    tenantId?: string;
   }): Promise<Response> {
-    const tenant = params.tenantId
-      ? { id: params.tenantId }
-      : await resolveTenantFromHost(params.headers?.get("host"));
     return this.authInstance.api.signInEmail({
       body: {
-        email: buildTenantAuthEmail(tenant?.id ?? "default", params.email),
+        email: params.email,
         password: params.password,
       },
       asResponse: true,
     });
   }
 
-  async signUpEmail(params: {
-    email: string;
-    password: string;
-    name: string;
-    tenantId?: string;
-  }) {
+  async signUpEmail(params: { email: string; password: string; name: string }) {
     try {
       const ctx = await this.authInstance.api.signUpEmail({
         body: {
-          email: buildTenantAuthEmail(
-            params.tenantId ?? "default",
-            params.email,
-          ),
+          email: params.email,
           password: params.password,
           name: params.name,
         },
@@ -401,14 +406,10 @@ class BetterAuthServer {
     password: string;
     name: string;
     headers?: Headers;
-    tenantId?: string;
   }): Promise<Response> {
-    const tenant = params.tenantId
-      ? { id: params.tenantId }
-      : await resolveTenantFromHost(params.headers?.get("host"));
     return this.authInstance.api.signUpEmail({
       body: {
-        email: buildTenantAuthEmail(tenant?.id ?? "default", params.email),
+        email: params.email,
         password: params.password,
         name: params.name,
       },
@@ -489,11 +490,7 @@ export const baseServer = {
     const server = getBetterAuthServer();
     return server.getApiHandler();
   },
-  signInEmail: async (params: {
-    email: string;
-    password: string;
-    tenantId?: string;
-  }) => {
+  signInEmail: async (params: { email: string; password: string }) => {
     const server = getBetterAuthServer();
     return server.signInEmail(params);
   },
@@ -501,7 +498,6 @@ export const baseServer = {
     email: string;
     password: string;
     headers?: Headers;
-    tenantId?: string;
   }) => {
     const server = getBetterAuthServer();
     return server.signInEmailResponse(params);
@@ -510,7 +506,6 @@ export const baseServer = {
     email: string;
     password: string;
     name: string;
-    tenantId?: string;
   }) => {
     const server = getBetterAuthServer();
     return server.signUpEmail(params);
@@ -520,7 +515,6 @@ export const baseServer = {
     password: string;
     name: string;
     headers?: Headers;
-    tenantId?: string;
   }) => {
     const server = getBetterAuthServer();
     return server.signUpEmailResponse(params);

@@ -1,6 +1,5 @@
 "use client";
 
-import type { Tenant } from "@repo/database/schema";
 import { Button } from "@repo/ui/components/button";
 import {
   Dialog,
@@ -25,13 +24,12 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export function CreateUserDialog({ tenants }: { tenants: Tenant[] }) {
+export function CreateUserDialog() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("user");
-  const [tenantId, setTenantId] = useState("default");
   const [submitting, setSubmitting] = useState(false);
 
   async function submit() {
@@ -48,7 +46,6 @@ export function CreateUserDialog({ tenants }: { tenants: Tenant[] }) {
           name: name.trim(),
           email: email.trim(),
           role,
-          tenantId,
         }),
       });
       const data = await res.json();
@@ -63,7 +60,6 @@ export function CreateUserDialog({ tenants }: { tenants: Tenant[] }) {
       setName("");
       setEmail("");
       setRole("user");
-      setTenantId("default");
       router.refresh();
     } finally {
       setSubmitting(false);
@@ -115,21 +111,6 @@ export function CreateUserDialog({ tenants }: { tenants: Tenant[] }) {
               <SelectContent>
                 <SelectItem value="user">user</SelectItem>
                 <SelectItem value="site-admin">site-admin</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="create-user-tenant">Tenant</Label>
-            <Select value={tenantId} onValueChange={setTenantId}>
-              <SelectTrigger id="create-user-tenant">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {tenants.map((tenant) => (
-                  <SelectItem key={tenant.id} value={tenant.id}>
-                    {tenant.name} ({tenant.id})
-                  </SelectItem>
-                ))}
               </SelectContent>
             </Select>
           </div>

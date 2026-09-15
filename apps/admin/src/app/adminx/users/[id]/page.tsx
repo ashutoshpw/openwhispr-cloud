@@ -93,12 +93,6 @@ export default async function UserDetailPage({
             </div>
             <div>
               <dt className="text-sm font-medium text-muted-foreground">
-                Tenant
-              </dt>
-              <dd>{user.tenantId}</dd>
-            </div>
-            <div>
-              <dt className="text-sm font-medium text-muted-foreground">
                 Role
               </dt>
               <dd>

@@ -52,11 +52,10 @@ export async function POST(request: Request) {
     const name = (body?.name ?? "").toString().trim();
     const slug = (body?.slug ?? "").toString().trim().toLowerCase();
     const ownerUserId = (body?.ownerUserId ?? "").toString();
-    const tenantId = (body?.tenantId ?? "default").toString().trim();
 
-    if (!name || !slug || !ownerUserId || !tenantId) {
+    if (!name || !slug || !ownerUserId) {
       return NextResponse.json(
-        { error: "name, slug, ownerUserId, and tenantId are required" },
+        { error: "name, slug, and ownerUserId are required" },
         { status: 400 },
       );
     }
@@ -72,7 +71,7 @@ export async function POST(request: Request) {
     const [owner] = await db()
       .select({ id: user.id })
       .from(user)
-      .where(and(eq(user.id, ownerUserId), eq(user.tenantId, tenantId)))
+      .where(eq(user.id, ownerUserId))
       .limit(1);
     if (!owner) {
       return NextResponse.json(
@@ -84,9 +83,7 @@ export async function POST(request: Request) {
     const existing = await db()
       .select({ id: organization.id })
       .from(organization)
-      .where(
-        and(eq(organization.tenantId, tenantId), eq(organization.slug, slug)),
-      )
+      .where(eq(organization.slug, slug))
       .limit(1);
     if (existing[0]) {
       return NextResponse.json(
@@ -98,21 +95,18 @@ export async function POST(request: Request) {
     const orgId = nanoid();
     await db().insert(organization).values({
       id: orgId,
-      tenantId,
       name,
       slug,
       status: ORG_STATUS.ACTIVE,
     });
     await db().insert(member).values({
       id: nanoid(),
-      tenantId,
       organizationId: orgId,
       userId: ownerUserId,
       role: "owner",
     });
     await db().insert(project).values({
       id: nanoid(),
-      tenantId,
       name: "Default Project",
       slug: "default",
       organizationId: orgId,

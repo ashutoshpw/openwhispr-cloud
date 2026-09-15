@@ -31,7 +31,6 @@ import type {
 function normalizeUser(user: {
   id: string;
   email: string;
-  tenantId?: string | null;
   name?: string | null;
   image?: string | null;
   role?: string | null;
@@ -39,7 +38,6 @@ function normalizeUser(user: {
   const separator = user.email.indexOf(":");
   return {
     id: user.id,
-    tenantId: user.tenantId ?? null,
     email: separator > 0 ? user.email.slice(separator + 1) : user.email,
     name: user.name ?? null,
     image: user.image ?? null,

@@ -1,3 +1,4 @@
+/// <reference path="../aws-lite-s3.d.ts" />
 import type {
   FileMetadata,
   ListOptions,

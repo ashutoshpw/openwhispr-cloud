@@ -1,6 +1,6 @@
 import { getSiteAdminStatus } from "@/lib/auth-utils";
 import { auth } from "@repo/auth/server";
-import { and, buildTenantAuthEmail, db, eq } from "@repo/database";
+import { and, db, eq } from "@repo/database";
 import { member, organization, user } from "@repo/database/schema";
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
@@ -70,17 +70,8 @@ export async function PATCH(
     const updateData: Partial<typeof user.$inferInsert> = {};
     if (name !== undefined) updateData.name = name;
     if (email !== undefined) {
-      const [existing] = await db()
-        .select({ tenantId: user.tenantId })
-        .from(user)
-        .where(eq(user.id, id))
-        .limit(1);
-      if (!existing) {
-        return NextResponse.json({ error: "User not found" }, { status: 404 });
-      }
-      const publicEmail = email.toString().trim().toLowerCase();
-      updateData.publicEmail = publicEmail;
-      updateData.email = buildTenantAuthEmail(existing.tenantId, publicEmail);
+      updateData.email = email.toString().trim().toLowerCase();
+      updateData.publicEmail = updateData.email;
     }
     if (role !== undefined) updateData.role = role;
     if (emailVerified !== undefined) updateData.emailVerified = emailVerified;

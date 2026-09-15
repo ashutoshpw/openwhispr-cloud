@@ -1,6 +1,6 @@
 import { UserTable } from "@/components/admin/UserTable";
 import { db } from "@repo/database";
-import { tenant, user } from "@repo/database/schema";
+import { user } from "@repo/database/schema";
 
 async function getUsers() {
   try {
@@ -12,17 +12,8 @@ async function getUsers() {
   }
 }
 
-async function getTenants() {
-  try {
-    return await db().select().from(tenant).orderBy(tenant.createdAt);
-  } catch (error) {
-    console.error("Error fetching tenants:", error);
-    return [];
-  }
-}
-
 export default async function UsersPage() {
-  const [users, tenants] = await Promise.all([getUsers(), getTenants()]);
+  const users = await getUsers();
 
   return (
     <div className="flex flex-col gap-4">
@@ -32,7 +23,7 @@ export default async function UsersPage() {
           View and manage all registered users
         </p>
       </div>
-      <UserTable users={users} tenants={tenants} />
+      <UserTable users={users} />
     </div>
   );
 }

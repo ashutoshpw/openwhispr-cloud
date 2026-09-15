@@ -53,16 +53,10 @@ async function main() {
   }
 
   // Dynamic imports to avoid loading db before env is configured
-  const { buildTenantAuthEmail, db, ensureDefaultTenant, eq } = await import(
-    "@repo/database"
-  );
+  const { db, eq } = await import("@repo/database");
   const { user, account } = await import("@repo/database/schema");
-  const defaultTenant = await ensureDefaultTenant();
   const normalizedAdminEmail = adminEmail.toLowerCase().trim();
-  const authEmail = buildTenantAuthEmail(
-    defaultTenant.id,
-    normalizedAdminEmail,
-  );
+  const authEmail = normalizedAdminEmail;
 
   // Check if user already exists
   const existingUser = await db()
@@ -134,7 +128,6 @@ async function main() {
 
   await db().insert(user).values({
     id: userId,
-    tenantId: defaultTenant.id,
     name: adminName,
     publicEmail: normalizedAdminEmail,
     email: authEmail,
@@ -147,7 +140,6 @@ async function main() {
   // Create account record for email/password auth
   await db().insert(account).values({
     id: nanoid(),
-    tenantId: defaultTenant.id,
     userId: userId,
     accountId: userId,
     providerId: "credential",
@@ -161,7 +153,6 @@ async function main() {
   );
   console.log("");
   console.log(`${colors.bold}  Details:${colors.reset}`);
-  console.log(`    Tenant: ${colors.cyan}${defaultTenant.name}${colors.reset}`);
   console.log(
     `    Email:  ${colors.cyan}${normalizedAdminEmail}${colors.reset}`,
   );

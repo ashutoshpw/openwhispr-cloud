@@ -27,7 +27,6 @@ export async function createWorkspaceCheckout(params: {
   priceId: string;
   workspaceName: string;
   workspaceSlug: string;
-  tenantId?: string;
   userId: string;
   userEmail: string;
   withTrial?: boolean;
@@ -39,26 +38,20 @@ export async function createWorkspaceCheckout(params: {
 
   // Create pending organization
   const orgId = nanoid();
-  await db()
-    .insert(organization)
-    .values({
-      id: orgId,
-      tenantId: params.tenantId ?? "default",
-      name: params.workspaceName,
-      slug: params.workspaceSlug,
-      status: ORG_STATUS.PENDING,
-    });
+  await db().insert(organization).values({
+    id: orgId,
+    name: params.workspaceName,
+    slug: params.workspaceSlug,
+    status: ORG_STATUS.PENDING,
+  });
 
   // Create membership for the user as owner
-  await db()
-    .insert(member)
-    .values({
-      id: nanoid(),
-      tenantId: params.tenantId ?? "default",
-      organizationId: orgId,
-      userId: params.userId,
-      role: "owner",
-    });
+  await db().insert(member).values({
+    id: nanoid(),
+    organizationId: orgId,
+    userId: params.userId,
+    role: "owner",
+  });
 
   // Get or create Stripe customer
   const customerId = await getOrCreateStripeCustomer({
@@ -73,7 +66,6 @@ export async function createWorkspaceCheckout(params: {
     workspaceName: params.workspaceName,
     workspaceSlug: params.workspaceSlug,
     userId: params.userId,
-    tenantId: params.tenantId ?? "default",
   };
 
   // Create checkout session
@@ -236,16 +228,13 @@ export async function activatePendingOrganization(
     .where(eq(project.organizationId, orgId));
 
   if (existingProjects.length === 0) {
-    await db()
-      .insert(project)
-      .values({
-        id: nanoid(),
-        tenantId: org[0]?.tenantId ?? "default",
-        name: "Default Project",
-        slug: "default",
-        organizationId: orgId,
-        isDefault: true,
-      });
+    await db().insert(project).values({
+      id: nanoid(),
+      name: "Default Project",
+      slug: "default",
+      organizationId: orgId,
+      isDefault: true,
+    });
   }
 }
 

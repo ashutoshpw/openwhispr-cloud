@@ -1,6 +1,6 @@
 import { OrganizationTable } from "@/components/admin/OrganizationTable";
 import { db } from "@repo/database";
-import { organization, tenant } from "@repo/database/schema";
+import { organization } from "@repo/database/schema";
 
 async function getOrganizations() {
   try {
@@ -15,20 +15,8 @@ async function getOrganizations() {
   }
 }
 
-async function getTenants() {
-  try {
-    return await db().select().from(tenant).orderBy(tenant.createdAt);
-  } catch (error) {
-    console.error("Error fetching tenants:", error);
-    return [];
-  }
-}
-
 export default async function OrganizationsPage() {
-  const [organizations, tenants] = await Promise.all([
-    getOrganizations(),
-    getTenants(),
-  ]);
+  const organizations = await getOrganizations();
 
   return (
     <div className="flex flex-col gap-4">
@@ -40,7 +28,7 @@ export default async function OrganizationsPage() {
           View and manage all organizations
         </p>
       </div>
-      <OrganizationTable organizations={organizations} tenants={tenants} />
+      <OrganizationTable organizations={organizations} />
     </div>
   );
 }

@@ -10,26 +10,14 @@ import {
   uniqueIndex,
   varchar,
 } from "drizzle-orm/pg-core";
-import { tenant } from "./schema-tenant";
 export { planTier } from "./schema-plan-tier";
 export type { PlanTier, NewPlanTier } from "./schema-plan-tier";
-export { tenant, tenantDomain } from "./schema-tenant";
-export type {
-  Tenant,
-  NewTenant,
-  TenantDomain,
-  NewTenantDomain,
-} from "./schema-tenant";
 
 // BetterAuth tables
 export const user = pgTable(
   "user",
   {
     id: text("id").primaryKey(),
-    tenantId: text("tenant_id")
-      .notNull()
-      .default("default")
-      .references(() => tenant.id, { onDelete: "restrict" }),
     name: text("name").notNull(),
     publicEmail: text("public_email").notNull(),
     email: text("email").notNull().unique(),
@@ -45,24 +33,11 @@ export const user = pgTable(
       .$onUpdate(() => new Date())
       .notNull(),
   },
-  (table) => [
-    uniqueIndex("user_tenant_public_email_unique").on(
-      table.tenantId,
-      table.publicEmail,
-    ),
-    uniqueIndex("user_tenant_username_unique").on(
-      table.tenantId,
-      table.username,
-    ),
-  ],
+  (table) => [uniqueIndex("user_username_unique").on(table.username)],
 );
 
 export const session = pgTable("session", {
   id: text("id").primaryKey(),
-  tenantId: text("tenant_id")
-    .notNull()
-    .default("default")
-    .references(() => tenant.id, { onDelete: "restrict" }),
   expiresAt: timestamp("expires_at").notNull(),
   token: text("token").notNull().unique(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -78,10 +53,6 @@ export const session = pgTable("session", {
 
 export const account = pgTable("account", {
   id: text("id").primaryKey(),
-  tenantId: text("tenant_id")
-    .notNull()
-    .default("default")
-    .references(() => tenant.id, { onDelete: "restrict" }),
   accountId: text("account_id").notNull(),
   providerId: text("provider_id").notNull(),
   userId: text("user_id")
@@ -102,10 +73,6 @@ export const account = pgTable("account", {
 
 export const verification = pgTable("verification", {
   id: text("id").primaryKey(),
-  tenantId: text("tenant_id")
-    .notNull()
-    .default("default")
-    .references(() => tenant.id, { onDelete: "cascade" }),
   identifier: text("identifier").notNull(),
   value: text("value").notNull(),
   expiresAt: timestamp("expires_at").notNull(),
@@ -137,10 +104,6 @@ export const organization = pgTable(
   "organization",
   {
     id: text("id").primaryKey(),
-    tenantId: text("tenant_id")
-      .notNull()
-      .default("default")
-      .references(() => tenant.id, { onDelete: "restrict" }),
     name: text("name").notNull(),
     slug: text("slug").notNull(),
     logo: text("logo"),
@@ -162,20 +125,11 @@ export const organization = pgTable(
       .$onUpdate(() => new Date())
       .notNull(),
   },
-  (table) => [
-    uniqueIndex("organization_tenant_slug_unique").on(
-      table.tenantId,
-      table.slug,
-    ),
-  ],
+  (table) => [uniqueIndex("organization_slug_unique").on(table.slug)],
 );
 
 export const member = pgTable("member", {
   id: text("id").primaryKey(),
-  tenantId: text("tenant_id")
-    .notNull()
-    .default("default")
-    .references(() => tenant.id, { onDelete: "restrict" }),
   organizationId: text("organization_id")
     .notNull()
     .references(() => organization.id, { onDelete: "cascade" }),
@@ -192,10 +146,6 @@ export const member = pgTable("member", {
 
 export const invitation = pgTable("invitation", {
   id: text("id").primaryKey(),
-  tenantId: text("tenant_id")
-    .notNull()
-    .default("default")
-    .references(() => tenant.id, { onDelete: "cascade" }),
   organizationId: text("organization_id")
     .notNull()
     .references(() => organization.id, { onDelete: "cascade" }),
@@ -214,10 +164,6 @@ export const project = pgTable(
   "project",
   {
     id: text("id").primaryKey(),
-    tenantId: text("tenant_id")
-      .notNull()
-      .default("default")
-      .references(() => tenant.id, { onDelete: "restrict" }),
     name: text("name").notNull(),
     slug: text("slug").notNull(),
     description: text("description"),
@@ -247,10 +193,10 @@ export type Organization = typeof organization.$inferSelect;
 export type NewOrganization = typeof organization.$inferInsert;
 export type Member = typeof member.$inferSelect;
 export type NewMember = typeof member.$inferInsert;
-export type Invitation = typeof invitation.$inferSelect;
-export type NewInvitation = typeof invitation.$inferInsert;
 export type Project = typeof project.$inferSelect;
 export type NewProject = typeof project.$inferInsert;
+export type Invitation = typeof invitation.$inferSelect;
+export type NewInvitation = typeof invitation.$inferInsert;
 
 // Billing: Pricing tier features (admin-managed feature sets per Stripe product)
 export const pricingTierFeatures = pgTable(
@@ -582,8 +528,6 @@ export {
   oauthApplication,
   oauthAccessToken,
   oauthConsent,
-  integration,
-  integrationInstallation,
   twoFactor,
   passkey,
 } from "./schema-ext";
@@ -591,10 +535,6 @@ export type {
   OAuthApplication,
   OAuthAccessToken,
   OAuthConsent,
-  Integration,
-  NewIntegration,
-  IntegrationInstallation,
-  NewIntegrationInstallation,
   TwoFactor,
   Passkey,
 } from "./schema-ext";

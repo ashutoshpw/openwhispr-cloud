@@ -260,66 +260,6 @@ async function main() {
     section: "Authentication Provider",
   });
 
-  printHeader("DEFAULT TENANT");
-  const existingTenantId = existingEnv.get("DEFAULT_TENANT_ID");
-  const defaultTenantId = await input({
-    message: "Default tenant ID:",
-    default: existingTenantId || "default",
-    validate: (v) =>
-      /^[a-z0-9_-]+$/.test(v.trim())
-        ? true
-        : "Use lowercase letters, numbers, underscores, or dashes",
-  });
-  const existingTenantName = existingEnv.get("DEFAULT_TENANT_NAME");
-  const defaultTenantName = await input({
-    message: "Default tenant name:",
-    default: existingTenantName || "Default Platform",
-    validate: (v) => (v.trim() ? true : "Tenant name is required"),
-  });
-  const existingPlatformName = existingEnv.get("DEFAULT_TENANT_PLATFORM_NAME");
-  const defaultPlatformName = await input({
-    message: "Default platform display name:",
-    default: existingPlatformName || defaultTenantName,
-    validate: (v) => (v.trim() ? true : "Platform name is required"),
-  });
-  const existingTenantSlug = existingEnv.get("DEFAULT_TENANT_SLUG");
-  const defaultTenantSlug = await input({
-    message: "Default tenant slug:",
-    default: existingTenantSlug || defaultTenantId,
-    validate: (v) =>
-      /^[a-z0-9-]+$/.test(v.trim())
-        ? true
-        : "Use lowercase letters, numbers, or dashes",
-  });
-  const existingTenantDomain = existingEnv.get("DEFAULT_TENANT_DOMAIN");
-  const defaultTenantDomain = await input({
-    message: "Default tenant primary domain:",
-    default: existingTenantDomain || normalizeDomain(appUrl),
-    validate: (v) => (v.trim() ? true : "Tenant domain is required"),
-  });
-  const existingTenantSupportEmail = existingEnv.get(
-    "DEFAULT_TENANT_SUPPORT_EMAIL",
-  );
-  const defaultTenantSupportEmail = await input({
-    message: "Default tenant support email (optional):",
-    default: existingTenantSupportEmail || "",
-  });
-
-  for (const [key, value] of [
-    ["DEFAULT_TENANT_ID", defaultTenantId],
-    ["DEFAULT_TENANT_SLUG", defaultTenantSlug],
-    ["DEFAULT_TENANT_NAME", defaultTenantName],
-    ["DEFAULT_TENANT_PLATFORM_NAME", defaultPlatformName],
-    ["DEFAULT_TENANT_DOMAIN", normalizeDomain(defaultTenantDomain)],
-    ["DEFAULT_TENANT_SUPPORT_EMAIL", defaultTenantSupportEmail],
-  ] satisfies Array<[string, string]>) {
-    const existingValue = existingEnv.get(key);
-    if (isUpdating && existingValue && existingValue !== value) {
-      changes.push({ key, oldValue: existingValue, newValue: value });
-    }
-    newVariables.push({ key, value, section: "Default Tenant" });
-  }
-
   await configureProviderSpecificVariables({
     authProvider: lockedProvider,
     appUrl,

@@ -1,5 +1,4 @@
-import { db, resolveTenantFromHost } from "@repo/database";
-import { and, eq } from "@repo/database";
+import { db, eq } from "@repo/database";
 import { organization } from "@repo/database/schema";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
@@ -28,21 +27,11 @@ export async function GET(request: Request) {
         { status: 400 },
       );
     }
-    const tenant = await resolveTenantFromHost((await headers()).get("host"));
-    if (!tenant) {
-      return NextResponse.json({ error: "Unknown tenant" }, { status: 404 });
-    }
-
     // Check if slug exists
     const existing = await db()
       .select({ id: organization.id })
       .from(organization)
-      .where(
-        and(
-          eq(organization.tenantId, tenant.id),
-          eq(organization.slug, normalizedSlug),
-        ),
-      )
+      .where(eq(organization.slug, normalizedSlug))
       .limit(1);
 
     if (existing.length === 0) {
@@ -59,12 +48,7 @@ export async function GET(request: Request) {
       const checkSuggestion = await db()
         .select({ id: organization.id })
         .from(organization)
-        .where(
-          and(
-            eq(organization.tenantId, tenant.id),
-            eq(organization.slug, suggestion),
-          ),
-        )
+        .where(eq(organization.slug, suggestion))
         .limit(1);
 
       if (checkSuggestion.length === 0) {

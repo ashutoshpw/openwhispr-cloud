@@ -1,6 +1,6 @@
 "use client";
 
-import type { Tenant, User } from "@repo/database/schema";
+import type { User } from "@repo/database/schema";
 import { Button } from "@repo/ui/components/button";
 import {
   Dialog,
@@ -25,13 +25,12 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-export function CreateOrganizationDialog({ tenants }: { tenants: Tenant[] }) {
+export function CreateOrganizationDialog() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [ownerUserId, setOwnerUserId] = useState("");
-  const [tenantId, setTenantId] = useState("default");
   const [users, setUsers] = useState<User[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -42,12 +41,11 @@ export function CreateOrganizationDialog({ tenants }: { tenants: Tenant[] }) {
     fetch("/api/admin/users")
       .then((r) => r.json())
       .then((data) => {
-        if (Array.isArray(data))
-          setUsers(data.filter((user) => user.tenantId === tenantId));
+        if (Array.isArray(data)) setUsers(data);
       })
       .catch(() => {})
       .finally(() => setLoadingUsers(false));
-  }, [open, tenantId]);
+  }, [open]);
 
   function onNameChange(v: string) {
     setName(v);
@@ -73,7 +71,6 @@ export function CreateOrganizationDialog({ tenants }: { tenants: Tenant[] }) {
           name: name.trim(),
           slug: slug.trim(),
           ownerUserId,
-          tenantId,
         }),
       });
       const data = await res.json();
@@ -86,7 +83,6 @@ export function CreateOrganizationDialog({ tenants }: { tenants: Tenant[] }) {
       setName("");
       setSlug("");
       setOwnerUserId("");
-      setTenantId("default");
       router.refresh();
     } finally {
       setSubmitting(false);
@@ -110,21 +106,6 @@ export function CreateOrganizationDialog({ tenants }: { tenants: Tenant[] }) {
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="create-org-tenant">Tenant</Label>
-            <Select value={tenantId} onValueChange={setTenantId}>
-              <SelectTrigger id="create-org-tenant">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {tenants.map((tenant) => (
-                  <SelectItem key={tenant.id} value={tenant.id}>
-                    {tenant.name} ({tenant.id})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
           <div className="space-y-2">
             <Label htmlFor="create-org-name">Name</Label>
             <Input
