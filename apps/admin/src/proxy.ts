@@ -9,10 +9,12 @@ import { auth } from "@repo/auth/server";
 import { headers } from "next/headers";
 import { type NextRequest, NextResponse } from "next/server";
 
-function authHost(path: string): string {
+function authHost(request: NextRequest, path: string): string {
   const base =
-    process.env.NEXT_PUBLIC_AUTH_URL ?? "https://auth.openwhispr.com";
-  return `${base}${path}`;
+    process.env.NEXT_PUBLIC_AUTH_URL ??
+    process.env.BETTER_AUTH_URL ??
+    new URL("/auth/sign-in", request.url).origin;
+  return `${base.replace(/\/$/, "")}${path}`;
 }
 
 export async function proxy(request: NextRequest) {
@@ -35,7 +37,9 @@ export async function proxy(request: NextRequest) {
   }
 
   if (!session) {
-    return NextResponse.redirect(authHost("/auth/sign-in"));
+    // No configured auth host means this deployment IS isolated — send the
+    // browser to this origin's own sign-in route (preview-friendly).
+    return NextResponse.redirect(authHost(request, "/auth/sign-in"));
   }
 
   const isAdmin = await getSiteAdminStatus(session.user.id);
@@ -47,5 +51,8 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!.*\\..*|_next|api/auth).*)", "/"],
+  // handoff page + handoff API are the token entry points and validate their
+  // own one-time token without a session (api/auth stays excluded for the
+  // Better Auth callback surface).
+  matcher: ["/((?!.*\\..*|_next|api/auth|api/admin/handoff|handoff).*)", "/"],
 };
