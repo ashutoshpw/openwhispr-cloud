@@ -1,35 +1,83 @@
 ---
 title: Deployment and runtime
-description: Vercel, Docker, runtime URLs, proxy behavior, and external docs hosting.
+description: Six Vercel projects, per-project environment variables, preview topology, and verification.
 ---
 
 # Deployment and runtime
 
-The Next.js app is built from `apps/next-app` through the root Turborepo
-commands. `apps/next-app/next.config.mjs` configures the Next.js build and
-external package behavior; `apps/next-app/src/proxy.ts` is the Next.js 16
-request interception entry point.
+OpenWhispr Cloud deploys as **six independent Vercel projects** from one
+Turborepo. Each project's **Root Directory** points at its app folder
+(`apps/www`, `apps/api`, `apps/auth`, `apps/notes`, `apps/admin`,
+`apps/mcp`); Bun installs the workspace from the repo root lockfile and the
+GitHub Actions matrix (`.github/workflows/deploy-vercel.yml` +
+`deploy-vercel-preview.yml`) runs `W3Dev/vercel-deploy@main` with
+`--archive=tgz` for production (`push` to `main`) and PR previews.
 
-## Vercel
+## Projects
 
-`vercel.json` defines install/build/output behavior. Set the required runtime
-environment variables in the project and configure Inngest separately for
-durable functions. Preview and production URLs feed the shared `site-config`
-base-URL helper, which is used by discovery metadata and agent credentials.
+| Project | Root Directory | Production domain | Deploys |
+| ------- | -------------- | ----------------- | ------- |
+| `openwhispr-www` | `apps/www` | `openwhispr.com`, `www.openwhispr.com` | marketing + dashboard |
+| `openwhispr-api` | `apps/api` | `api.openwhispr.com` | data + media/AI + V1 planes |
+| `openwhispr-auth` | `apps/auth` | `auth.openwhispr.com` | Better Auth server + hosted UI |
+| `openwhispr-notes` | `apps/notes` | `notes.openwhispr.com` | public share viewer |
+| `openwhispr-admin` | `apps/admin` | `admin.openwhispr.com` | enterprise console |
+| `openwhispr-mcp` | `apps/mcp` | `mcp.openwhispr.com` | Streamable HTTP MCP |
 
-## Docker
+## Environment variables (per project)
 
-The root `Dockerfile` packages the app. Apply database migrations separately,
-provide runtime variables through the deployment secret store, and expose the
-port expected by the app (`8801` by default in development).
+Shared everywhere: `DATABASE_URL` (Neon), `BETTER_AUTH_SECRET`.
 
-## Documentation sites
+- **www**: `NEXT_PUBLIC_APP_URL` (its own origin, incl. previews),
+  `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_AUTH_URL`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`.
+- **api**: `NEXT_PUBLIC_APP_URL`, `NEXT_PUBLIC_AUTH_URL`,
+  `BETTER_AUTH_URL`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`,
+  `STRIPE_PRICE_PRO_MONTHLY/_ANNUAL`, `STRIPE_PRICE_BUSINESS_MONTHLY/_ANNUAL`,
+  `OPENAI_API_KEY` (+ optional `OPENAI_BASE_URL`, `AI_DEFAULT_MODEL`),
+  `ASSEMBLYAI_API_KEY`, `DEEPGRAM_API_KEY`, `GEMINI_API_KEY`,
+  `WEB_SEARCH_API_KEY`, `UPSTASH_REDIS_REST_URL`/`_TOKEN` (V1 rate limits —
+  limiter fails open without them), `RESEND_API_KEY` (invitation
+  `email_sent`), `INNGEST_EVENT_KEY`/`INNGEST_SIGNING_KEY`,
+  `OBJECT_STORAGE_PROVIDER`, `STT_PROVIDER_DEFAULT`, `STT_STREAMING_ENABLED`.
+- **auth**: `BETTER_AUTH_URL`, `NEXT_PUBLIC_APP_URL`
+  (`https://openwhispr.com`), OAuth IdP secrets (Google/Microsoft/Apple),
+  `ADMIN_URL`, `AUTH_COOKIE_DOMAIN` (`.openwhispr.com` in production),
+  `AUTH_TRUSTED_ORIGINS` (add preview hosts here), `PASSKEY_RP_ID`,
+  `ALLOWED_DESKTOP_CALLBACKS` (comma-separated extra hosts for the desktop
+  handoff — add preview www URLs when testing).
+- **notes**: `DATABASE_URL` only (viewer resolves shares straight from DB).
+- **admin**: `DATABASE_URL`, `NEXT_PUBLIC_AUTH_URL` (sign-in redirect target),
+  `ADMIN_EMAIL_DOMAINS` (site-admin promotion), `INTEGRATION_ENCRYPTION_KEY`.
+- **mcp**: `DATABASE_URL`, `UPSTASH_*` (optional), `NEXT_PUBLIC_APP_URL`.
 
-If Mintlify hosts `docs-public/` and `docs-internal/` separately, confirm the
-internal site's access control before publishing. If `/docs` remains in the
-Next.js app, it must load the public source tree rather than a forked copy.
+Preview vs production: set the same variables twice in Vercel —
+**Production** scope pointing at production hosts, **Preview** scope pointing
+at the other apps' preview URLs (or leave `NEXT_PUBLIC_*` unset on previews;
+apps fall back to same-origin/request-derived hosts where possible).
 
-## Post-deploy checks
+## Preview topology notes
 
-Check `/status`, `/robots.txt`, `/sitemap.xml`, `/auth.md`, OAuth/OIDC metadata,
-JWKS, the MCP server card, and `/mcp` with the intended authentication state.
+- `apps/www`/`apps/admin` proxies derive the sign-in redirect from
+  `NEXT_PUBLIC_AUTH_URL` → `BETTER_AUTH_URL` → same-origin, in that order.
+  On previews **set `NEXT_PUBLIC_AUTH_URL`** to the auth preview URL, or the
+  redirect lands on the app's own origin (which has no sign-in route).
+- The auth server accepts the canonical `openwhispr.com` desktop callback
+  plus anything listed in `ALLOWED_DESKTOP_CALLBACKS`.
+- Better Auth rejects unknown origins: add preview www/admin URLs to
+  `AUTH_TRUSTED_ORIGINS` on the auth project before testing browser flows.
+
+## Verification checklist
+
+1. `GET /api/health` on api (200 + CORS echo), `GET /` on auth (302 →
+   sign-in), `GET /n/x` on notes (404 page), `GET /mcp` on mcp (405/JSON-RPC).
+2. Desktop against preview hosts: set `OPENWHISPR_API_URL` +
+   `VITE_AUTH_URL` in runtime-env; sign-up → token via `set-auth-token`;
+   notes create/list/search; 409 on stale `base_updated_at`; share → open
+   notes `/n/{token}`; invitation email → deep-link accept; admin handoff via
+   one-time token; MCP connect with `owk_live_` key.
+3. V1: `curl -H "Authorization: Bearer owk_live_…"` against
+   `/api/v1/usage`, `/api/v1/notes/list` — check `X-RateLimit-*` headers and
+   429 `Retry-After` after 30 free-tier calls.
+4. Stripe: checkout returns a hosted URL in sandbox keys; webhook receives
+   `customer.subscription.*` events (configure the endpoint in the Stripe
+   dashboard → `{api}/api/webhooks/stripe`).

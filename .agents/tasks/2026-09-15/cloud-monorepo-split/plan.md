@@ -1,6 +1,6 @@
 # OpenWhispr Cloud: monorepo split into six deployable apps
 
-**Status:** Planned (not started)
+**Status:** Implemented through M11; Phase 2 docs debt tracked in §9
 **Date:** 2026-09-15
 **Repository:** `openwhispr-cloud` (Next.js starter monorepo, baseline `main`)
 **Contract source:** desktop app repo (`~/PROJECTS/ashutoshpw/openwhispr`) — every
