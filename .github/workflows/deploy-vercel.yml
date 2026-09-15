@@ -28,32 +28,26 @@ jobs:
       matrix:
         include:
           - app: www
-            working_directory: apps/www
             project_id: prj_p1DeT78RzflBid8YvCHjI5eIJlJc
             project_name: openwhispr-www
             alias_prefix: openwhispr-www
           - app: api
-            working_directory: apps/api
             project_id: prj_Fkke6EqdAmQ5FkMVqdCVN9jiOUvC
             project_name: openwhispr-api
             alias_prefix: openwhispr-api
           - app: auth
-            working_directory: apps/auth
             project_id: prj_HhI4HOv3ZR9DGKR65dzKHGvV2vrZ
             project_name: openwhispr-auth
             alias_prefix: openwhispr-auth
           - app: notes
-            working_directory: apps/notes
             project_id: prj_O6paA2AkfjUpmkFjsx6CdQMWTmLy
             project_name: openwhispr-notes
             alias_prefix: openwhispr-notes
           - app: admin
-            working_directory: apps/admin
             project_id: prj_JsmYl8TcnfVUlSMC2uDZGkWczOGd
             project_name: openwhispr-admin
             alias_prefix: openwhispr-admin
           - app: mcp
-            working_directory: apps/mcp
             project_id: prj_BURLxASe6bsyxBFEjnn7IXaUsAl5
             project_name: openwhispr-mcp
             alias_prefix: openwhispr-mcp
@@ -75,7 +69,6 @@ jobs:
           vercel_project_name: ${{ matrix.project_name }}
           package_manager: 'bun'
           node_version: '22'
-          working_directory: ${{ matrix.working_directory }}
           deploy_args: '--archive=tgz'
           environment: ${{ (github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')) && 'production' || 'preview' }}
           alias_prefix: ${{ matrix.alias_prefix }}
