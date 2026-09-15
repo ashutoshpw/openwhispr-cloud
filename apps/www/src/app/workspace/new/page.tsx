@@ -9,7 +9,9 @@ export default async function NewWorkspacePage() {
   const session = await auth.api.getSession({ headers: await headers() });
 
   if (!session?.user?.id) {
-    redirect("/auth/sign-in?redirect=/workspace/new");
+    redirect(
+      `${process.env.NEXT_PUBLIC_AUTH_URL ?? "https://auth.openwhispr.com"}/auth/sign-in?redirect=${encodeURIComponent("/workspace/new")}`,
+    );
   }
 
   const [pricingTiers, canCreateFree] = await Promise.all([

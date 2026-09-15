@@ -74,11 +74,11 @@ function mapBetterAuthSession(
 // Get auth config from environment
 function getAuthConfig() {
   const baseURL =
+    process.env.NEXT_PUBLIC_AUTH_URL ||
     process.env.BETTER_AUTH_URL ||
-    process.env.NEXT_PUBLIC_APP_URL ||
     (typeof window !== "undefined"
       ? window.location.origin
-      : "http://localhost:3000");
+      : "http://localhost:8803");
 
   return { baseURL };
 }

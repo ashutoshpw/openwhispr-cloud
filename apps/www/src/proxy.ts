@@ -18,7 +18,7 @@ function authHost(request: NextRequest, path: string): string {
   const base =
     process.env.NEXT_PUBLIC_AUTH_URL ??
     process.env.BETTER_AUTH_URL ??
-    new URL("/auth/sign-in", request.url).origin;
+    "https://auth.openwhispr.com";
   return `${base.replace(/\/$/, "")}${path}`;
 }
 

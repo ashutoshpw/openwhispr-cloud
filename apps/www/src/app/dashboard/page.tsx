@@ -11,7 +11,9 @@ export default async function DashboardPage() {
   });
 
   if (!session?.user?.id) {
-    redirect("/auth/sign-in");
+    redirect(
+      `${process.env.NEXT_PUBLIC_AUTH_URL ?? "https://auth.openwhispr.com"}/auth/sign-in`,
+    );
   }
 
   // Get user's organizations
@@ -21,7 +23,9 @@ export default async function DashboardPage() {
     .where(eq(member.userId, session.user.id));
 
   if (userMembers.length === 0) {
-    redirect("/auth/onboarding");
+    redirect(
+      `${process.env.NEXT_PUBLIC_AUTH_URL ?? "https://auth.openwhispr.com"}/auth/onboarding`,
+    );
   }
 
   const organizationIds = userMembers.map((m) => m.organizationId);
@@ -33,7 +37,9 @@ export default async function DashboardPage() {
     .limit(1);
 
   if (organizations.length === 0) {
-    redirect("/auth/onboarding");
+    redirect(
+      `${process.env.NEXT_PUBLIC_AUTH_URL ?? "https://auth.openwhispr.com"}/auth/onboarding`,
+    );
   }
 
   // Redirect to the first workspace

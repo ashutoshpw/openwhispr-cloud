@@ -9,9 +9,7 @@ import PricingPage from "@/components/LandingPage/Pricing";
 export default function Home() {
   return (
     <PageWrapper>
-      <div className="mt-4 p-3">
-        <HeroSection />
-      </div>
+      <HeroSection />
       <div className="flex flex-col my-32 p-2 w-full justify-center items-center">
         <MarketingCards />
       </div>

@@ -31,10 +31,12 @@ export default function SignInPage() {
   const [accountError, setAccountError] = useState<string | null>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
+  // Successful sign-ins land back on the www dashboard; relative defaults
+  // would 404 on the auth host.
   const redirectTo =
     searchParams.get("redirect") ||
     searchParams.get("callbackURL") ||
-    "/dashboard";
+    `${process.env.NEXT_PUBLIC_APP_URL ?? "https://openwhispr.com"}/dashboard`;
 
   useEffect(() => {
     if (searchParams.get("error") === "account_archived") {

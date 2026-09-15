@@ -1,4 +1,5 @@
 "use client";
+import { AUTH_SIGN_IN } from "@/lib/auth-host";
 import { useSession } from "@repo/auth/client";
 import {
   NavigationMenu,
@@ -60,7 +61,7 @@ export function NavBar({
   }, []);
 
   return (
-    <div className="z-10 flex justify-between bg-white dark:bg-black p-2 border-b min-w-full">
+    <div className="z-10 flex justify-between p-3 min-w-full absolute top-0 inset-x-0 bg-transparent">
       <div className="min-[825px]:hidden flex justify-between w-full">
         {mounted && (
           <Sheet>
@@ -95,7 +96,7 @@ export function NavBar({
                 </SheetClose>
                 <SheetClose asChild>
                   <Link
-                    href={user ? "/dashboard" : "/auth/sign-in"}
+                    href={user ? "/dashboard" : AUTH_SIGN_IN}
                     legacyBehavior
                     passHref
                     className="cursor-pointer"
@@ -154,7 +155,7 @@ export function NavBar({
       )}
       <div className="max-[825px]:hidden flex items-center gap-3">
         <Link
-          href={user ? "/dashboard" : "/auth/sign-in"}
+          href={user ? "/dashboard" : AUTH_SIGN_IN}
           className="max-[825px]:hidden"
         >
           <Button size="sm" className="cursor-pointer">

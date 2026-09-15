@@ -1,3 +1,4 @@
+import { AUTH_SIGN_IN } from "@/lib/auth-host";
 import { auth } from "@repo/auth/server";
 import { and, db, eq } from "@repo/database";
 import {
@@ -23,8 +24,8 @@ export async function requireSession(redirectTo?: string): Promise<{
   if (!result?.user?.id) {
     redirect(
       redirectTo
-        ? `/auth/sign-in?redirect=${encodeURIComponent(redirectTo)}`
-        : "/auth/sign-in",
+        ? `${AUTH_SIGN_IN}?redirect=${encodeURIComponent(redirectTo)}`
+        : AUTH_SIGN_IN,
     );
   }
   return { user: result.user as SessionUser };

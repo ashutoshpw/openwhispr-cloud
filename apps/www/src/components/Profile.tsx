@@ -1,4 +1,5 @@
 "use client";
+import { authUrl } from "@/lib/auth-host";
 import { signOut, useSession } from "@repo/auth/client";
 import {
   Avatar,
@@ -78,7 +79,7 @@ export function Profile() {
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <Link href="/auth/user-profile">
+          <Link href={authUrl("/auth/user-profile")}>
             <DropdownMenuItem>
               <User className="mr-2 w-4 h-4" />
               <span>Profile</span>

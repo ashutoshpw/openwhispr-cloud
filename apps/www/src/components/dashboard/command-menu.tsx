@@ -1,4 +1,5 @@
 "use client";
+import { authUrl } from "@/lib/auth-host";
 
 import { signOut } from "@repo/auth/client";
 import {
@@ -253,7 +254,9 @@ export function CommandMenu() {
           {/* Account */}
           <CommandGroup heading="Account">
             <CommandItem
-              onSelect={() => handleNavigation("/auth/user-profile")}
+              onSelect={() =>
+                window.open(authUrl("/auth/user-profile"), "_blank")
+              }
             >
               <User />
               <span>Profile</span>
