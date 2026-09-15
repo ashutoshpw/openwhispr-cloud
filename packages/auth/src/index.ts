@@ -7,6 +7,7 @@
 
 export * from "./types";
 export { auth, getSession, getBetterAuthServer } from "./server";
+export { mintBearerToken, latestSessionToken } from "./mint";
 export {
   signIn,
   signUp,

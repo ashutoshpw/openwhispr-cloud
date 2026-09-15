@@ -1,6 +1,5 @@
 // Re-export everything from schema and client
 export * from "./schema";
-export * from "./schema-ext";
 export * from "./schema-analytics";
 export * from "./schema-notes";
 export * from "./schema-workspaces";

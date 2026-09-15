@@ -531,6 +531,11 @@ export {
   twoFactor,
   passkey,
 } from "./schema-ext";
+export * from "./schema-ext";
+export * from "./schema-analytics";
+export * from "./schema-notes";
+export * from "./schema-workspaces";
+export * from "./schema-platform";
 export type {
   OAuthApplication,
   OAuthAccessToken,
