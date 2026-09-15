@@ -21,6 +21,16 @@ function finishUrl(request: Request, desktopCallback: string): string {
   return url.toString();
 }
 
+/** Production canonical host + any host allowlisted for previews. */
+function allowedCallback(cb: string): boolean {
+  if (cb.startsWith("https://openwhispr.com/")) return true;
+  const extra = (process.env.ALLOWED_DESKTOP_CALLBACKS ?? "")
+    .split(",")
+    .map((h) => h.trim())
+    .filter(Boolean);
+  return extra.some((h) => cb.startsWith(`${h}/`) || cb.startsWith(`${h}?`));
+}
+
 export async function GET(
   request: Request,
   ctx: { params: Promise<{ provider: string }> },
@@ -36,9 +46,9 @@ export async function GET(
 
   const requestedCb =
     new URL(request.url).searchParams.get("callbackURL") ?? "";
-  if (!requestedCb.startsWith("https://openwhispr.com/")) {
+  if (!allowedCallback(requestedCb)) {
     return NextResponse.json(
-      { error: { message: "callbackURL must be an openwhispr.com URL" } },
+      { error: { message: "callbackURL is not an allowlisted host" } },
       { status: 400 },
     );
   }

@@ -19,10 +19,20 @@ function deepLinkCallback(desktopCallback: URL, bearerToken: string): string {
   return target.toString();
 }
 
+/** Production canonical host + any host allowlisted for previews. */
+function allowedCallback(cb: string): boolean {
+  if (cb.startsWith("https://openwhispr.com/")) return true;
+  const extra = (process.env.ALLOWED_DESKTOP_CALLBACKS ?? "")
+    .split(",")
+    .map((h) => h.trim())
+    .filter(Boolean);
+  return extra.some((h) => cb.startsWith(`${h}/`) || cb.startsWith(`${h}?`));
+}
+
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const cb = url.searchParams.get("cb") ?? "";
-  if (!cb.startsWith("https://openwhispr.com/")) {
+  if (!allowedCallback(cb)) {
     return NextResponse.json(
       { error: { message: "Missing or invalid cb parameter" } },
       { status: 400 },
